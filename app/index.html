@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<title>Moon OS</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	<link rel="icon" href="https://siwei.dev/favicon.gif">
+
+	<script src="https://runtime.siwei.dev/ui/main/jquery-1.12.4.js"></script>
+	<script src="https://runtime.siwei.dev/ui/console/jqconsole.js"></script>
+
+	<link rel="stylesheet" href="https://runtime.siwei.dev/ui/console/jqconsole.css">
+	<link rel="stylesheet" href="./css/style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+	<div class="wrapper">
+		<!-- <h1>Moon OS</h1> -->
+		<div class="console-view">
+			<div id="console"></div>
+		</div>
+
+		<div class="app-info">
+			<p>This game is written in <a href="https://github.com/yjlo123/runtime-script" target="_blank">Runtime Script</a>.</p>
+			<p>View source code <a href="https://raw.githubusercontent.com/yjlo123/runtime-go/main/examples/moon.runtime" target="_blank">here</a>.</p>
+			<p>Download binary: <a href="dist/Moon_macOS.zip" target="_blank">macOS</a> <a href="dist/Moon_win.zip" target="_blank">Windows</a>.</p>
+		</div>
+		<footer>
+			<small>&copy; Copyright 2020 <a href="https://liusiwei.com">liusiwei.com</a></small>
+		</footer>
+
+
+<!-- 		<div class="chat-view">
+			<div class="chat-header"><div id="chat-btn"></div></div>
+			<div id="chat-console"></div>
+		</div> -->
+	</div>
+	<script src="https://runtime.siwei.dev/src/parser.js"></script>
+	<script src="https://runtime.siwei.dev/src/evaluator.js"></script>
+	<script src="https://runtime.siwei.dev/src/executer.js"></script>
+	<script src="./js/source.js"></script>
+	<script src="./js/chat.js"></script>
+
+<script>
+(function() {
+	let runtime = runtimeExecuter();
+	let evaluator = runtimeEvaluator();
+	let parser = runtimeParser();
+
+	let jqconsole = $('#console').jqconsole();
+	jqconsole.SetPromptLabel('');
+
+	runtime.config(parser, evaluator, null, jqconsole, null, {});
+
+	jqconsole.Prompt(true, function (input) {
+		//jqconsole.Write('[Session Ended]\nPlease refresh this page to start a new session.', 'console-default');
+	});
+
+	runtime.restart();
+	runtime.executeAll(null, moonSrc);
+})();
+
+/*
+(function() {
+	let runtime = runtimeExecuter();
+	let evaluator = runtimeEvaluator();
+	let parser = runtimeParser();
+
+	let chat_console = $('#chat-console').jqconsole();
+	chat_console.SetPromptLabel('');
+
+	runtime.config(parser, evaluator, null, chat_console, null, {});
+
+	(function () {
+		chat_console.Prompt(true, function (input) {
+		});
+	})();
+	runtime.restart();
+	runtime.executeAll(null, chatSrc);
+})();
+
+let chatOpened = true;
+$('#chat-btn').click(function() {
+	if (chatOpened) {
+		$('.chat-view').addClass('chat-collapsed');
+		chatOpened = false;
+	} else {
+		$('.chat-view').removeClass('chat-collapsed');
+		chatOpened = true;
+	}
+});
+*/
+</script>
+
+</body>
+</html>

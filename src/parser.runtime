@@ -1,0 +1,111 @@
+/ ====== parsing runtime program ======
+def parse_line
+ let _line $0
+ let _tokens []
+ #next_token
+ let _token ''
+ #parse_token
+ pol $_line _c
+ jeq $_c '' parse_done
+ jeq $_c ' ' token_done
+ jeq $_c '\'' parse_string
+ jeq $_c '"' parse_string
+ jmp add_token_char
+ 
+ #parse_string
+ let _q $_c
+ let _s '\''
+
+ #parse_string_char
+ pol $_line _c
+ ife $_c $_q
+  psh $_s $_c
+  psh $_tokens $_s
+  jmp next_token
+ els
+  psh $_s $_c
+  jmp parse_string_char
+ fin
+ 
+ #add_token_char
+ add _token $_token $_c
+ jmp parse_token
+
+ #token_done
+ ife $_token ''
+  jmp next_token
+ els
+  psh $_tokens $_token
+ fin
+ jmp next_token
+ #parse_done
+ ife $_token ''
+  ret $_tokens
+ fin
+ psh $_tokens $_token
+ ret $_tokens
+end
+
+def parse
+ let _src $0
+ let _p $1  / map ref
+ let _lbl $2  / map ref
+ let _lc 0
+ for _line $_src
+  / check label
+  pol $_line _c1
+  ife $_c1 '#'
+   put $_lbl $_line $_lc
+  fin
+  add _line $_c1 $_line
+  cal parse_line $_line
+  put $_p $_lc $ret
+  add _lc $_lc 1
+ nxt
+ ret $_p
+end
+
+/ ====== parsing user input ======
+def parse_input
+ let _input $0
+ let _tokens []
+ #next_token
+ let _token ''
+ #parse_token
+ pol $_input _c
+ jeq $_c '' parse_done
+ jeq $_c ' ' token_done
+ jeq $_c '\'' parse_string
+ jeq $_c '"' parse_string
+ jmp add_token_char
+ 
+ #parse_string
+ let _q $_c
+ let _s ''
+ #parse_string_char
+ pol $_input _c
+ ife $_c $_q
+  psh $_tokens $_s
+  jmp next_token
+ els
+  psh $_s $_c
+  jmp parse_string_char
+ fin
+ 
+ #add_token_char
+ add _token $_token $_c
+ jmp parse_token
+ #token_done
+ ife $_token ''
+  jmp next_token
+ els
+  psh $_tokens $_token
+ fin
+ jmp next_token
+ #parse_done
+ ife $_token ''
+  ret $_tokens
+ fin
+ psh $_tokens $_token
+ ret $_tokens
+end

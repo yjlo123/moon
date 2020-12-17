@@ -1,0 +1,51 @@
+
+let root {}
+let path []
+
+def init_files
+ let root {}
+ let path []
+
+ / :/home
+ let _path_home {}
+ let _notes ''
+ psh $_notes '----------- Moon OS Manual ------------\n'
+ psh $_notes 'ls -- list directory contents\n'
+ psh $_notes 'pwd -- return working directory name\n'
+ psh $_notes 'cd <d> -- change directory\n'
+ psh $_notes 'mkdir <d> -- make a directory\n'
+ psh $_notes 'cat <f> -- concatenate and print a file\n'
+ psh $_notes 'rm <f/d> -- remove a directory entry\n'
+ psh $_notes 'echo <s> -- output an argument\n'
+ psh $_notes '  ~ > <f> -- write to a file\n'
+ psh $_notes '  ~ >> <f> -- append to a file\n'
+ psh $_notes 'run <f> -- run an executable file\n'
+ psh $_notes 'exit -- shut down system\n'
+ psh $_notes '---------------------------------------\n'
+ put $_path_home 'note' $_notes
+ let _misc {}
+ put $_misc 'test' 'Hello World!'
+ put $_path_home 'misc' $_misc
+ put $root 'home' $_path_home
+
+ / :/programs
+ let _path_programs {}
+ let _hello_p []
+ psh $_hello_p 'prt \'Hello!\''
+ psh $_hello_p 'slp 500'
+ psh $_hello_p 'prt \'Bye~\''
+ put $_path_programs 'hello' $_hello_p
+ put $root 'programs' $_path_programs
+ 
+ let _count_p []
+ psh $_count_p 'let n 5'
+ psh $_count_p '#loop'
+ psh $_count_p 'prt $n'
+ psh $_count_p 'sub n $n 1'
+ psh $_count_p 'slp 600'
+ psh $_count_p 'jne $n 0 loop'
+ put $_path_programs 'count' $_count_p
+ put $root 'programs' $_path_programs
+
+ psh $path 'home'
+end

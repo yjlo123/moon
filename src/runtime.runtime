@@ -1,0 +1,113 @@
+let env {}
+
+/ ====== evaluating ======
+def expr
+ let _expr $0
+ let _original $0
+ int _i $_expr
+ jeq $_i $nil continue
+ ret $_i
+ #continue
+ pol $_expr _c1
+ ife $_c1 '$'
+  get $env $_expr _val
+  ret $_val
+ fin
+ ife $_c1 '\''
+  pop $_expr _
+  ret $_expr
+ fin
+ ife $_c1 '['
+  ret []
+ fin
+ ret $_original
+end
+
+def eval_param
+ let _line $0
+ let _idx $1
+ get $_line $_idx _val
+ cal expr $_val
+ ret $ret
+end
+
+/ ** main eval **
+def runtime
+ let _src $0
+ let env {}
+ let _p {}
+ let _lbl {}
+ cal parse $_src $_p $_lbl
+ let _pc 0
+ 
+ #eval
+ get $_p $_pc _line
+ jeq $_line $nil eval_done
+ get $_line 0 _cmd
+ 
+ ife $_cmd 'clr'
+  clr
+ fin
+ ife $_cmd 'prt'
+  get $_line 1 _val
+  cal expr $_val
+  let _val $ret
+  prt $_val
+ fin
+ ife $_cmd 'let'
+  get $_line 1 _var
+  cal eval_param $_line 2
+  put $env $_var $ret
+ fin
+ jeq $_cmd 'add' do_arithmetic
+ jeq $_cmd 'sub' do_arithmetic
+ jeq $_cmd 'mul' do_arithmetic
+ jeq $_cmd 'div' do_arithmetic
+ jmp non_arithmetic
+  #do_arithmetic
+  get $_line 1 _var
+  cal eval_param $_line 2
+  let _val1 $ret
+  cal eval_param $_line 3
+  let _val2 $ret
+  ife $_cmd 'add'
+   add _res $_val1 $_val2
+  fin
+  ife $_cmd 'sub'
+   sub _res $_val1 $_val2
+  fin
+  ife $_cmd 'mul'
+   mul _res $_val1 $_val2
+  fin
+  ife $_cmd 'div'
+   div _res $_val1 $_val2
+  fin
+  put $env $_var $_res
+ #non_arithmetic
+ ife $_cmd 'slp'
+  cal eval_param $_line 1
+  slp $ret
+ fin
+ ife $_cmd 'drw'
+  cal eval_param $_line 1
+  let _x $ret
+  cal eval_param $_line 2
+  let _y $ret
+  cal eval_param $_line 3
+  drw $_x $_y $ret
+ fin
+ ife $_cmd 'jne'
+  cal eval_param $_line 1
+  let _v1 $ret
+  cal eval_param $_line 2
+  let _v2 $ret
+  get $_line 3 _lbl_name
+  jeq $_v1 $_v2 jne_false
+  get $_lbl $_lbl_name _pc
+  #jne_false
+ fin
+ add _pc $_pc 1
+ jmp eval
+ 
+ #eval_done
+end

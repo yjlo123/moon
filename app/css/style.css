@@ -1,0 +1,111 @@
+body {
+    font:16px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #ccc;
+}
+
+.wrapper {
+    text-align: center;
+    width: 500px;
+    margin: auto;
+}
+
+.wrapper h1 {
+    color: #444;
+}
+
+.console-view {
+    height: 400px;
+    text-align: left;
+    background-color: #1a1a1a;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.app-info p {
+    margin: 2px;
+    color: #333;
+}
+
+#console {
+    width: 500px;
+    height: 400px;
+}
+
+.app-info {
+    width: 500px;
+    overflow: hidden;
+    margin: auto;
+    font-size: 14px;
+}
+
+
+/* The current prompt text color */
+.jqconsole-prompt {
+    color: #ddd;
+    background: none;
+}
+
+/* The command history */
+.jqconsole-old-prompt {
+	color: #ddd;
+    font-weight: normal;
+    background: none;
+}
+/* The text color when in input mode. */
+.jqconsole-input {
+	color: #ccc;
+    font-weight: normal;
+    background: none;
+	padding-left: 2px;
+}
+/* Previously entered input. */
+.jqconsole-old-input {
+	color: #bbb;
+	font-weight: normal;
+	background: none;
+	padding-left: 2px;
+}
+.console-default {
+    color: #ddd;
+}
+
+
+.chat-view {
+    overflow: hidden;
+    border-radius: 10px 10px 0 0;
+    text-align: left;
+    position: fixed;
+    height: 400px;
+    width: 300px;
+    bottom: 0;
+    right: 50px;
+    background-color: #555;
+    border: 2px solid #444;
+    z-index: 100;
+}
+
+.chat-collapsed {
+    bottom: -370px;
+}
+
+.chat-header {
+    top: 0;
+    height: 30px;
+    width: 300px;
+    background-color: #333;
+    border-bottom: 2px solid #444;
+}
+
+#chat-console {
+    position: relative;
+    height: calc(100% - 30px);
+}
+
+#chat-btn {
+    float: right;
+    margin: 7px;
+    width: 16px;
+    height: 16px;
+    background-color: #888;
+    cursor: pointer;
+}

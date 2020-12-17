@@ -1,0 +1,34 @@
+def get_path
+ let _path '/'
+ for _d $path
+  add _path $_path $_d
+  add _path $_path '/'
+ nxt
+ ret $_path
+end
+
+def get_current_dir
+ let _curr_path $root
+ for _d $path
+  get $_curr_path $_d _curr_path
+ nxt
+ ret $_curr_path
+end
+
+def check_executable
+ let _file $0
+ typ file_type $_file
+ ife $file_type 'list'
+  ret 1
+ fin
+ ret 0
+end
+
+def check_is_dir
+ let _file $0
+ typ file_type $_file
+ ife $file_type 'map'
+  ret 1
+ fin
+ ret 0
+end
