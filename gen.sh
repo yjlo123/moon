@@ -14,4 +14,4 @@ cat ./dist/program.runtime >> ./dist/source.js
 echo '`' >> ./dist/source.js
 sed -i '' 's/\\/\\\\/g' ./dist/source.js
 
-cp ./dist/source.js ./app/js/source.js
+cp ./dist/source.js ./docs/js/source.js
