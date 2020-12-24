@@ -1,5 +1,5 @@
 /* Built on
-Thu Dec 17 23:10:44 +08 2020
+Thu Dec 24 21:20:50 +08 2020
 */
 let moonSrc = `
 
@@ -263,6 +263,18 @@ ife $cmd 'echo'
    fin
   fin
  fin
+ jmp repl_loop
+fin
+/ -- SAVE --
+ife $cmd 'save'
+ sav 'moon.sav' $root
+ prt '[Saved]'
+ jmp repl_loop
+fin
+/ -- LOAD --
+ife $cmd 'load'
+ lod 'moon.sav' root
+ prt '[Loaded]'
  jmp repl_loop
 fin
 ife $cmd $nil

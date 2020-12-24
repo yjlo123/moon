@@ -210,6 +210,18 @@ ife $cmd 'echo'
  fin
  jmp repl_loop
 fin
+/ -- SAVE --
+ife $cmd 'save'
+ sav 'moon.sav' $root
+ prt '[Saved]'
+ jmp repl_loop
+fin
+/ -- LOAD --
+ife $cmd 'load'
+ lod 'moon.sav' root
+ prt '[Loaded]'
+ jmp repl_loop
+fin
 ife $cmd $nil
  jmp repl_loop
 fin
