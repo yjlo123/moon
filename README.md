@@ -20,4 +20,4 @@ A linux-like terminal game written in Runtime Script
 - Restart the VM program
 
 ## Packed Release
-[Latest Release](https://github.com/yjlo123/runtime-go/releases/latest)
+[Latest Release](https://github.com/yjlo123/moon/releases/latest)
