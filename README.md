@@ -9,8 +9,8 @@ A linux-like terminal game written in Runtime Script
 [Download source](https://raw.githubusercontent.com/yjlo123/moon/master/dist/program.runtime)  
 
 ### macOS
-- Right click the VM app, select "Show Package Contents"
-- Go to Contents/MacOS/src
+- Right click the VM app, select `Show Package Contents`
+- Go to `Contents/MacOS/src`
 - Replace the `program.runtime` file with the downloaded source file
 - Restart the VM app
 
