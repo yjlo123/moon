@@ -271,7 +271,7 @@ fin
 ife $cmd 'load'
  lod 'moon.sav' loaded_data
  ife $loaded_data $nil
-  prt 'ERR This is no saved data'
+  prt 'ERR There is no saved data'
  els
   let root $loaded_data
   prt '[Loaded]'
