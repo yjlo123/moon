@@ -1,5 +1,5 @@
 /* Built on
-Thu Dec 24 21:20:50 +08 2020
+Thu Dec 24 21:42:10 +08 2020
 */
 let moonSrc = `
 
@@ -273,8 +273,13 @@ ife $cmd 'save'
 fin
 / -- LOAD --
 ife $cmd 'load'
- lod 'moon.sav' root
- prt '[Loaded]'
+ lod 'moon.sav' loaded_data
+ ife $loaded_data $nil
+  prt 'ERR This is no saved data'
+ els
+  let root $loaded_data
+  prt '[Loaded]'
+ fin
  jmp repl_loop
 fin
 ife $cmd $nil

@@ -218,8 +218,13 @@ ife $cmd 'save'
 fin
 / -- LOAD --
 ife $cmd 'load'
- lod 'moon.sav' root
- prt '[Loaded]'
+ lod 'moon.sav' loaded_data
+ ife $loaded_data $nil
+  prt 'ERR This is no saved data'
+ els
+  let root $loaded_data
+  prt '[Loaded]'
+ fin
  jmp repl_loop
 fin
 ife $cmd $nil
