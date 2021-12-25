@@ -1,4 +1,4 @@
-def get_path
+def get_current_path_str
  let _path '/'
  for _d $path
   add _path $_path $_d
@@ -31,4 +31,10 @@ def check_is_dir
   ret 1
  fin
  ret 0
+end
+
+def print_error
+ let _msg $0
+ add _msg 'ERR ' $_msg
+ prt $_msg
 end

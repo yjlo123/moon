@@ -58,8 +58,15 @@
 	runtime.config(parser, evaluator, null, jqconsole, null, {});
 
 	jqconsole.Prompt(true, function (input) {
-		//jqconsole.Write('[Session Ended]\nPlease refresh this page to start a new session.', 'console-default');
+		jqconsole.Write('[Session Ended]\nPlease refresh this page to start a new session.', 'console-default');
 	});
+
+	jqconsole.custom_control_key_handler = function(e) {
+		if (e.which === 9) {
+			// tab key
+			return false;
+		}
+	};
 
 	runtime.restart();
 	runtime.executeAll(null, moonSrc);

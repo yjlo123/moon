@@ -16,7 +16,7 @@ pol $tokens cmd
 jeq $cmd 'exit' exit
 / -- PWD --
 ife $cmd 'pwd'
- cal get_path
+ cal get_current_path_str
  prt $ret
  jmp repl_loop
 fin
@@ -45,7 +45,7 @@ fin
 ife $cmd 'cd'
  pol $tokens d
  ife $d $nil
-  prt 'ERR invalid directory name'
+  cal print_error 'invalid directory name'
   jmp repl_loop
  fin
  ife $d '..'
@@ -59,7 +59,7 @@ ife $cmd 'cd'
   cal get_current_dir
   get $ret $d dr
   ife $dr $nil
-   prt 'ERR Directory not found'
+   cal print_error 'Directory not found'
    jmp repl_loop
   fin
   typ dr_typ $dr
@@ -67,7 +67,7 @@ ife $cmd 'cd'
    psh $path $d
    jmp repl_loop
   els
-   prt 'ERR Not a directory'
+   cal print_error 'Not a directory'
   fin
  fin
  jmp repl_loop
@@ -76,7 +76,7 @@ fin
 ife $cmd 'mkdir'
  pol $tokens d
  ife $d $nil
-  prt 'ERR invalid directory name'
+  cal print_error 'Invalid directory name'
   jmp repl_loop
  fin
  cal get_current_dir
@@ -85,7 +85,7 @@ ife $cmd 'mkdir'
  ife $dr $nil
   put $curr_dir $d {}
  els
-  prt 'ERR Directory/file exists'
+  cal print_error 'Directory/file exists'
  fin
  jmp repl_loop
 fin
@@ -93,20 +93,34 @@ fin
 ife $cmd 'cat'
  pol $tokens d
  ife $d $nil
-  prt 'ERR Invalid file name'
+  cal print_error 'Invalid file name'
   jmp repl_loop
  fin
  cal get_current_dir
  let curr_dir $ret
  get $curr_dir $d dr
  ife $dr $nil
-  prt 'ERR File not found'
+  cal print_error 'File not found'
  els
   cal check_is_dir $dr
   ife $ret 1
-   prt 'ERR Not a file'
+   cal print_error 'Not a file'
   els
-   prt $dr
+   typ file_type $dr
+   let cat_success 0
+   ife $file_type 'str'
+    prt $dr
+    let cat_success 1
+   fin
+   ife $file_type 'list'
+    for _row $dr
+     prt $_row
+    nxt
+    let cat_success 1
+   fin
+   ife $cat_success 0
+    cal print_error 'Unsupported file type.'
+   fin
   fin
  fin
  jmp repl_loop
@@ -115,20 +129,20 @@ fin
 ife $cmd 'run'
  pol $tokens d
  ife $d $nil
-  prt 'ERR Invalid file name'
+  cal print_error 'Invalid file name'
   jmp repl_loop
  fin
  cal get_current_dir
  let curr_dir $ret
  get $curr_dir $d dr
  ife $dr $nil
-  prt 'ERR File not found'
+  cal print_error 'File not found'
  els
   cal check_executable $dr
   ife $ret 1
    cal runtime $dr
   els
-   prt 'ERR File not executable'
+   cal print_error 'File not executable'
   fin
  fin
  jmp repl_loop
@@ -137,14 +151,14 @@ fin
 ife $cmd 'rm'
  pol $tokens d
  ife $d $nil
-  prt 'ERR Invalid file/directory name'
+  cal print_error 'Invalid file/directory name'
   jmp repl_loop
  fin
  cal get_current_dir
  let curr_dir $ret
  get $curr_dir $d dr
  ife $dr $nil
-  prt 'ERR File/directory not found'
+  cal print_error 'File/directory not found'
  els
   del $curr_dir $d
  fin
@@ -164,7 +178,7 @@ ife $cmd 'echo'
   / write to file
   pol $tokens f
   ife $f $nil
-   prt 'ERR Parse error'
+   cal print_error 'Parse error'
   els
    cal get_current_dir
    let curr_dir $ret
@@ -188,7 +202,7 @@ ife $cmd 'echo'
   / append to file
   pol $tokens f
   ife $f $nil
-   prt 'ERR Parse error'
+   cal print_error 'Parse error'
    jmp repl_loop
   els
    cal get_current_dir
@@ -199,7 +213,7 @@ ife $cmd 'echo'
    els
     cal check_executable $fc
     ife $ret 1
-     prt 'ERR Cannot write to an executable file'
+     cal print_error 'Cannot write to an executable file'
     els
      add fc $fc '\n'
      add fc $fc $s
@@ -220,7 +234,7 @@ fin
 ife $cmd 'load'
  lod 'moon.sav' loaded_data
  ife $loaded_data $nil
-  prt 'ERR There is no saved data'
+  cal print_error 'There is no saved data'
  els
   let root $loaded_data
   prt '[Loaded]'
@@ -230,8 +244,8 @@ fin
 ife $cmd $nil
  jmp repl_loop
 fin
-add err_msg 'ERR Unknown command: ' $cmd
-prt $err_msg
+add err_msg 'Unknown command: ' $cmd
+cal print_error $err_msg
 jmp repl_loop
 
 #exit
