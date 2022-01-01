@@ -47,6 +47,17 @@ def init_files
  put $_path_programs 'count' $_count_p
  put $root 'programs' $_path_programs
 
+ let _age_p []
+ psh $_age_p 'prt \'Input year born:\''
+ psh $_age_p 'inp _year'
+ psh $_age_p 'int _year $_year'
+ psh $_age_p 'tim _current year'
+ psh $_age_p 'sub age $_current $_year'
+ psh $_age_p 'prt \'Age:\''
+ psh $_age_p 'prt $age'
+ put $_path_programs 'compute_age' $_age_p
+ put $root 'programs' $_path_programs
+
  psh $path 'home'
 end
 prt 'Moon OS  v1.0'
@@ -164,8 +175,12 @@ ife $cmd 'cat'
     let cat_success 1
    fin
    ife $file_type 'list'
+  let _i 1    / line number
     for _row $dr
+     add _ln $_i ' |'
+     add _row $_ln $_row
      prt $_row
+     add _i $_i 1
     nxt
     let cat_success 1
    fin
@@ -198,6 +213,119 @@ ife $cmd 'run'
  fin
  jmp repl_loop
 fin
+
+/ -- EDIT --
+ife $cmd 'edit'
+ pol $tokens file_name
+ ife $file_name $nil
+  cal print_error 'Invalid file name'
+  jmp repl_loop
+ fin
+ cal get_current_dir
+ let curr_dir $ret
+ get $curr_dir $file_name fc
+
+ / create file if not exist
+ ife $fc $nil
+  let file_content []
+  put $curr_dir $file_name $file_content
+  prt 'File created.'
+ fin
+ get $curr_dir $file_name fc
+
+ / check file executable
+ cal check_executable $fc
+ ife $ret 1
+  jmp edit_file_valid
+ fin
+ cal print_error 'Not an executable file'
+ jmp repl_loop
+ #edit_file_valid
+
+ prt 'Edit v0.1'
+ prt 'v:view a:append i:insert r:replace q:quit'
+ prt 'File: ' ''
+ prt $file_name
+
+ #edit_loop
+ prt '#' ''
+ inp edit_in
+ cal parse_input $edit_in
+ let edit_tokens $ret
+ pol $edit_tokens edit_cmd
+
+ jeq $edit_cmd 'q' repl_loop   / quit
+ ife $edit_cmd 'v'             / view
+  get $curr_dir $file_name fc
+  let _i 1    / line number
+  for _row $fc
+   add _ln $_i ' |'
+   add _row $_ln $_row
+   prt $_row
+   add _i $_i 1
+  nxt
+ fin
+ ife $edit_cmd 'a'             / append
+  pol $edit_tokens line_content
+  get $curr_dir $file_name current_content
+  psh $current_content $line_content
+ fin
+ ife $edit_cmd 'd'             / delete
+  pol $edit_tokens line_number
+  int line_number $line_number
+  sub line_number $line_number 1
+  get $curr_dir $file_name current_content
+  let new_content []
+  let _line_count 0
+  for line $current_content
+   ife $_line_count $line_number
+    jmp _edit_delete_continue
+   fin
+   psh $new_content $line
+   #_edit_delete_continue
+   add _line_count $_line_count 1
+  nxt
+  put $curr_dir $file_name $new_content
+ fin
+ ife $edit_cmd 'i'              / insert
+  pol $edit_tokens line_number
+  int line_number $line_number
+  sub line_number $line_number 1
+  pol $edit_tokens line_content
+  get $curr_dir $file_name current_content
+  let new_content []
+  let _line_count 0
+  for line $current_content
+   ife $_line_count $line_number
+    psh $new_content $line_content
+   fin
+   psh $new_content $line
+   add _line_count $_line_count 1
+  nxt
+  put $curr_dir $file_name $new_content
+ fin
+ ife $edit_cmd 'r'              / replace
+  pol $edit_tokens line_number
+  int line_number $line_number
+  sub line_number $line_number 1
+  pol $edit_tokens line_content
+  get $curr_dir $file_name current_content
+  let new_content []
+  let _line_count 0
+  for line $current_content
+   ife $_line_count $line_number
+    psh $new_content $line_content
+   els
+    psh $new_content $line
+   fin
+   add _line_count $_line_count 1
+  nxt
+  put $curr_dir $file_name $new_content
+ fin
+ / prt 'File updated.'
+ jmp edit_loop
+fin
+
 / -- RM --
 ife $cmd 'rm'
  pol $tokens d
@@ -520,6 +648,26 @@ def runtime
   get $_lbl $_lbl_name _pc
   #jne_false
  fin
+ife $_cmd 'inp'
+  get $_line 1 _var
+  inp _val
+  put $env $_var $_val
+ fin
+ ife $_cmd 'int'
+  get $_line 1 _var
+  cal eval_param $_line 2
+  int _val $ret
+  put $env $_var $_val
+ fin
+ ife $_cmd 'tim'
+  get $_line 1 _var
+  get $_line 2 _time
+  ife $_time 'year'
+   tim _val year
+  fin
+  put $env $_var $_val
+ fin
+
  add _pc $_pc 1
  jmp eval
  

@@ -106,6 +106,26 @@ def runtime
   get $_lbl $_lbl_name _pc
   #jne_false
  fin
+ife $_cmd 'inp'
+  get $_line 1 _var
+  inp _val
+  put $env $_var $_val
+ fin
+ ife $_cmd 'int'
+  get $_line 1 _var
+  cal eval_param $_line 2
+  int _val $ret
+  put $env $_var $_val
+ fin
+ ife $_cmd 'tim'
+  get $_line 1 _var
+  get $_line 2 _time
+  ife $_time 'year'
+   tim _val year
+  fin
+  put $env $_var $_val
+ fin
+
  add _pc $_pc 1
  jmp eval
  

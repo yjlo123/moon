@@ -47,5 +47,16 @@ def init_files
  put $_path_programs 'count' $_count_p
  put $root 'programs' $_path_programs
 
+ let _age_p []
+ psh $_age_p 'prt \'Input year born:\''
+ psh $_age_p 'inp _year'
+ psh $_age_p 'int _year $_year'
+ psh $_age_p 'tim _current year'
+ psh $_age_p 'sub age $_current $_year'
+ psh $_age_p 'prt \'Age:\''
+ psh $_age_p 'prt $age'
+ put $_path_programs 'compute_age' $_age_p
+ put $root 'programs' $_path_programs
+
  psh $path 'home'
 end
