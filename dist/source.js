@@ -1,5 +1,5 @@
 /* Built on
-Sat 1 Jan 2022 15:15:09 EST
+Sat 1 Jan 2022 17:20:04 EST
 */
 let moonSrc = `
 
@@ -14,18 +14,19 @@ def init_files
  let _path_home {}
  let _notes ''
  psh $_notes '----------- Moon OS Manual ------------\\n'
- psh $_notes 'ls -- list directory contents\\n'
+ psh $_notes 'ls [<p>]-- list directory contents\\n'
  psh $_notes 'pwd -- return working directory name\\n'
  psh $_notes 'cd <d> -- change directory\\n'
  psh $_notes 'mkdir <d> -- make a directory\\n'
  psh $_notes 'cat <f> -- concatenate and print a file\\n'
  psh $_notes 'rm <f/d> -- remove a directory entry\\n'
  psh $_notes 'echo <s> -- output an argument\\n'
- psh $_notes '  ~ > <f> -- write to a file\\n'
- psh $_notes '  ~ >> <f> -- append to a file\\n'
+ psh $_notes '..[> <f>] -- write to a file\\n'
+ psh $_notes '..[>> <f>] -- append to a file\\n'
  psh $_notes 'run <f> -- run an executable file\\n'
+ psh $_notes 'edit <f> -- edit an executable file\\n'
  psh $_notes 'exit -- shut down system\\n'
- psh $_notes '---------------------------------------\\n'
+ psh $_notes '---------------------------------------'
  put $_path_home 'note' $_notes
  let _misc {}
  put $_misc 'test' 'Hello World!'
@@ -64,7 +65,7 @@ def init_files
 
  psh $path 'home'
 end
-prt 'Moon OS  v1.0'
+prt 'Moon OS  v1.01'
 prt 'Copyright (c) 1992 RunTech, Inc.'
 prt 'All rights reserved.'
 prt ''
@@ -88,7 +89,17 @@ ife $cmd 'pwd'
 fin
 / -- LS --
 ife $cmd 'ls'
- cal get_current_dir
+ pol $tokens _path
+ ife $_path $nil
+  cal get_current_dir
+ els
+  cal get_dir_by_path_str $_path
+ fin
+ ife $ret $nil
+  cal print_error 'Invalid path'
+  jmp repl_loop
+ fin
+
  let dir $ret
  key $dir files
  for f $files
@@ -692,6 +703,80 @@ def get_current_dir
   get $_curr_path $_d _curr_path
  nxt
  ret $_curr_path
+end
+
+def split_str
+ let _res []
+ let _str $0
+ let _delimiter $1
+ let _current_token ''
+ for _c $_str
+  ife $_c $_delimiter
+   jeq $_current_token '' split_str_token_skip
+   psh $_res $_current_token
+   let _current_token ''
+   #split_str_token_skip
+  els
+   add _current_token $_current_token $_c
+  fin
+ nxt
+ jeq $_current_token '' split_str_last_token_skip
+ psh $_res $_current_token
+ #split_str_last_token_skip
+ ret $_res
+end
+
+def get_dir_by_path_str
+ let _path_str $0    / assert non-empty
+ get $_path_str 0 _path_first_c
+ 
+ let _full_path []
+ ife $_path_first_c '/'
+  / absolute path
+  let _full_path []
+ els
+  / relative path
+  for _p $path
+   psh $_full_path $_p
+  nxt
+ fin
+ 
+ cal split_str $_path_str '/'
+ let _path $ret
+
+ for _p $_path
+  psh $_full_path $_p
+ nxt
+
+ let _dup_full_path []
+ for _p $_full_path
+  psh $_dup_full_path $_p
+ nxt
+ cal verify_path $_dup_full_path
+ ife $ret 0
+  ret $nil
+ fin
+
+ let _curr_path $root
+ for _d $_full_path
+  get $_curr_path $_d _curr_path
+ nxt
+ ret $_curr_path
+end
+
+def verify_path
+ let _path $0
+ let _curr_path $root
+ #verify_path_next
+ pol $_path _p
+ jeq $_p $nil verify_path_true
+ get $_curr_path $_p _curr_path
+ ife $_curr_path $nil
+  ret 0
+ fin
+ jmp verify_path_next
+ #verify_path_true
+ ret 1
 end
 
 def check_executable

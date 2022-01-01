@@ -1,4 +1,4 @@
-prt 'Moon OS  v1.0'
+prt 'Moon OS  v1.01'
 prt 'Copyright (c) 1992 RunTech, Inc.'
 prt 'All rights reserved.'
 prt ''
@@ -22,7 +22,17 @@ ife $cmd 'pwd'
 fin
 / -- LS --
 ife $cmd 'ls'
- cal get_current_dir
+ pol $tokens _path
+ ife $_path $nil
+  cal get_current_dir
+ els
+  cal get_dir_by_path_str $_path
+ fin
+ ife $ret $nil
+  cal print_error 'Invalid path'
+  jmp repl_loop
+ fin
+
  let dir $ret
  key $dir files
  for f $files
