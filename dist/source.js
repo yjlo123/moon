@@ -1,5 +1,5 @@
 /* Built on
-Sat 1 Jan 2022 17:20:04 EST
+Sun 2 Jan 2022 00:11:24 EST
 */
 let moonSrc = `
 
@@ -28,10 +28,13 @@ def init_files
  psh $_notes 'exit -- shut down system\\n'
  psh $_notes '---------------------------------------'
  put $_path_home 'note' $_notes
+
  let _misc {}
  put $_misc 'test' 'Hello World!'
  put $_path_home 'misc' $_misc
+
  put $root 'home' $_path_home
+
 
  / :/programs
  let _path_programs {}
@@ -40,7 +43,6 @@ def init_files
  psh $_hello_p 'slp 500'
  psh $_hello_p 'prt \\'Bye~\\''
  put $_path_programs 'hello' $_hello_p
- put $root 'programs' $_path_programs
  
  let _count_p []
  psh $_count_p 'let n 5'
@@ -50,7 +52,6 @@ def init_files
  psh $_count_p 'slp 600'
  psh $_count_p 'jne $n 0 loop'
  put $_path_programs 'count' $_count_p
- put $root 'programs' $_path_programs
 
  let _age_p []
  psh $_age_p 'prt \\'Input year born:\\''
@@ -61,6 +62,18 @@ def init_files
  psh $_age_p 'prt \\'Age:\\''
  psh $_age_p 'prt $age'
  put $_path_programs 'compute_age' $_age_p
+
+ let _slow_print_p []
+ psh $_slow_print_p 'let msg \\'Hello World!\\n\\''
+ psh $_slow_print_p '#loop'
+ psh $_slow_print_p 'pol $msg c'
+ psh $_slow_print_p 'jeq $c \\'\\' done'
+ psh $_slow_print_p 'slp 100'
+ psh $_slow_print_p 'prt $c \\'\\''
+ psh $_slow_print_p 'jmp loop'
+ psh $_slow_print_p '#done'
+ put $_path_programs 'slow_print' $_slow_print_p
+
  put $root 'programs' $_path_programs
 
  psh $path 'home'
@@ -609,7 +622,13 @@ def runtime
   get $_line 1 _val
   cal expr $_val
   let _val $ret
-  prt $_val
+  get $_line 2 _val2
+  ife $_val2 $nil
+   prt $_val
+  els
+   cal expr $_val2
+   prt $_val $ret
+  fin
  fin
  ife $_cmd 'let'
   get $_line 1 _var
@@ -653,6 +672,20 @@ def runtime
   cal eval_param $_line 3
   drw $_x $_y $ret
  fin
+ ife $_cmd 'jmp'
+  get $_line 1 _lbl_name
+  get $_lbl $_lbl_name _pc
+ fin
+ ife $_cmd 'jeq'
+  cal eval_param $_line 1
+  let _v1 $ret
+  cal eval_param $_line 2
+  let _v2 $ret
+  get $_line 3 _lbl_name
+  jne $_v1 $_v2 jeq_false
+  get $_lbl $_lbl_name _pc
+  #jeq_false
+ fin
  ife $_cmd 'jne'
   cal eval_param $_line 1
   let _v1 $ret
@@ -663,7 +696,7 @@ def runtime
   get $_lbl $_lbl_name _pc
   #jne_false
  fin
-ife $_cmd 'inp'
+ ife $_cmd 'inp'
   get $_line 1 _var
   inp _val
   put $env $_var $_val
@@ -681,6 +714,16 @@ ife $_cmd 'inp'
    tim _val year
   fin
   put $env $_var $_val
+ fin
+ ife $_cmd 'pol'
+  cal eval_param $_line 1
+  let _list $ret
+  get $_line 2 _name
+  pol $_list _first
+  get $_line 1 _list_name
+  pol $_list_name _
+  put $env $_list_name $_list
+  put $env $_name $_first
  fin
 
  add _pc $_pc 1

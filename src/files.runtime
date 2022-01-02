@@ -24,10 +24,13 @@ def init_files
  psh $_notes 'exit -- shut down system\n'
  psh $_notes '---------------------------------------'
  put $_path_home 'note' $_notes
+
  let _misc {}
  put $_misc 'test' 'Hello World!'
  put $_path_home 'misc' $_misc
+
  put $root 'home' $_path_home
+
 
  / :/programs
  let _path_programs {}
@@ -36,7 +39,6 @@ def init_files
  psh $_hello_p 'slp 500'
  psh $_hello_p 'prt \'Bye~\''
  put $_path_programs 'hello' $_hello_p
- put $root 'programs' $_path_programs
  
  let _count_p []
  psh $_count_p 'let n 5'
@@ -46,7 +48,6 @@ def init_files
  psh $_count_p 'slp 600'
  psh $_count_p 'jne $n 0 loop'
  put $_path_programs 'count' $_count_p
- put $root 'programs' $_path_programs
 
  let _age_p []
  psh $_age_p 'prt \'Input year born:\''
@@ -57,6 +58,18 @@ def init_files
  psh $_age_p 'prt \'Age:\''
  psh $_age_p 'prt $age'
  put $_path_programs 'compute_age' $_age_p
+
+ let _slow_print_p []
+ psh $_slow_print_p 'let msg \'Hello World!\n\''
+ psh $_slow_print_p '#loop'
+ psh $_slow_print_p 'pol $msg c'
+ psh $_slow_print_p 'jeq $c \'\' done'
+ psh $_slow_print_p 'slp 100'
+ psh $_slow_print_p 'prt $c \'\''
+ psh $_slow_print_p 'jmp loop'
+ psh $_slow_print_p '#done'
+ put $_path_programs 'slow_print' $_slow_print_p
+
  put $root 'programs' $_path_programs
 
  psh $path 'home'
