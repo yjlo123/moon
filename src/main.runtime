@@ -192,9 +192,9 @@ ife $cmd 'edit'
  jmp repl_loop
  #edit_file_valid
 
- prt 'Edit v0.1'
- prt 'v:view a:append i:insert r:replace q:quit'
- prt 'File: ' ''
+ prt '== Edit v0.1'
+ prt '== v:view a:append i:insert r:replace q:quit'
+ prt '== File: ' ''
  prt $file_name
 
  #edit_loop
@@ -220,7 +220,8 @@ ife $cmd 'edit'
  ife $edit_cmd 'a'             / append
   pol $edit_tokens line_content
   get $curr_dir $file_name current_content
-  psh $current_content $line_content
+  cal replace_esc_in_str $line_content
+  psh $current_content $ret
  fin
  ife $edit_cmd 'd'             / delete
   pol $edit_tokens line_number
@@ -249,7 +250,8 @@ ife $cmd 'edit'
   let _line_count 0
   for line $current_content
    ife $_line_count $line_number
-    psh $new_content $line_content
+    cal replace_esc_in_str $line_content
+    psh $new_content $ret
    fin
    psh $new_content $line
    add _line_count $_line_count 1
@@ -266,7 +268,8 @@ ife $cmd 'edit'
   let _line_count 0
   for line $current_content
    ife $_line_count $line_number
-    psh $new_content $line_content
+   cal replace_esc_in_str $line_content
+    psh $new_content $ret
    els
     psh $new_content $line
    fin

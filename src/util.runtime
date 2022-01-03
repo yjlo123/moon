@@ -129,3 +129,30 @@ def replace_char_in_str
  nxt
  ret $new
 end
+
+def replace_esc_in_str
+ let str $0
+ len $str str_len
+ let new ''
+ let escaping 0
+ for i $str_len
+  get $str $i c
+  ife $c '\\'
+   ife $escaping 0
+    let escaping 1
+   els
+    add new $new $c
+   fin
+  els
+   ife $escaping 1
+    ife $c 'n'
+     add new $new '\n'
+    fin
+    let escaping 0
+   els
+    add new $new $c
+   fin
+  fin
+ nxt
+ ret $new
+end

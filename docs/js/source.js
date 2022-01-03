@@ -1,5 +1,5 @@
 /* Built on
-Sun 2 Jan 2022 23:11:07 EST
+Mon 3 Jan 2022 12:32:59 EST
 */
 let moonSrc = `
 
@@ -272,9 +272,9 @@ ife $cmd 'edit'
  jmp repl_loop
  #edit_file_valid
 
- prt 'Edit v0.1'
- prt 'v:view a:append i:insert r:replace q:quit'
- prt 'File: ' ''
+ prt '== Edit v0.1'
+ prt '== v:view a:append i:insert r:replace q:quit'
+ prt '== File: ' ''
  prt $file_name
 
  #edit_loop
@@ -300,7 +300,8 @@ ife $cmd 'edit'
  ife $edit_cmd 'a'             / append
   pol $edit_tokens line_content
   get $curr_dir $file_name current_content
-  psh $current_content $line_content
+  cal replace_esc_in_str $line_content
+  psh $current_content $ret
  fin
  ife $edit_cmd 'd'             / delete
   pol $edit_tokens line_number
@@ -329,7 +330,8 @@ ife $cmd 'edit'
   let _line_count 0
   for line $current_content
    ife $_line_count $line_number
-    psh $new_content $line_content
+    cal replace_esc_in_str $line_content
+    psh $new_content $ret
    fin
    psh $new_content $line
    add _line_count $_line_count 1
@@ -346,7 +348,8 @@ ife $cmd 'edit'
   let _line_count 0
   for line $current_content
    ife $_line_count $line_number
-    psh $new_content $line_content
+   cal replace_esc_in_str $line_content
+    psh $new_content $ret
    els
     psh $new_content $line
    fin
@@ -862,6 +865,33 @@ def replace_char_in_str
    add new $new $to
   els
    add new $new $c
+  fin
+ nxt
+ ret $new
+end
+
+def replace_esc_in_str
+ let str $0
+ len $str str_len
+ let new ''
+ let escaping 0
+ for i $str_len
+  get $str $i c
+  ife $c '\\\\'
+   ife $escaping 0
+    let escaping 1
+   els
+    add new $new $c
+   fin
+  els
+   ife $escaping 1
+    ife $c 'n'
+     add new $new '\\n'
+    fin
+    let escaping 0
+   els
+    add new $new $c
+   fin
   fin
  nxt
  ret $new
