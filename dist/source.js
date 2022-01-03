@@ -1,5 +1,5 @@
 /* Built on
-Mon 3 Jan 2022 12:32:59 EST
+Mon 3 Jan 2022 15:13:21 EST
 */
 let moonSrc = `
 
@@ -78,392 +78,398 @@ def init_files
 
  psh $path 'home'
 end
-prt 'Moon OS  v1.01'
-prt 'Copyright (c) 1992 RunTech, Inc.'
-prt 'All rights reserved.'
-prt ''
-prt 'Welcome'
+def welcome_info
+ prt 'Moon OS  v1.01'
+ prt 'Copyright (c) 1992 RunTech, Inc.'
+ prt 'All rights reserved.'
+ prt ''
+ prt 'Welcome'
+end
 
-cal init_files
+def main
+ #repl_loop
+ prt '>' ''
+ inp in
+ cal parse_input $in
+ let tokens $ret
+ pol $tokens cmd
 
-#repl_loop
-prt '>' ''
-inp in
-cal parse_input $in
-let tokens $ret
-pol $tokens cmd
-
-jeq $cmd 'exit' exit
-/ -- PWD --
-ife $cmd 'pwd'
- cal get_current_path_str
- prt $ret
- jmp repl_loop
-fin
-/ -- LS --
-ife $cmd 'ls'
- pol $tokens _path
- ife $_path $nil
-  cal get_current_dir
- els
-  cal get_dir_by_path_str $_path
- fin
- ife $ret $nil
-  cal print_error 'Invalid path'
+ jeq $cmd 'exit' exit
+ / -- PWD --
+ ife $cmd 'pwd'
+  cal get_current_path_str
+  prt $ret
   jmp repl_loop
  fin
+ / -- LS --
+ ife $cmd 'ls'
+  pol $tokens _path
+  ife $_path $nil
+   cal get_current_dir
+  els
+   cal get_dir_by_path_str $_path
+  fin
+  ife $ret $nil
+   cal print_error 'Invalid path'
+   jmp repl_loop
+  fin
 
- let dir $ret
- key $dir files
- for f $files
-  get $dir $f fc 
-  typ ft $fc
-  ife $ft 'str'
-   prt '<TXT> ' ''
-  fin
-  ife $ft 'list'
-   prt '<EXE> ' ''
-  fin
-  ife $ft 'map'
-   prt '<DIR> ' ''
-  fin
-  prt $f
- nxt
- jmp repl_loop
-fin
-/ -- CD --
-ife $cmd 'cd'
- pol $tokens d
- ife $d $nil
-  cal print_error 'invalid directory name'
+  let dir $ret
+  key $dir files
+  for f $files
+   get $dir $f fc 
+   typ ft $fc
+   ife $ft 'str'
+    prt '<TXT> ' ''
+   fin
+   ife $ft 'list'
+    prt '<EXE> ' ''
+   fin
+   ife $ft 'map'
+    prt '<DIR> ' ''
+   fin
+   prt $f
+  nxt
   jmp repl_loop
  fin
- ife $d '..'
-  pop $path _
-  jmp repl_loop
- els
-  ife $d '../'
+ / -- CD --
+ ife $cmd 'cd'
+  pol $tokens d
+  ife $d $nil
+   cal print_error 'invalid directory name'
+   jmp repl_loop
+  fin
+  ife $d '..'
    pop $path _
    jmp repl_loop
+  els
+   ife $d '../'
+    pop $path _
+    jmp repl_loop
+   fin
+   cal get_current_dir
+   let current_dir $ret
+   get $current_dir $d dr
+   ife $dr $nil
+    cal print_error 'Directory not found'
+    jmp repl_loop
+   fin
+   typ dr_typ $dr
+   ife $dr_typ 'map'
+    psh $path $d
+    jmp repl_loop
+   els
+    cal print_error 'Not a directory'
+   fin
+  fin
+  jmp repl_loop
+ fin
+ / -- MKDIR --
+ ife $cmd 'mkdir'
+  pol $tokens d
+  ife $d $nil
+   cal print_error 'Invalid directory name'
+   jmp repl_loop
   fin
   cal get_current_dir
-  get $ret $d dr
+  let curr_dir $ret
+  get $curr_dir $d dr
   ife $dr $nil
-   cal print_error 'Directory not found'
+   put $curr_dir $d {}
+  els
+   cal print_error 'Directory/file exists'
+  fin
+  jmp repl_loop
+ fin
+ / -- CAT --
+ ife $cmd 'cat'
+  pol $tokens d
+  ife $d $nil
+   cal print_error 'Invalid file name'
    jmp repl_loop
   fin
-  typ dr_typ $dr
-  ife $dr_typ 'map'
-   psh $path $d
-   jmp repl_loop
+  cal get_current_dir
+  let curr_dir $ret
+  get $curr_dir $d dr
+  ife $dr $nil
+   cal print_error 'File not found'
   els
-   cal print_error 'Not a directory'
-  fin
- fin
- jmp repl_loop
-fin
-/ -- MKDIR --
-ife $cmd 'mkdir'
- pol $tokens d
- ife $d $nil
-  cal print_error 'Invalid directory name'
-  jmp repl_loop
- fin
- cal get_current_dir
- let curr_dir $ret
- get $curr_dir $d dr
- ife $dr $nil
-  put $curr_dir $d {}
- els
-  cal print_error 'Directory/file exists'
- fin
- jmp repl_loop
-fin
-/ -- CAT --
-ife $cmd 'cat'
- pol $tokens d
- ife $d $nil
-  cal print_error 'Invalid file name'
-  jmp repl_loop
- fin
- cal get_current_dir
- let curr_dir $ret
- get $curr_dir $d dr
- ife $dr $nil
-  cal print_error 'File not found'
- els
-  cal check_is_dir $dr
-  ife $ret 1
-   cal print_error 'Not a file'
-  els
-   typ file_type $dr
-   let cat_success 0
-   ife $file_type 'str'
-    prt $dr
-    let cat_success 1
-   fin
-   ife $file_type 'list'
-    let _i 1    / line number
-    for _row $dr
-     cal replace_char_in_str $_row '\\n' '\\\\n'
-     let _row $ret
-     add _ln $_i ' |'
-     add _row $_ln $_row
-     prt $_row
-     add _i $_i 1
-    nxt
-    let cat_success 1
-   fin
-   ife $cat_success 0
-    cal print_error 'Unsupported file type.'
-   fin
-  fin
- fin
- jmp repl_loop
-fin
-/ -- RUN --
-ife $cmd 'run'
- pol $tokens d
- ife $d $nil
-  cal print_error 'Invalid file name'
-  jmp repl_loop
- fin
- cal get_current_dir
- let curr_dir $ret
- get $curr_dir $d dr
- ife $dr $nil
-  cal print_error 'File not found'
- els
-  cal check_executable $dr
-  ife $ret 1
-   cal runtime $dr
-  els
-   cal print_error 'File not executable'
-  fin
- fin
- jmp repl_loop
-fin
-
-/ -- EDIT --
-ife $cmd 'edit'
- pol $tokens file_name
- ife $file_name $nil
-  cal print_error 'Invalid file name'
-  jmp repl_loop
- fin
- cal get_current_dir
- let curr_dir $ret
- get $curr_dir $file_name fc
-
- / create file if not exist
- ife $fc $nil
-  let file_content []
-  put $curr_dir $file_name $file_content
-  prt 'File created.'
- fin
- get $curr_dir $file_name fc
-
- / check file executable
- cal check_executable $fc
- ife $ret 1
-  jmp edit_file_valid
- fin
- cal print_error 'Not an executable file'
- jmp repl_loop
- #edit_file_valid
-
- prt '== Edit v0.1'
- prt '== v:view a:append i:insert r:replace q:quit'
- prt '== File: ' ''
- prt $file_name
-
- #edit_loop
- prt '#' ''
- inp edit_in
- cal parse_input $edit_in
- let edit_tokens $ret
- pol $edit_tokens edit_cmd
-
- jeq $edit_cmd 'q' repl_loop   / quit
- ife $edit_cmd 'v'             / view
-  get $curr_dir $file_name fc
-  let _i 1    / line number
-  for _row $fc
-   cal replace_char_in_str $_row '\\n' '\\\\n'
-   let _row $ret
-   add _ln $_i ' |'
-   add _row $_ln $_row
-   prt $_row
-   add _i $_i 1
-  nxt
- fin
- ife $edit_cmd 'a'             / append
-  pol $edit_tokens line_content
-  get $curr_dir $file_name current_content
-  cal replace_esc_in_str $line_content
-  psh $current_content $ret
- fin
- ife $edit_cmd 'd'             / delete
-  pol $edit_tokens line_number
-  int line_number $line_number
-  sub line_number $line_number 1
-  get $curr_dir $file_name current_content
-  let new_content []
-  let _line_count 0
-  for line $current_content
-   ife $_line_count $line_number
-    jmp _edit_delete_continue
-   fin
-   psh $new_content $line
-   #_edit_delete_continue
-   add _line_count $_line_count 1
-  nxt
-  put $curr_dir $file_name $new_content
- fin
- ife $edit_cmd 'i'              / insert
-  pol $edit_tokens line_number
-  int line_number $line_number
-  sub line_number $line_number 1
-  pol $edit_tokens line_content
-  get $curr_dir $file_name current_content
-  let new_content []
-  let _line_count 0
-  for line $current_content
-   ife $_line_count $line_number
-    cal replace_esc_in_str $line_content
-    psh $new_content $ret
-   fin
-   psh $new_content $line
-   add _line_count $_line_count 1
-  nxt
-  put $curr_dir $file_name $new_content
- fin
- ife $edit_cmd 'r'              / replace
-  pol $edit_tokens line_number
-  int line_number $line_number
-  sub line_number $line_number 1
-  pol $edit_tokens line_content
-  get $curr_dir $file_name current_content
-  let new_content []
-  let _line_count 0
-  for line $current_content
-   ife $_line_count $line_number
-   cal replace_esc_in_str $line_content
-    psh $new_content $ret
+   cal check_is_dir $dr
+   ife $ret 1
+    cal print_error 'Not a file'
    els
-    psh $new_content $line
-   fin
-   add _line_count $_line_count 1
-  nxt
-  put $curr_dir $file_name $new_content
- fin
- / prt 'File updated.'
- jmp edit_loop
-fin
-
-/ -- RM --
-ife $cmd 'rm'
- pol $tokens d
- ife $d $nil
-  cal print_error 'Invalid file/directory name'
-  jmp repl_loop
- fin
- cal get_current_dir
- let curr_dir $ret
- get $curr_dir $d dr
- ife $dr $nil
-  cal print_error 'File/directory not found'
- els
-  del $curr_dir $d
- fin
- jmp repl_loop
-fin
-/ -- ECHO --
-ife $cmd 'echo'
- pol $tokens s
- ife $s $nil
-  let s ''
- fin
- pol $tokens p
- ife $p $nil
-  prt $s
- fin
- ife $p '>'
-  / write to file
-  pol $tokens f
-  ife $f $nil
-   cal print_error 'Parse error'
-  els
-   cal get_current_dir
-   let curr_dir $ret
-   get $curr_dir $f fd
-   ife $fd $nil
-    put $curr_dir $f $s
-   els
-    prt 'File/directory exists, overwrite? Y/n'
-    inp ans
-    jeq $ans 'y' overwrite
-    jeq $ans 'Y' overwrite
-    jeq $ans '' overwrite
-    jmp skip_ow
-    #overwrite
-    put $curr_dir $f $s
-    #skip_ow
-   fin
-  fin
- fin
- ife $p '>>'
-  / append to file
-  pol $tokens f
-  ife $f $nil
-   cal print_error 'Parse error'
-   jmp repl_loop
-  els
-   cal get_current_dir
-   let curr_dir $ret
-   get $curr_dir $f fc
-   ife $fc $nil
-    put $curr_dir $f $s
-   els
-    cal check_executable $fc
-    ife $ret 1
-     cal print_error 'Cannot write to an executable file'
-    els
-     add fc $fc '\\n'
-     add fc $fc $s
-     put $curr_dir $f $fc
+    typ file_type $dr
+    let cat_success 0
+    ife $file_type 'str'
+     prt $dr
+     let cat_success 1
+    fin
+    ife $file_type 'list'
+     let _i 1    / line number
+     for _row $dr
+      cal replace_char_in_str $_row '\\n' '\\\\n'
+      let _row $ret
+      add _ln $_i ' |'
+      add _row $_ln $_row
+      prt $_row
+      add _i $_i 1
+     nxt
+     let cat_success 1
+    fin
+    ife $cat_success 0
+     cal print_error 'Unsupported file type.'
     fin
    fin
   fin
+  jmp repl_loop
  fin
- jmp repl_loop
-fin
-/ -- SAVE --
-ife $cmd 'save'
- sav 'moon.sav' $root
- prt '[Saved]'
- jmp repl_loop
-fin
-/ -- LOAD --
-ife $cmd 'load'
- lod 'moon.sav' loaded_data
- ife $loaded_data $nil
-  cal print_error 'There is no saved data'
- els
-  let root $loaded_data
-  prt '[Loaded]'
+ / -- RUN --
+ ife $cmd 'run'
+  pol $tokens d
+  ife $d $nil
+   cal print_error 'Invalid file name'
+   jmp repl_loop
+  fin
+  cal get_current_dir
+  let curr_dir $ret
+  get $curr_dir $d dr
+  ife $dr $nil
+   cal print_error 'File not found'
+  els
+   cal check_executable $dr
+   ife $ret 1
+    cal runtime $dr
+   els
+    cal print_error 'File not executable'
+   fin
+  fin
+  jmp repl_loop
  fin
- jmp repl_loop
-fin
-ife $cmd $nil
- jmp repl_loop
-fin
-add err_msg 'Unknown command: ' $cmd
-cal print_error $err_msg
-jmp repl_loop
 
-#exit
-prt 'Shutting down...'
+ / -- EDIT --
+ ife $cmd 'edit'
+  pol $tokens file_name
+  ife $file_name $nil
+   cal print_error 'Invalid file name'
+   jmp repl_loop
+  fin
+  cal get_current_dir
+  let curr_dir $ret
+  get $curr_dir $file_name fc
+
+  / create file if not exist
+  ife $fc $nil
+   let file_content []
+   put $curr_dir $file_name $file_content
+   prt 'File created.'
+  fin
+  get $curr_dir $file_name fc
+
+  / check file executable
+  cal check_executable $fc
+  ife $ret 1
+   jmp edit_file_valid
+  fin
+  cal print_error 'Not an executable file'
+  jmp repl_loop
+  #edit_file_valid
+
+  prt '== Edit v0.1'
+  prt '== v:view a:append i:insert r:replace q:quit'
+  prt '== File: ' ''
+  prt $file_name
+
+  #edit_loop
+  prt '#' ''
+  inp edit_in
+  cal parse_input $edit_in
+  let edit_tokens $ret
+  pol $edit_tokens edit_cmd
+
+  jeq $edit_cmd 'q' repl_loop   / quit
+  ife $edit_cmd 'v'             / view
+   get $curr_dir $file_name fc
+   let _i 1    / line number
+   for _row $fc
+    cal replace_char_in_str $_row '\\n' '\\\\n'
+    let _row $ret
+    add _ln $_i ' |'
+    add _row $_ln $_row
+    prt $_row
+    add _i $_i 1
+   nxt
+  fin
+  ife $edit_cmd 'a'             / append
+   pol $edit_tokens line_content
+   get $curr_dir $file_name current_content
+   cal replace_esc_in_str $line_content
+   psh $current_content $ret
+  fin
+  ife $edit_cmd 'd'             / delete
+   pol $edit_tokens line_number
+   int line_number $line_number
+   sub line_number $line_number 1
+   get $curr_dir $file_name current_content
+   let new_content []
+   let _line_count 0
+   for line $current_content
+    ife $_line_count $line_number
+     jmp _edit_delete_continue
+    fin
+    psh $new_content $line
+    #_edit_delete_continue
+    add _line_count $_line_count 1
+   nxt
+   put $curr_dir $file_name $new_content
+  fin
+  ife $edit_cmd 'i'              / insert
+   pol $edit_tokens line_number
+   int line_number $line_number
+   sub line_number $line_number 1
+   pol $edit_tokens line_content
+   get $curr_dir $file_name current_content
+   let new_content []
+   let _line_count 0
+   for line $current_content
+    ife $_line_count $line_number
+     cal replace_esc_in_str $line_content
+     psh $new_content $ret
+    fin
+    psh $new_content $line
+    add _line_count $_line_count 1
+   nxt
+   put $curr_dir $file_name $new_content
+  fin
+  ife $edit_cmd 'r'              / replace
+   pol $edit_tokens line_number
+   int line_number $line_number
+   sub line_number $line_number 1
+   pol $edit_tokens line_content
+   get $curr_dir $file_name current_content
+   let new_content []
+   let _line_count 0
+   for line $current_content
+    ife $_line_count $line_number
+    cal replace_esc_in_str $line_content
+     psh $new_content $ret
+    els
+     psh $new_content $line
+    fin
+    add _line_count $_line_count 1
+   nxt
+   put $curr_dir $file_name $new_content
+  fin
+  / prt 'File updated.'
+  jmp edit_loop
+ fin
+
+ / -- RM --
+ ife $cmd 'rm'
+  pol $tokens d
+  ife $d $nil
+   cal print_error 'Invalid file/directory name'
+   jmp repl_loop
+  fin
+  cal get_current_dir
+  let curr_dir $ret
+  get $curr_dir $d dr
+  ife $dr $nil
+   cal print_error 'File/directory not found'
+  els
+   del $curr_dir $d
+  fin
+  jmp repl_loop
+ fin
+ / -- ECHO --
+ ife $cmd 'echo'
+  pol $tokens s
+  ife $s $nil
+   let s ''
+  fin
+  pol $tokens p
+  ife $p $nil
+   prt $s
+  fin
+  ife $p '>'
+   / write to file
+   pol $tokens f
+   ife $f $nil
+    cal print_error 'Parse error'
+   els
+    cal get_current_dir
+    let curr_dir $ret
+    get $curr_dir $f fd
+    ife $fd $nil
+     put $curr_dir $f $s
+    els
+     prt 'File/directory exists, overwrite? Y/n'
+     inp ans
+     jeq $ans 'y' overwrite
+     jeq $ans 'Y' overwrite
+     jeq $ans '' overwrite
+     jmp skip_ow
+     #overwrite
+     put $curr_dir $f $s
+     #skip_ow
+    fin
+   fin
+  fin
+  ife $p '>>'
+   / append to file
+   pol $tokens f
+   ife $f $nil
+    cal print_error 'Parse error'
+    jmp repl_loop
+   els
+    cal get_current_dir
+    get $ret $f fc
+    ife $fc $nil
+     put $curr_dir $f $s
+    els
+     cal check_executable $fc
+     ife $ret 1
+      cal print_error 'Cannot write to an executable file'
+     els
+      add fc $fc '\\n'
+      add fc $fc $s
+      put $curr_dir $f $fc
+     fin
+    fin
+   fin
+  fin
+  jmp repl_loop
+ fin
+ / -- SAVE --
+ ife $cmd 'save'
+  sav 'moon.sav' $root
+  prt '[Saved]'
+  jmp repl_loop
+ fin
+ / -- LOAD --
+ ife $cmd 'load'
+  lod 'moon.sav' loaded_data
+  ife $loaded_data $nil
+   cal print_error 'There is no saved data'
+  els
+   let root $loaded_data
+   prt '[Loaded]'
+  fin
+  jmp repl_loop
+ fin
+ ife $cmd $nil
+  jmp repl_loop
+ fin
+ add err_msg 'Unknown command: ' $cmd
+ cal print_error $err_msg
+ jmp repl_loop
+
+ #exit
+ prt 'Shutting down...'
+end
+
+cal welcome_info
+cal init_files
+cal main
 / ====== parsing runtime program ======
 def parse_line
  let _line $0

@@ -52,6 +52,10 @@
 	let evaluator = runtimeEvaluator();
 	let parser = runtimeParser();
 
+	let consoleHistory = [];
+	let consoleHistoryIndex = -1;
+	const MaxHistorySize = 20;
+
 	let jqconsole = $('#console').jqconsole();
 	jqconsole.SetPromptLabel('');
 
@@ -65,6 +69,35 @@
 		if (e.which === 9) {
 			// tab key
 			return false;
+		}
+		if (e.which === 13) {
+			// enter key
+			let promptText = jqconsole.GetPromptText();
+			if (promptText.length > 0) {
+				consoleHistory.push(promptText);
+				if (consoleHistory.length > MaxHistorySize) {
+					consoleHistory.shift();
+				}
+				consoleHistoryIndex = consoleHistory.length;
+			}
+		}
+		if (e.which === 38) {
+			// up arrow key
+			if (consoleHistoryIndex > 0) {
+				consoleHistoryIndex -= 1;
+				jqconsole.SetPromptText(consoleHistory[consoleHistoryIndex]);
+			}
+		}
+		if (e.which === 40) {
+			// down arrow key
+			if (consoleHistoryIndex < consoleHistory.length) {
+				consoleHistoryIndex += 1;
+				if (consoleHistoryIndex === consoleHistory.length) {
+					jqconsole.SetPromptText("");
+				} else {
+					jqconsole.SetPromptText(consoleHistory[consoleHistoryIndex]);
+				}
+			}
 		}
 	};
 
