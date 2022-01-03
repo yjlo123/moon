@@ -1,5 +1,5 @@
 /* Built on
-Sun 2 Jan 2022 00:11:24 EST
+Sun 2 Jan 2022 23:11:07 EST
 */
 let moonSrc = `
 
@@ -203,8 +203,10 @@ ife $cmd 'cat'
     let cat_success 1
    fin
    ife $file_type 'list'
-  let _i 1    / line number
+    let _i 1    / line number
     for _row $dr
+     cal replace_char_in_str $_row '\\n' '\\\\n'
+     let _row $ret
      add _ln $_i ' |'
      add _row $_ln $_row
      prt $_row
@@ -287,6 +289,8 @@ ife $cmd 'edit'
   get $curr_dir $file_name fc
   let _i 1    / line number
   for _row $fc
+   cal replace_char_in_str $_row '\\n' '\\\\n'
+   let _row $ret
    add _ln $_i ' |'
    add _row $_ln $_row
    prt $_row
@@ -844,5 +848,22 @@ def print_error
  let _msg $0
  add _msg 'ERR ' $_msg
  prt $_msg
+end
+
+def replace_char_in_str
+ let str $0
+ let chr $1
+ let to $2
+ len $str str_len
+ let new ''
+ for i $str_len
+  get $str $i c
+  ife $c $chr
+   add new $new $to
+  els
+   add new $new $c
+  fin
+ nxt
+ ret $new
 end
 `
