@@ -1,5 +1,5 @@
 /* Built on
-Mon 3 Jan 2022 17:42:34 EST
+Mon 3 Jan 2022 21:08:25 EST
 */
 let moonSrc = `
 
@@ -95,29 +95,37 @@ def main
  pol $tokens cmd
 
  jeq $cmd 'exit' exit
+
  / -- PWD --
  ife $cmd 'pwd'
   cal get_current_path_str
   prt $ret
   jmp repl_loop
  fin
+
  / -- LS --
  ife $cmd 'ls'
   pol $tokens _path
   ife $_path $nil
+   / default: current directory
    cal get_current_dir
+   let _dir $ret
   els
-   cal get_dir_by_path_str $_path
-  fin
-  ife $ret $nil
-   cal print_error 'Invalid path'
-   jmp repl_loop
+   / specified directory
+   cal get_path_by_str $_path
+   ife $ret $nil
+    cal print_error 'Invalid path'
+    jmp repl_loop
+   fin
+   let _dir $root
+   for _d $ret
+    get $_dir $_d _dir
+   nxt
   fin
 
-  let dir $ret
-  key $dir files
+  key $_dir files
   for f $files
-   get $dir $f fc 
+   get $_dir $f fc 
    typ ft $fc
    ife $ft 'str'
     prt '<TXT> ' ''
@@ -132,38 +140,28 @@ def main
   nxt
   jmp repl_loop
  fin
+
  / -- CD --
  ife $cmd 'cd'
-  pol $tokens d
-  ife $d $nil
+  pol $tokens _path
+  ife $_path $nil
    cal print_error 'invalid directory name'
    jmp repl_loop
   fin
-  ife $d '..'
-   pop $path _
+  cal get_path_by_str $_path
+  ife $ret $nil
+   cal print_error 'Invalid path'
    jmp repl_loop
-  els
-   ife $d '../'
-    pop $path _
-    jmp repl_loop
-   fin
-   cal get_current_dir
-   let current_dir $ret
-   get $current_dir $d dr
-   ife $dr $nil
-    cal print_error 'Directory not found'
-    jmp repl_loop
-   fin
-   typ dr_typ $dr
-   ife $dr_typ 'map'
-    psh $path $d
-    jmp repl_loop
-   els
-    cal print_error 'Not a directory'
-   fin
   fin
+  let _full_path $ret
+
+  let path []
+  for _d $_full_path
+   psh $path $_d
+  nxt
   jmp repl_loop
  fin
+
  / -- MKDIR --
  ife $cmd 'mkdir'
   pol $tokens d
@@ -181,6 +179,7 @@ def main
   fin
   jmp repl_loop
  fin
+
  / -- CAT --
  ife $cmd 'cat'
   pol $tokens d
@@ -223,6 +222,7 @@ def main
   fin
   jmp repl_loop
  fin
+
  / -- RUN --
  ife $cmd 'run'
   pol $tokens d
@@ -380,6 +380,7 @@ def main
   fin
   jmp repl_loop
  fin
+
  / -- ECHO --
  ife $cmd 'echo'
   pol $tokens s
@@ -439,12 +440,14 @@ def main
   fin
   jmp repl_loop
  fin
+
  / -- SAVE --
  ife $cmd 'save'
   sav 'moon.sav' $root
   prt '[Saved]'
   jmp repl_loop
  fin
+
  / -- LOAD --
  ife $cmd 'load'
   lod 'moon.sav' loaded_data
@@ -782,7 +785,7 @@ def split_str
  ret $_res
 end
 
-def get_dir_by_path_str
+def get_path_by_str
  let _path_str $0    / assert non-empty
  get $_path_str 0 _path_first_c
  
@@ -805,19 +808,21 @@ def get_dir_by_path_str
  nxt
 
  let _dup_full_path []
+ let _real_full_path []
  for _p $_full_path
-  psh $_dup_full_path $_p
+  ife $_p '..'
+   pop $_dup_full_path a
+   pop $_real_full_path a
+  els
+   psh $_dup_full_path $_p
+   psh $_real_full_path $_p
+  fin
  nxt
  cal verify_path $_dup_full_path
  ife $ret 0
   ret $nil
  fin
-
- let _curr_path $root
- for _d $_full_path
-  get $_curr_path $_d _curr_path
- nxt
- ret $_curr_path
+ ret $_real_full_path
 end
 
 def verify_path
@@ -826,13 +831,23 @@ def verify_path
  #verify_path_next
  pol $_path _p
  jeq $_p $nil verify_path_true
- get $_curr_path $_p _curr_path
- ife $_curr_path $nil
+ typ _path_typ $_curr_path
+ ife $_path_typ 'map'
+  get $_curr_path $_p _curr_path
+  ife $_curr_path $nil
+   ret 0
+  fin
+ els
   ret 0
  fin
  jmp verify_path_next
  #verify_path_true
- ret 1
+ typ _path_typ $_curr_path
+ ife $_path_typ 'map'   / check final dir is valid
+  ret 1
+ els
+  ret 0
+ fin
 end
 
 def check_executable

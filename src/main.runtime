@@ -15,29 +15,37 @@ def main
  pol $tokens cmd
 
  jeq $cmd 'exit' exit
+
  / -- PWD --
  ife $cmd 'pwd'
   cal get_current_path_str
   prt $ret
   jmp repl_loop
  fin
+
  / -- LS --
  ife $cmd 'ls'
   pol $tokens _path
   ife $_path $nil
+   / default: current directory
    cal get_current_dir
+   let _dir $ret
   els
-   cal get_dir_by_path_str $_path
-  fin
-  ife $ret $nil
-   cal print_error 'Invalid path'
-   jmp repl_loop
+   / specified directory
+   cal get_path_by_str $_path
+   ife $ret $nil
+    cal print_error 'Invalid path'
+    jmp repl_loop
+   fin
+   let _dir $root
+   for _d $ret
+    get $_dir $_d _dir
+   nxt
   fin
 
-  let dir $ret
-  key $dir files
+  key $_dir files
   for f $files
-   get $dir $f fc 
+   get $_dir $f fc 
    typ ft $fc
    ife $ft 'str'
     prt '<TXT> ' ''
@@ -52,38 +60,28 @@ def main
   nxt
   jmp repl_loop
  fin
+
  / -- CD --
  ife $cmd 'cd'
-  pol $tokens d
-  ife $d $nil
+  pol $tokens _path
+  ife $_path $nil
    cal print_error 'invalid directory name'
    jmp repl_loop
   fin
-  ife $d '..'
-   pop $path _
+  cal get_path_by_str $_path
+  ife $ret $nil
+   cal print_error 'Invalid path'
    jmp repl_loop
-  els
-   ife $d '../'
-    pop $path _
-    jmp repl_loop
-   fin
-   cal get_current_dir
-   let current_dir $ret
-   get $current_dir $d dr
-   ife $dr $nil
-    cal print_error 'Directory not found'
-    jmp repl_loop
-   fin
-   typ dr_typ $dr
-   ife $dr_typ 'map'
-    psh $path $d
-    jmp repl_loop
-   els
-    cal print_error 'Not a directory'
-   fin
   fin
+  let _full_path $ret
+
+  let path []
+  for _d $_full_path
+   psh $path $_d
+  nxt
   jmp repl_loop
  fin
+
  / -- MKDIR --
  ife $cmd 'mkdir'
   pol $tokens d
@@ -101,6 +99,7 @@ def main
   fin
   jmp repl_loop
  fin
+
  / -- CAT --
  ife $cmd 'cat'
   pol $tokens d
@@ -143,6 +142,7 @@ def main
   fin
   jmp repl_loop
  fin
+
  / -- RUN --
  ife $cmd 'run'
   pol $tokens d
@@ -300,6 +300,7 @@ def main
   fin
   jmp repl_loop
  fin
+
  / -- ECHO --
  ife $cmd 'echo'
   pol $tokens s
@@ -359,12 +360,14 @@ def main
   fin
   jmp repl_loop
  fin
+
  / -- SAVE --
  ife $cmd 'save'
   sav 'moon.sav' $root
   prt '[Saved]'
   jmp repl_loop
  fin
+
  / -- LOAD --
  ife $cmd 'load'
   lod 'moon.sav' loaded_data
