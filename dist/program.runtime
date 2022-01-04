@@ -99,9 +99,516 @@ def init_files
  psh $_date_p 'prt $date_str'
  put $_path_programs 'date' $_date_p
 
+ let _time_p []
+ psh $_time_p 'tim _hour hour'
+ psh $_time_p 'tim _minute minute'
+ psh $_time_p 'tim _second second'
+ psh $_time_p 'let time_str \'\''
+ psh $_time_p 'add time_str $time_str $_hour'
+ psh $_time_p 'add time_str $time_str \':\''
+ psh $_time_p 'add time_str $time_str $_minute'
+ psh $_time_p 'add time_str $time_str \':\''
+ psh $_time_p 'add time_str $time_str $_second'
+ psh $_time_p 'prt $time_str'
+put $_path_programs 'time' $_time_p
+
  put $root 'programs' $_path_programs
 
  psh $path 'home'
+end
+
+cal init_files
+def load_extra_files
+ prs _fs '{"mnt": {"test": "hello"}}'
+ for _d $_fs
+  get $_fs $_d _content
+  put $root $_d $_content
+ nxt
+end
+cal load_extra_files
+/ ====== parsing runtime program ======
+def parse_line
+ let _line $0
+ let _tokens []
+ #next_token
+ let _token ''
+ #parse_token
+ pol $_line _c
+ jeq $_c '' parse_done
+ jeq $_c ' ' token_done
+ jeq $_c '\'' parse_string
+ jeq $_c '"' parse_string
+ jmp add_token_char
+ 
+ #parse_string
+ let _q $_c
+ let _s '\''
+
+ #parse_string_char
+ pol $_line _c
+ ife $_c $_q
+  psh $_s $_c
+  psh $_tokens $_s
+  jmp next_token
+ els
+  psh $_s $_c
+  jmp parse_string_char
+ fin
+ 
+ #add_token_char
+ add _token $_token $_c
+ jmp parse_token
+
+ #token_done
+ ife $_token ''
+  jmp next_token
+ els
+  psh $_tokens $_token
+ fin
+ jmp next_token
+ #parse_done
+ ife $_token ''
+  ret $_tokens
+ fin
+ psh $_tokens $_token
+ ret $_tokens
+end
+
+def parse
+ let _src $0
+ let _p $1  / map ref
+ let _lbl $2  / map ref
+ let _lc 0
+ for _line $_src
+  / check label
+  pol $_line _c1
+  ife $_c1 '#'
+   put $_lbl $_line $_lc
+  fin
+  add _line $_c1 $_line
+  cal parse_line $_line
+  put $_p $_lc $ret
+  add _lc $_lc 1
+ nxt
+ ret $_p
+end
+
+/ ====== parsing user input ======
+def parse_input
+ let _input $0
+ let _tokens []
+ #next_token
+ let _token ''
+ #parse_token
+ pol $_input _c
+ jeq $_c '' parse_done
+ jeq $_c ' ' token_done
+ jeq $_c '\'' parse_string
+ jeq $_c '"' parse_string
+ jmp add_token_char
+ 
+ #parse_string
+ let _q $_c
+ let _s ''
+ #parse_string_char
+ pol $_input _c
+ ife $_c $_q
+  psh $_tokens $_s
+  jmp next_token
+ els
+  psh $_s $_c
+  jmp parse_string_char
+ fin
+ 
+ #add_token_char
+ add _token $_token $_c
+ jmp parse_token
+ #token_done
+ ife $_token ''
+  jmp next_token
+ els
+  psh $_tokens $_token
+ fin
+ jmp next_token
+ #parse_done
+ ife $_token ''
+  ret $_tokens
+ fin
+ psh $_tokens $_token
+ ret $_tokens
+end
+let env {}
+
+/ ====== evaluating ======
+def expr
+ let _expr $0
+ let _original $0
+ int _i $_expr
+ jeq $_i $nil continue
+ ret $_i
+ #continue
+ pol $_expr _c1
+ ife $_c1 '$'
+  get $env $_expr _val
+  ret $_val
+ fin
+ ife $_c1 '\''
+  pop $_expr _
+  ret $_expr
+ fin
+ ife $_c1 '['
+  ret []
+ fin
+ ret $_original
+end
+
+def eval_param
+ let _line $0
+ let _idx $1
+ get $_line $_idx _val
+ cal expr $_val
+ ret $ret
+end
+
+/ ** main eval **
+def runtime
+ let _src $0
+ let env {}
+ let _p {}
+ let _lbl {}
+ cal parse $_src $_p $_lbl
+ let _pc 0
+ 
+ #eval
+ get $_p $_pc _line
+ jeq $_line $nil eval_done
+ get $_line 0 _cmd
+ 
+ ife $_cmd 'clr'
+  clr
+ fin
+ ife $_cmd 'prt'
+  get $_line 1 _val
+  cal expr $_val
+  let _val $ret
+  get $_line 2 _val2
+  ife $_val2 $nil
+   prt $_val
+  els
+   cal expr $_val2
+   prt $_val $ret
+  fin
+ fin
+ ife $_cmd 'let'
+  get $_line 1 _var
+  cal eval_param $_line 2
+  put $env $_var $ret
+ fin
+ jeq $_cmd 'add' do_arithmetic
+ jeq $_cmd 'sub' do_arithmetic
+ jeq $_cmd 'mul' do_arithmetic
+ jeq $_cmd 'div' do_arithmetic
+ jmp non_arithmetic
+  #do_arithmetic
+  get $_line 1 _var
+  cal eval_param $_line 2
+  let _val1 $ret
+  cal eval_param $_line 3
+  let _val2 $ret
+  ife $_cmd 'add'
+   add _res $_val1 $_val2
+  fin
+  ife $_cmd 'sub'
+   sub _res $_val1 $_val2
+  fin
+  ife $_cmd 'mul'
+   mul _res $_val1 $_val2
+  fin
+  ife $_cmd 'div'
+   div _res $_val1 $_val2
+  fin
+  put $env $_var $_res
+ #non_arithmetic
+ ife $_cmd 'slp'
+  cal eval_param $_line 1
+  slp $ret
+ fin
+ ife $_cmd 'drw'
+  cal eval_param $_line 1
+  let _x $ret
+  cal eval_param $_line 2
+  let _y $ret
+  cal eval_param $_line 3
+  drw $_x $_y $ret
+ fin
+ ife $_cmd 'jmp'
+  get $_line 1 _lbl_name
+  get $_lbl $_lbl_name _pc
+ fin
+ ife $_cmd 'jeq'
+  cal eval_param $_line 1
+  let _v1 $ret
+  cal eval_param $_line 2
+  let _v2 $ret
+  get $_line 3 _lbl_name
+  jne $_v1 $_v2 jeq_false
+  get $_lbl $_lbl_name _pc
+  #jeq_false
+ fin
+ ife $_cmd 'jne'
+  cal eval_param $_line 1
+  let _v1 $ret
+  cal eval_param $_line 2
+  let _v2 $ret
+  get $_line 3 _lbl_name
+  jeq $_v1 $_v2 jne_false
+  get $_lbl $_lbl_name _pc
+  #jne_false
+ fin
+ ife $_cmd 'inp'
+  get $_line 1 _var
+  inp _val
+  put $env $_var $_val
+ fin
+ ife $_cmd 'int'
+  get $_line 1 _var
+  cal eval_param $_line 2
+  int _val $ret
+  put $env $_var $_val
+ fin
+ ife $_cmd 'tim'
+  get $_line 1 _var
+  get $_line 2 _time
+  tim _val $_time
+  put $env $_var $_val
+ fin
+ ife $_cmd 'pol'
+  cal eval_param $_line 1
+  let _list $ret
+  get $_line 2 _name
+  pol $_list _first
+  get $_line 1 _list_name
+  pol $_list_name x
+  put $env $_list_name $_list
+  put $env $_name $_first
+ fin
+ ife $_cmd 'psh'
+  cal eval_param $_line 1
+  let _list $ret
+  len $_line _line_len
+  sub _line_len $_line_len 2
+  for i $_line_len
+    add j $i 2
+    cal eval_param $_line $j
+    let _val $ret
+    psh $_list $_val
+  nxt
+ fin
+ ife $_cmd 'get'
+  cal eval_param $_line 1
+  let _list $ret
+  cal eval_param $_line 2
+  let _key $ret
+  cal eval_param $_line 3
+  let _var $ret
+  get $_list $_key _val
+  put $env $_var $_val
+ fin
+
+ add _pc $_pc 1
+ jmp eval
+ 
+ #eval_done
+end
+def get_current_path_str
+ let _path '/'
+ for _d $path
+  add _path $_path $_d
+  add _path $_path '/'
+ nxt
+ ret $_path
+end
+
+def get_current_dir
+ let _curr_path $root
+ for _d $path
+  get $_curr_path $_d _curr_path
+ nxt
+ ret $_curr_path
+end
+
+def get_by_path
+ let _path $0
+ let _curr_path $root
+ for _d $_path
+  typ _typ $_curr_path
+  ife $_typ 'map'
+   get $_curr_path $_d _curr_path
+  els
+   ret $nil
+  fin
+ nxt
+ ret $_curr_path
+end
+
+def split_str
+ let _res []
+ let _str $0
+ let _delimiter $1
+ let _current_token ''
+ for _c $_str
+  ife $_c $_delimiter
+   jeq $_current_token '' split_str_token_skip
+   psh $_res $_current_token
+   let _current_token ''
+   #split_str_token_skip
+  els
+   add _current_token $_current_token $_c
+  fin
+ nxt
+ jeq $_current_token '' split_str_last_token_skip
+ psh $_res $_current_token
+ #split_str_last_token_skip
+ ret $_res
+end
+
+def get_path_by_str
+ let _path_str $0    / assert non-empty
+ let _is_file $1     / pass in 1 if is file
+ get $_path_str 0 _path_first_c
+ 
+ let _full_path []
+ ife $_path_first_c '/'
+  / absolute path
+  let _full_path []
+ els
+  / relative path
+  for _p $path
+   psh $_full_path $_p
+  nxt
+ fin
+ 
+ cal split_str $_path_str '/'
+ let _path $ret
+
+ for _p $_path
+  psh $_full_path $_p
+ nxt
+
+ let _dup_full_path []
+ let _real_full_path []
+ for _p $_full_path
+  ife $_p '..'
+   pop $_dup_full_path a
+   pop $_real_full_path a
+  els
+   psh $_dup_full_path $_p
+   psh $_real_full_path $_p
+  fin
+ nxt
+ cal verify_path $_dup_full_path $_is_file
+ ife $ret 0
+  ret $nil
+ fin
+ ret $_real_full_path
+end
+
+def verify_path
+ let _path $0
+ let _if_file $1
+ let _curr_path $root
+ #verify_path_next
+ pol $_path _p
+ jeq $_p $nil verify_path_true
+ typ _path_typ $_curr_path
+ ife $_path_typ 'map'
+  get $_curr_path $_p _curr_path
+  ife $_curr_path $nil
+   ret 0
+  fin
+ els
+  ret 0
+ fin
+ jmp verify_path_next
+ #verify_path_true
+ ife $_if_file 1
+  ret 1
+ els
+  typ _path_typ $_curr_path
+  ife $_path_typ 'map'   / check final dir is valid
+   ret 1
+  els
+   ret 0
+  fin
+ fin
+end
+
+def check_executable
+ let _file $0
+ typ file_type $_file
+ ife $file_type 'list'
+  ret 1
+ fin
+ ret 0
+end
+
+def check_is_dir
+ let _file $0
+ typ file_type $_file
+ ife $file_type 'map'
+  ret 1
+ fin
+ ret 0
+end
+
+def print_error
+ let _msg $0
+ add _msg 'ERR ' $_msg
+ prt $_msg
+end
+
+def replace_char_in_str
+ let str $0
+ let chr $1
+ let to $2
+ len $str str_len
+ let new ''
+ for i $str_len
+  get $str $i c
+  ife $c $chr
+   add new $new $to
+  els
+   add new $new $c
+  fin
+ nxt
+ ret $new
+end
+
+def replace_esc_in_str
+ let str $0
+ len $str str_len
+ let new ''
+ let escaping 0
+ for i $str_len
+  get $str $i c
+  ife $c '\\'
+   ife $escaping 0
+    let escaping 1
+   els
+    add new $new $c
+   fin
+  els
+   ife $escaping 1
+    ife $c 'n'
+     add new $new '\n'
+    fin
+    let escaping 0
+   els
+    add new $new $c
+   fin
+  fin
+ nxt
+ ret $new
 end
 def welcome_info
  prt 'Moon OS  v1.02'
@@ -552,500 +1059,4 @@ def main
 end
 
 cal welcome_info
-cal init_files
 cal main
-/ ====== parsing runtime program ======
-def parse_line
- let _line $0
- let _tokens []
- #next_token
- let _token ''
- #parse_token
- pol $_line _c
- jeq $_c '' parse_done
- jeq $_c ' ' token_done
- jeq $_c '\'' parse_string
- jeq $_c '"' parse_string
- jmp add_token_char
- 
- #parse_string
- let _q $_c
- let _s '\''
-
- #parse_string_char
- pol $_line _c
- ife $_c $_q
-  psh $_s $_c
-  psh $_tokens $_s
-  jmp next_token
- els
-  psh $_s $_c
-  jmp parse_string_char
- fin
- 
- #add_token_char
- add _token $_token $_c
- jmp parse_token
-
- #token_done
- ife $_token ''
-  jmp next_token
- els
-  psh $_tokens $_token
- fin
- jmp next_token
- #parse_done
- ife $_token ''
-  ret $_tokens
- fin
- psh $_tokens $_token
- ret $_tokens
-end
-
-def parse
- let _src $0
- let _p $1  / map ref
- let _lbl $2  / map ref
- let _lc 0
- for _line $_src
-  / check label
-  pol $_line _c1
-  ife $_c1 '#'
-   put $_lbl $_line $_lc
-  fin
-  add _line $_c1 $_line
-  cal parse_line $_line
-  put $_p $_lc $ret
-  add _lc $_lc 1
- nxt
- ret $_p
-end
-
-/ ====== parsing user input ======
-def parse_input
- let _input $0
- let _tokens []
- #next_token
- let _token ''
- #parse_token
- pol $_input _c
- jeq $_c '' parse_done
- jeq $_c ' ' token_done
- jeq $_c '\'' parse_string
- jeq $_c '"' parse_string
- jmp add_token_char
- 
- #parse_string
- let _q $_c
- let _s ''
- #parse_string_char
- pol $_input _c
- ife $_c $_q
-  psh $_tokens $_s
-  jmp next_token
- els
-  psh $_s $_c
-  jmp parse_string_char
- fin
- 
- #add_token_char
- add _token $_token $_c
- jmp parse_token
- #token_done
- ife $_token ''
-  jmp next_token
- els
-  psh $_tokens $_token
- fin
- jmp next_token
- #parse_done
- ife $_token ''
-  ret $_tokens
- fin
- psh $_tokens $_token
- ret $_tokens
-end
-let env {}
-
-/ ====== evaluating ======
-def expr
- let _expr $0
- let _original $0
- int _i $_expr
- jeq $_i $nil continue
- ret $_i
- #continue
- pol $_expr _c1
- ife $_c1 '$'
-  get $env $_expr _val
-  ret $_val
- fin
- ife $_c1 '\''
-  pop $_expr _
-  ret $_expr
- fin
- ife $_c1 '['
-  ret []
- fin
- ret $_original
-end
-
-def eval_param
- let _line $0
- let _idx $1
- get $_line $_idx _val
- cal expr $_val
- ret $ret
-end
-
-/ ** main eval **
-def runtime
- let _src $0
- let env {}
- let _p {}
- let _lbl {}
- cal parse $_src $_p $_lbl
- let _pc 0
- 
- #eval
- get $_p $_pc _line
- jeq $_line $nil eval_done
- get $_line 0 _cmd
- 
- ife $_cmd 'clr'
-  clr
- fin
- ife $_cmd 'prt'
-  get $_line 1 _val
-  cal expr $_val
-  let _val $ret
-  get $_line 2 _val2
-  ife $_val2 $nil
-   prt $_val
-  els
-   cal expr $_val2
-   prt $_val $ret
-  fin
- fin
- ife $_cmd 'let'
-  get $_line 1 _var
-  cal eval_param $_line 2
-  put $env $_var $ret
- fin
- jeq $_cmd 'add' do_arithmetic
- jeq $_cmd 'sub' do_arithmetic
- jeq $_cmd 'mul' do_arithmetic
- jeq $_cmd 'div' do_arithmetic
- jmp non_arithmetic
-  #do_arithmetic
-  get $_line 1 _var
-  cal eval_param $_line 2
-  let _val1 $ret
-  cal eval_param $_line 3
-  let _val2 $ret
-  ife $_cmd 'add'
-   add _res $_val1 $_val2
-  fin
-  ife $_cmd 'sub'
-   sub _res $_val1 $_val2
-  fin
-  ife $_cmd 'mul'
-   mul _res $_val1 $_val2
-  fin
-  ife $_cmd 'div'
-   div _res $_val1 $_val2
-  fin
-  put $env $_var $_res
- #non_arithmetic
- ife $_cmd 'slp'
-  cal eval_param $_line 1
-  slp $ret
- fin
- ife $_cmd 'drw'
-  cal eval_param $_line 1
-  let _x $ret
-  cal eval_param $_line 2
-  let _y $ret
-  cal eval_param $_line 3
-  drw $_x $_y $ret
- fin
- ife $_cmd 'jmp'
-  get $_line 1 _lbl_name
-  get $_lbl $_lbl_name _pc
- fin
- ife $_cmd 'jeq'
-  cal eval_param $_line 1
-  let _v1 $ret
-  cal eval_param $_line 2
-  let _v2 $ret
-  get $_line 3 _lbl_name
-  jne $_v1 $_v2 jeq_false
-  get $_lbl $_lbl_name _pc
-  #jeq_false
- fin
- ife $_cmd 'jne'
-  cal eval_param $_line 1
-  let _v1 $ret
-  cal eval_param $_line 2
-  let _v2 $ret
-  get $_line 3 _lbl_name
-  jeq $_v1 $_v2 jne_false
-  get $_lbl $_lbl_name _pc
-  #jne_false
- fin
- ife $_cmd 'inp'
-  get $_line 1 _var
-  inp _val
-  put $env $_var $_val
- fin
- ife $_cmd 'int'
-  get $_line 1 _var
-  cal eval_param $_line 2
-  int _val $ret
-  put $env $_var $_val
- fin
- ife $_cmd 'tim'
-  get $_line 1 _var
-  get $_line 2 _time
-  ife $_time 'year'
-   tim _val year
-  fin
-  ife $_time 'month'
-   tim _val month
-  fin
-  ife $_time 'day'
-   tim _val day
-  fin
-  ife $_time 'date'
-   tim _val date
-  fin
-  put $env $_var $_val
- fin
- ife $_cmd 'pol'
-  cal eval_param $_line 1
-  let _list $ret
-  get $_line 2 _name
-  pol $_list _first
-  get $_line 1 _list_name
-  pol $_list_name x
-  put $env $_list_name $_list
-  put $env $_name $_first
- fin
- ife $_cmd 'psh'
-  cal eval_param $_line 1
-  let _list $ret
-  len $_line _line_len
-  sub _line_len $_line_len 2
-  for i $_line_len
-    add j $i 2
-    cal eval_param $_line $j
-    let _val $ret
-    psh $_list $_val
-  nxt
- fin
- ife $_cmd 'get'
-  cal eval_param $_line 1
-  let _list $ret
-  cal eval_param $_line 2
-  let _key $ret
-  cal eval_param $_line 3
-  let _var $ret
-  get $_list $_key _val
-  put $env $_var $_val
- fin
-
- add _pc $_pc 1
- jmp eval
- 
- #eval_done
-end
-def get_current_path_str
- let _path '/'
- for _d $path
-  add _path $_path $_d
-  add _path $_path '/'
- nxt
- ret $_path
-end
-
-def get_current_dir
- let _curr_path $root
- for _d $path
-  get $_curr_path $_d _curr_path
- nxt
- ret $_curr_path
-end
-
-def get_by_path
- let _path $0
- let _curr_path $root
- for _d $_path
-  typ _typ $_curr_path
-  ife $_typ 'map'
-   get $_curr_path $_d _curr_path
-  els
-   ret $nil
-  fin
- nxt
- ret $_curr_path
-end
-
-def split_str
- let _res []
- let _str $0
- let _delimiter $1
- let _current_token ''
- for _c $_str
-  ife $_c $_delimiter
-   jeq $_current_token '' split_str_token_skip
-   psh $_res $_current_token
-   let _current_token ''
-   #split_str_token_skip
-  els
-   add _current_token $_current_token $_c
-  fin
- nxt
- jeq $_current_token '' split_str_last_token_skip
- psh $_res $_current_token
- #split_str_last_token_skip
- ret $_res
-end
-
-def get_path_by_str
- let _path_str $0    / assert non-empty
- let _is_file $1     / pass in 1 if is file
- get $_path_str 0 _path_first_c
- 
- let _full_path []
- ife $_path_first_c '/'
-  / absolute path
-  let _full_path []
- els
-  / relative path
-  for _p $path
-   psh $_full_path $_p
-  nxt
- fin
- 
- cal split_str $_path_str '/'
- let _path $ret
-
- for _p $_path
-  psh $_full_path $_p
- nxt
-
- let _dup_full_path []
- let _real_full_path []
- for _p $_full_path
-  ife $_p '..'
-   pop $_dup_full_path a
-   pop $_real_full_path a
-  els
-   psh $_dup_full_path $_p
-   psh $_real_full_path $_p
-  fin
- nxt
- cal verify_path $_dup_full_path $_is_file
- ife $ret 0
-  ret $nil
- fin
- ret $_real_full_path
-end
-
-def verify_path
- let _path $0
- let _if_file $1
- let _curr_path $root
- #verify_path_next
- pol $_path _p
- jeq $_p $nil verify_path_true
- typ _path_typ $_curr_path
- ife $_path_typ 'map'
-  get $_curr_path $_p _curr_path
-  ife $_curr_path $nil
-   ret 0
-  fin
- els
-  ret 0
- fin
- jmp verify_path_next
- #verify_path_true
- ife $_if_file 1
-  ret 1
- els
-  typ _path_typ $_curr_path
-  ife $_path_typ 'map'   / check final dir is valid
-   ret 1
-  els
-   ret 0
-  fin
- fin
-end
-
-def check_executable
- let _file $0
- typ file_type $_file
- ife $file_type 'list'
-  ret 1
- fin
- ret 0
-end
-
-def check_is_dir
- let _file $0
- typ file_type $_file
- ife $file_type 'map'
-  ret 1
- fin
- ret 0
-end
-
-def print_error
- let _msg $0
- add _msg 'ERR ' $_msg
- prt $_msg
-end
-
-def replace_char_in_str
- let str $0
- let chr $1
- let to $2
- len $str str_len
- let new ''
- for i $str_len
-  get $str $i c
-  ife $c $chr
-   add new $new $to
-  els
-   add new $new $c
-  fin
- nxt
- ret $new
-end
-
-def replace_esc_in_str
- let str $0
- len $str str_len
- let new ''
- let escaping 0
- for i $str_len
-  get $str $i c
-  ife $c '\\'
-   ife $escaping 0
-    let escaping 1
-   els
-    add new $new $c
-   fin
-  els
-   ife $escaping 1
-    ife $c 'n'
-     add new $new '\n'
-    fin
-    let escaping 0
-   els
-    add new $new $c
-   fin
-  fin
- nxt
- ret $new
-end

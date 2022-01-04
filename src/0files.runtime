@@ -99,7 +99,22 @@ def init_files
  psh $_date_p 'prt $date_str'
  put $_path_programs 'date' $_date_p
 
+ let _time_p []
+ psh $_time_p 'tim _hour hour'
+ psh $_time_p 'tim _minute minute'
+ psh $_time_p 'tim _second second'
+ psh $_time_p 'let time_str \'\''
+ psh $_time_p 'add time_str $time_str $_hour'
+ psh $_time_p 'add time_str $time_str \':\''
+ psh $_time_p 'add time_str $time_str $_minute'
+ psh $_time_p 'add time_str $time_str \':\''
+ psh $_time_p 'add time_str $time_str $_second'
+ psh $_time_p 'prt $time_str'
+put $_path_programs 'time' $_time_p
+
  put $root 'programs' $_path_programs
 
  psh $path 'home'
 end
+
+cal init_files

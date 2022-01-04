@@ -447,5 +447,4 @@ def main
 end
 
 cal welcome_info
-cal init_files
 cal main
