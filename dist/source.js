@@ -1,5 +1,5 @@
 /* Built on
-Tue 4 Jan 2022 15:44:37 EST
+Tue 4 Jan 2022 17:09:11 EST
 */
 let moonSrc = `
 
@@ -108,7 +108,7 @@ def init_files
  psh $path 'home'
 end
 def welcome_info
- prt 'Moon OS  v1.01'
+ prt 'Moon OS  v1.02'
  prt 'Copyright (c) 1992 RunTech, Inc.'
  prt 'All rights reserved.'
  prt ''
@@ -212,30 +212,39 @@ def main
 
  / -- CAT --
  ife $cmd 'cat'
-  pol $tokens d
-  ife $d $nil
+  pol $tokens _d
+  ife $_d $nil
    cal print_error 'Invalid file name'
    jmp repl_loop
   fin
-  cal get_current_dir
-  let curr_dir $ret
-  get $curr_dir $d dr
-  ife $dr $nil
+
+  cal get_path_by_str $_d 1
+  ife $ret $nil
+   cal print_error 'File not found'
+   jmp repl_loop
+  fin
+  let _file_path $ret
+  pop $_file_path _prog
+  cal get_by_path $_file_path
+  let file_dir $ret
+
+  get $file_dir $_prog _file_content
+  ife $_file_content $nil
    cal print_error 'File not found'
   els
-   cal check_is_dir $dr
+   cal check_is_dir $_file_content
    ife $ret 1
     cal print_error 'Not a file'
    els
-    typ file_type $dr
+    typ file_type $_file_content
     let cat_success 0
     ife $file_type 'str'
-     prt $dr
+     prt $_file_content
      let cat_success 1
     fin
     ife $file_type 'list'
      let _i 1    / line number
-     for _row $dr
+     for _row $_file_content
       cal replace_char_in_str $_row '\\n' '\\\\n'
       let _row $ret
       add _ln $_i ' |'
@@ -264,6 +273,7 @@ def main
   cal get_path_by_str $_d 1
   ife $ret $nil
    cal print_error 'File not found'
+   jmp repl_loop
   fin
   let _prog_path $ret
   pop $_prog_path _prog
