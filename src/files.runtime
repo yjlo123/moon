@@ -77,6 +77,28 @@ def init_files
  psh $_slow_print_p '#done'
  put $_path_programs 'slow_print' $_slow_print_p
 
+ let _date_p []
+ psh $_date_p 'let days []'
+ psh $_date_p 'psh $days \'Sun\' \'Mon\' \'Tue\' \'Wed\' \'Thu\' \'Fri\' "Sat"'
+ psh $_date_p 'let months []'
+ psh $_date_p 'psh $months \'Jan\' \'Feb\' \'Mar\' \'Apr\' \'May\' \'Jun\' \'Jul\' \'Aug\' \'Sep\' \'Oct\' \'Nov\' \'Dec\''
+ psh $_date_p 'tim _day day'
+ psh $_date_p 'get $days $_day _day_str'
+ psh $_date_p 'tim _month month'
+ psh $_date_p 'get $months $_month _month_str'
+ psh $_date_p 'tim _date date'
+ psh $_date_p 'tim _year year'
+ psh $_date_p 'let date_str \'\''
+ psh $_date_p 'add date_str $date_str $_day_str'
+ psh $_date_p 'add date_str $date_str \' \''
+ psh $_date_p 'add date_str $date_str $_month_str'
+ psh $_date_p 'add date_str $date_str \' \''
+ psh $_date_p 'add date_str $date_str $_date'
+ psh $_date_p 'add date_str $date_str \' \''
+ psh $_date_p 'add date_str $date_str $_year'
+ psh $_date_p 'prt $date_str'
+ put $_path_programs 'date' $_date_p
+
  put $root 'programs' $_path_programs
 
  psh $path 'home'

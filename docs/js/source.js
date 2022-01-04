@@ -1,5 +1,5 @@
 /* Built on
-Tue 4 Jan 2022 14:59:39 EST
+Tue 4 Jan 2022 15:44:37 EST
 */
 let moonSrc = `
 
@@ -80,6 +80,28 @@ def init_files
  psh $_slow_print_p 'jmp loop'
  psh $_slow_print_p '#done'
  put $_path_programs 'slow_print' $_slow_print_p
+
+ let _date_p []
+ psh $_date_p 'let days []'
+ psh $_date_p 'psh $days \\'Sun\\' \\'Mon\\' \\'Tue\\' \\'Wed\\' \\'Thu\\' \\'Fri\\' "Sat"'
+ psh $_date_p 'let months []'
+ psh $_date_p 'psh $months \\'Jan\\' \\'Feb\\' \\'Mar\\' \\'Apr\\' \\'May\\' \\'Jun\\' \\'Jul\\' \\'Aug\\' \\'Sep\\' \\'Oct\\' \\'Nov\\' \\'Dec\\''
+ psh $_date_p 'tim _day day'
+ psh $_date_p 'get $days $_day _day_str'
+ psh $_date_p 'tim _month month'
+ psh $_date_p 'get $months $_month _month_str'
+ psh $_date_p 'tim _date date'
+ psh $_date_p 'tim _year year'
+ psh $_date_p 'let date_str \\'\\''
+ psh $_date_p 'add date_str $date_str $_day_str'
+ psh $_date_p 'add date_str $date_str \\' \\''
+ psh $_date_p 'add date_str $date_str $_month_str'
+ psh $_date_p 'add date_str $date_str \\' \\''
+ psh $_date_p 'add date_str $date_str $_date'
+ psh $_date_p 'add date_str $date_str \\' \\''
+ psh $_date_p 'add date_str $date_str $_year'
+ psh $_date_p 'prt $date_str'
+ put $_path_programs 'date' $_date_p
 
  put $root 'programs' $_path_programs
 
@@ -782,6 +804,15 @@ def runtime
   ife $_time 'year'
    tim _val year
   fin
+  ife $_time 'month'
+   tim _val month
+  fin
+  ife $_time 'day'
+   tim _val day
+  fin
+  ife $_time 'date'
+   tim _val date
+  fin
   put $env $_var $_val
  fin
  ife $_cmd 'pol'
@@ -790,9 +821,31 @@ def runtime
   get $_line 2 _name
   pol $_list _first
   get $_line 1 _list_name
-  pol $_list_name _
+  pol $_list_name x
   put $env $_list_name $_list
   put $env $_name $_first
+ fin
+ ife $_cmd 'psh'
+  cal eval_param $_line 1
+  let _list $ret
+  len $_line _line_len
+  sub _line_len $_line_len 2
+  for i $_line_len
+    add j $i 2
+    cal eval_param $_line $j
+    let _val $ret
+    psh $_list $_val
+  nxt
+ fin
+ ife $_cmd 'get'
+  cal eval_param $_line 1
+  let _list $ret
+  cal eval_param $_line 2
+  let _key $ret
+  cal eval_param $_line 3
+  let _var $ret
+  get $_list $_key _val
+  put $env $_var $_val
  fin
 
  add _pc $_pc 1
