@@ -12,6 +12,7 @@ def main
  inp in
  cal parse_input $in
  let tokens $ret
+ #exec_tokens
  pol $tokens cmd
 
  jeq $cmd 'exit' exit
@@ -145,20 +146,28 @@ def main
 
  / -- RUN --
  ife $cmd 'run'
-  pol $tokens d
-  ife $d $nil
+  pol $tokens _d
+  ife $_d $nil
    cal print_error 'Invalid file name'
    jmp repl_loop
   fin
-  cal get_current_dir
-  let curr_dir $ret
-  get $curr_dir $d dr
-  ife $dr $nil
+
+  cal get_path_by_str $_d 1
+  ife $ret $nil
+   cal print_error 'File not found'
+  fin
+  let _prog_path $ret
+  pop $_prog_path _prog
+  cal get_by_path $_prog_path
+  let prog_dir $ret
+
+  get $prog_dir $_prog _file_content
+  ife $_file_content $nil
    cal print_error 'File not found'
   els
-   cal check_executable $dr
+   cal check_executable $_file_content
    ife $ret 1
-    cal runtime $dr
+    cal runtime $_file_content
    els
     cal print_error 'File not executable'
    fin
@@ -379,9 +388,46 @@ def main
   fin
   jmp repl_loop
  fin
+
+ / -- (EMPTY) --
  ife $cmd $nil
   jmp repl_loop
  fin
+
+ / -- (ENV PROGRAM) --
+ cal split_str $env_path '/'
+ cal get_by_path $ret
+ let _env_path_str $ret
+ cal get_path_by_str $_env_path_str
+ ife $ret $nil
+  jmp skip_env_program
+ fin
+ 
+ let _program_dir $root
+ for _d $ret
+  get $_program_dir $_d _program_dir
+ nxt
+ let _has_program 0
+ for _p $_program_dir
+  ife $_p $cmd
+   let _has_program 1
+  fin
+ nxt
+ ife $_has_program 1
+  let _new_tokens []
+  psh $_new_tokens 'run'
+  add _prog_path $_env_path_str '/'
+  add _prog_path $_prog_path $cmd
+  psh $_new_tokens $_prog_path
+  for t $tokens
+   psh $_new_tokens $t
+  nxt
+  let tokens $_new_tokens
+  jmp exec_tokens
+ fin
+ #skip_env_program
+
+ / -- (INVALID) --
  add err_msg 'Unknown command: ' $cmd
  cal print_error $err_msg
  jmp repl_loop

@@ -1,14 +1,21 @@
 /* Built on
-Mon 3 Jan 2022 21:08:25 EST
+Tue 4 Jan 2022 14:59:39 EST
 */
 let moonSrc = `
 
 let root {}
 let path []
+let env_path ''
 
 def init_files
  let root {}
  let path []
+ let env_path '/env/path'
+
+ / :/env
+ let _path_env {}
+ put $_path_env 'path' '/programs'
+ put $root 'env' $_path_env
 
  / :/home
  let _path_home {}
@@ -92,6 +99,7 @@ def main
  inp in
  cal parse_input $in
  let tokens $ret
+ #exec_tokens
  pol $tokens cmd
 
  jeq $cmd 'exit' exit
@@ -225,20 +233,28 @@ def main
 
  / -- RUN --
  ife $cmd 'run'
-  pol $tokens d
-  ife $d $nil
+  pol $tokens _d
+  ife $_d $nil
    cal print_error 'Invalid file name'
    jmp repl_loop
   fin
-  cal get_current_dir
-  let curr_dir $ret
-  get $curr_dir $d dr
-  ife $dr $nil
+
+  cal get_path_by_str $_d 1
+  ife $ret $nil
+   cal print_error 'File not found'
+  fin
+  let _prog_path $ret
+  pop $_prog_path _prog
+  cal get_by_path $_prog_path
+  let prog_dir $ret
+
+  get $prog_dir $_prog _file_content
+  ife $_file_content $nil
    cal print_error 'File not found'
   els
-   cal check_executable $dr
+   cal check_executable $_file_content
    ife $ret 1
-    cal runtime $dr
+    cal runtime $_file_content
    els
     cal print_error 'File not executable'
    fin
@@ -459,9 +475,46 @@ def main
   fin
   jmp repl_loop
  fin
+
+ / -- (EMPTY) --
  ife $cmd $nil
   jmp repl_loop
  fin
+
+ / -- (ENV PROGRAM) --
+ cal split_str $env_path '/'
+ cal get_by_path $ret
+ let _env_path_str $ret
+ cal get_path_by_str $_env_path_str
+ ife $ret $nil
+  jmp skip_env_program
+ fin
+ 
+ let _program_dir $root
+ for _d $ret
+  get $_program_dir $_d _program_dir
+ nxt
+ let _has_program 0
+ for _p $_program_dir
+  ife $_p $cmd
+   let _has_program 1
+  fin
+ nxt
+ ife $_has_program 1
+  let _new_tokens []
+  psh $_new_tokens 'run'
+  add _prog_path $_env_path_str '/'
+  add _prog_path $_prog_path $cmd
+  psh $_new_tokens $_prog_path
+  for t $tokens
+   psh $_new_tokens $t
+  nxt
+  let tokens $_new_tokens
+  jmp exec_tokens
+ fin
+ #skip_env_program
+
+ / -- (INVALID) --
  add err_msg 'Unknown command: ' $cmd
  cal print_error $err_msg
  jmp repl_loop
@@ -764,6 +817,20 @@ def get_current_dir
  ret $_curr_path
 end
 
+def get_by_path
+ let _path $0
+ let _curr_path $root
+ for _d $_path
+  typ _typ $_curr_path
+  ife $_typ 'map'
+   get $_curr_path $_d _curr_path
+  els
+   ret $nil
+  fin
+ nxt
+ ret $_curr_path
+end
+
 def split_str
  let _res []
  let _str $0
@@ -787,6 +854,7 @@ end
 
 def get_path_by_str
  let _path_str $0    / assert non-empty
+ let _is_file $1     / pass in 1 if is file
  get $_path_str 0 _path_first_c
  
  let _full_path []
@@ -818,7 +886,7 @@ def get_path_by_str
    psh $_real_full_path $_p
   fin
  nxt
- cal verify_path $_dup_full_path
+ cal verify_path $_dup_full_path $_is_file
  ife $ret 0
   ret $nil
  fin
@@ -827,6 +895,7 @@ end
 
 def verify_path
  let _path $0
+ let _if_file $1
  let _curr_path $root
  #verify_path_next
  pol $_path _p
@@ -842,11 +911,15 @@ def verify_path
  fin
  jmp verify_path_next
  #verify_path_true
- typ _path_typ $_curr_path
- ife $_path_typ 'map'   / check final dir is valid
+ ife $_if_file 1
   ret 1
  els
-  ret 0
+  typ _path_typ $_curr_path
+  ife $_path_typ 'map'   / check final dir is valid
+   ret 1
+  els
+   ret 0
+  fin
  fin
 end
 
