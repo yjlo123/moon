@@ -35,95 +35,14 @@ def init_files
  let _misc {}
  put $_misc 'test' 'Hello World!'
  put $_path_home 'misc' $_misc
-
  put $root 'home' $_path_home
-
-
- / :/programs
- let _path_programs {}
- let _hello_p []
- psh $_hello_p 'prt \'Hello!\''
- psh $_hello_p 'slp 500'
- psh $_hello_p 'prt \'Bye~\''
- put $_path_programs 'hello' $_hello_p
- 
- let _count_p []
- psh $_count_p 'let n 5'
- psh $_count_p '#loop'
- psh $_count_p 'prt $n'
- psh $_count_p 'sub n $n 1'
- psh $_count_p 'slp 600'
- psh $_count_p 'jne $n 0 loop'
- put $_path_programs 'count' $_count_p
-
- let _age_p []
- psh $_age_p 'prt \'Input year born:\''
- psh $_age_p 'inp _year'
- psh $_age_p 'int _year $_year'
- psh $_age_p 'tim _current year'
- psh $_age_p 'sub age $_current $_year'
- psh $_age_p 'prt \'Age:\''
- psh $_age_p 'prt $age'
- put $_path_programs 'compute_age' $_age_p
-
- let _slow_print_p []
- psh $_slow_print_p 'let msg \'Hello World!\n\''
- psh $_slow_print_p 'jeq $0 $nil continue'
- psh $_slow_print_p 'let msg $0'
- psh $_slow_print_p 'add msg $msg \'\n\''
- psh $_slow_print_p '#continue'
- psh $_slow_print_p '#loop'
- psh $_slow_print_p 'pol $msg c'
- psh $_slow_print_p 'jeq $c \'\' done'
- psh $_slow_print_p 'slp 100'
- psh $_slow_print_p 'prt $c \'\''
- psh $_slow_print_p 'jmp loop'
- psh $_slow_print_p '#done'
- put $_path_programs 'slow_print' $_slow_print_p
-
- let _date_p []
- psh $_date_p 'let days []'
- psh $_date_p 'psh $days \'Sun\' \'Mon\' \'Tue\' \'Wed\' \'Thu\' \'Fri\' "Sat"'
- psh $_date_p 'let months []'
- psh $_date_p 'psh $months \'Jan\' \'Feb\' \'Mar\' \'Apr\' \'May\' \'Jun\' \'Jul\' \'Aug\' \'Sep\' \'Oct\' \'Nov\' \'Dec\''
- psh $_date_p 'tim _day day'
- psh $_date_p 'get $days $_day _day_str'
- psh $_date_p 'tim _month month'
- psh $_date_p 'get $months $_month _month_str'
- psh $_date_p 'tim _date date'
- psh $_date_p 'tim _year year'
- psh $_date_p 'let date_str \'\''
- psh $_date_p 'add date_str $date_str $_day_str'
- psh $_date_p 'add date_str $date_str \' \''
- psh $_date_p 'add date_str $date_str $_month_str'
- psh $_date_p 'add date_str $date_str \' \''
- psh $_date_p 'add date_str $date_str $_date'
- psh $_date_p 'add date_str $date_str \' \''
- psh $_date_p 'add date_str $date_str $_year'
- psh $_date_p 'prt $date_str'
- put $_path_programs 'date' $_date_p
-
- let _time_p []
- psh $_time_p 'tim _hour hour'
- psh $_time_p 'tim _minute minute'
- psh $_time_p 'tim _second second'
- psh $_time_p 'let time_str \'\''
- psh $_time_p 'add time_str $time_str $_hour'
- psh $_time_p 'add time_str $time_str \':\''
- psh $_time_p 'add time_str $time_str $_minute'
- psh $_time_p 'add time_str $time_str \':\''
- psh $_time_p 'add time_str $time_str $_second'
- psh $_time_p 'prt $time_str'
-put $_path_programs 'time' $_time_p
-
- put $root 'programs' $_path_programs
 
  psh $path 'home'
 end
 
 cal init_files
 def load_extra_files
- prs _fs '{"mnt": {"test": "hello"}}'
+ prs _fs '{"mnt": {"test": "hello"}, "programs": {"hello": ["prt \'Hello!\'", "slp 500", "prt \'Bye~\'"], "count": ["let n 5", "#loop", "prt $n", "sub n $n 1", "slp 600", "jne $n 0 loop"], "compute_age": ["prt \'Input year born:\'", "inp _year", "int _year $_year", "tim _current year", "sub age $_current $_year", "prt \'Age:\'", "prt $age"], "slow_print": ["let msg \'Hello World!\\n\'", "jeq $0 $nil continue", "let msg $0", "add msg $msg \'\\n\'", "#continue", "#loop", "pol $msg c", "jeq $c \'\' done", "slp 100", "prt $c \'\'", "jmp loop", "#done"], "time": ["tim _hour hour", "tim _minute minute", "tim _second second", "let time_str \'\'", "add time_str $time_str $_hour", "add time_str $time_str \':\'", "add time_str $time_str $_minute", "add time_str $time_str \':\'", "add time_str $time_str $_second", "prt $time_str"], "date": ["let days []", "psh $days \'Sun\' \'Mon\' \'Tue\' \'Wed\' \'Thu\' \'Fri\' \'Sat\'", "let months []", "psh $months \'Jan\' \'Feb\' \'Mar\' \'Apr\' \'May\' \'Jun\' \'Jul\' \'Aug\' \'Sep\' \'Oct\' \'Nov\' \'Dec\'", "tim _day day", "get $days $_day _day_str", "tim _month month", "get $months $_month _month_str", "tim _date date", "tim _year year", "let date_str \'\'", "add date_str $date_str $_day_str", "add date_str $date_str \' \'", "add date_str $date_str $_month_str", "add date_str $date_str \' \'", "add date_str $date_str $_date", "add date_str $date_str \' \'", "add date_str $date_str $_year", "prt $date_str"]}}'
  for _d $_fs
   get $_fs $_d _content
   put $root $_d $_content

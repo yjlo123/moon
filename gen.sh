@@ -8,8 +8,10 @@ echo -e "def load_extra_files
  prs _fs '\c" >> $files_extra
 python3 -c "
 import json
-f=open('src/1_files_extra.json')
-print(json.dumps(json.load(f)), end = '')
+f = open('src/1_files_extra.json')
+text = json.dumps(json.load(f))
+text = text.replace(\"'\", \"\\\\'\")
+print(text, end = '')
 f.close()" >> $files_extra
 echo "'
  for _d \$_fs
