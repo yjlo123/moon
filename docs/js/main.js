@@ -20,15 +20,25 @@
 		if (e.which === 9) {
 			// tab key
             let env = runtime.getEnv(false);
-            let path = env.global.path;
+            let path = env.global.path; 
             let root = env.global.root;
             let text = jqconsole.GetPromptText();
             let tokens = text.split(" ");
-            if (tokens.length <= 1 || (text.length > 0 && text[text.length-1] === " ")) {
+            if (tokens.length < 1 || text.length > 0 && text[text.length-1] === " ") {
                 return false;
             }
             let lastToken = tokens[tokens.length-1];
             let currentDir = root;
+
+            if (tokens.length === 1) {
+                // find program in env path
+                let envPathDir = env.global.env_path.split("/").filter(i => i);
+                let tempPath = root;
+                for (let i = 0; i < envPathDir.length; i++) {
+                    tempPath = tempPath[envPathDir[i]];
+                }
+                path = tempPath.split("/").filter(i => i);
+            }
             for (let i = 0; i < path.length; i++) {
                 currentDir = currentDir[path[i]];
             }
