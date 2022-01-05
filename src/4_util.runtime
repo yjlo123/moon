@@ -125,7 +125,10 @@ def check_executable
  let _file $0
  typ file_type $_file
  ife $file_type 'list'
-  ret 1
+  cal get_list_type $_file
+  ife $ret 'exe'
+   ret 1
+  fin
  fin
  ret 0
 end
@@ -187,4 +190,16 @@ def replace_esc_in_str
   fin
  nxt
  ret $new
+end
+
+def get_list_type
+ let _fc $0
+ get $_fc 0 _meta
+ typ _line_1_typ $_meta
+ ife $_line_1_typ 'list'
+  get $_meta 0 _t
+  ret $_t
+ els
+  ret $nil
+ fin
 end

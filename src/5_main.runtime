@@ -49,10 +49,21 @@ def main
    get $_dir $f fc 
    typ ft $fc
    ife $ft 'str'
-    prt '<TXT> ' ''
+    prt '<RAW> ' ''
    fin
    ife $ft 'list'
-    prt '<EXE> ' ''
+    cal get_list_type $fc
+    let _t $ret
+    ife $_t 'exe'
+     prt '<EXE> ' ''
+     jmp list_type_done
+    fin
+    ife $_t 'txt'
+     prt '<TXT> ' ''
+     jmp list_type_done
+    fin
+    prt '<XXX> ' ''
+    #list_type_done
    fin
    ife $ft 'map'
     prt '<DIR> ' ''
@@ -134,16 +145,32 @@ def main
      let cat_success 1
     fin
     ife $file_type 'list'
-     let _i 1    / line number
-     for _row $_file_content
-      cal replace_char_in_str $_row '\n' '\\n'
-      let _row $ret
-      add _ln $_i ' |'
-      add _row $_ln $_row
-      prt $_row
-      add _i $_i 1
-     nxt
-     let cat_success 1
+     cal get_list_type $_file_content
+     let _lt $ret
+     ife $_lt 'exe'
+      let _i 0
+      for _row $_file_content
+       jeq $_i 0 skip_exe_meta
+       cal replace_char_in_str $_row '\n' '\\n'
+       let _row $ret
+       add _ln $_i ' |'
+       add _row $_ln $_row
+       prt $_row
+       #skip_exe_meta
+       add _i $_i 1
+      nxt
+      let cat_success 1
+     fin
+     ife $_lt 'txt'
+      let _i 0
+      for _row $_file_content
+       jeq $_i 0 skip_txt_meta
+       prt $_row
+       #skip_txt_meta
+       add _i $_i 1
+      nxt
+      let cat_success 1
+     fin
     fin
     ife $cat_success 0
      cal print_error 'Unsupported file type.'
@@ -177,7 +204,15 @@ def main
   els
    cal check_executable $_file_content
    ife $ret 1
-    cal runtime $_file_content $tokens
+    let _exe []
+    len $_file_content _length
+    sub _length $_length 1   / skip frist meta line
+    for _i $_length
+     add _j $_i 1
+     get $_file_content $_j _line
+     psh $_exe $_line
+    nxt
+    cal runtime $_exe $tokens
    els
     cal print_error 'File not executable'
    fin
@@ -199,24 +234,38 @@ def main
   / create file if not exist
   ife $fc $nil
    let file_content []
+   let _file_meta []
+   prt 'Create a new file?'
+   prt 't:txt(default) e:exe c:<cancel>'
+   inp _choice
+   jeq $_choice 'c' repl_loop
+   ife $_choice 'e'
+    psh $_file_meta 'exe'
+   els
+    psh $_file_meta 'txt'
+   fin
+   psh $file_content $_file_meta
    put $curr_dir $file_name $file_content
    prt 'File created.'
   fin
   get $curr_dir $file_name fc
 
-  / check file executable
-  cal check_executable $fc
-  ife $ret 1
+  / check file editable
+  typ file_type $fc
+  ife $file_type 'list'
    jmp edit_file_valid
   fin
-  cal print_error 'Not an executable file'
+  cal print_error 'Not an editable file'
   jmp repl_loop
   #edit_file_valid
 
   prt '== Edit v0.1'
   prt '== v:view a:append i:insert r:replace q:quit'
   prt '== File: ' ''
-  prt $file_name
+  prt $file_name ' '
+  prt 'Type: ' ''
+  cal get_list_type $fc
+  prt $ret
 
   #edit_loop
   prt '#' ''
@@ -228,13 +277,15 @@ def main
   jeq $edit_cmd 'q' repl_loop   / quit
   ife $edit_cmd 'v'             / view
    get $curr_dir $file_name fc
-   let _i 1    / line number
+   let _i 0    / line number
    for _row $fc
+    jeq $_i 0 edit_view_skip_meta
     cal replace_char_in_str $_row '\n' '\\n'
     let _row $ret
     add _ln $_i ' |'
     add _row $_ln $_row
     prt $_row
+    #edit_view_skip_meta
     add _i $_i 1
    nxt
   fin
@@ -247,7 +298,6 @@ def main
   ife $edit_cmd 'd'             / delete
    pol $edit_tokens line_number
    int line_number $line_number
-   sub line_number $line_number 1
    get $curr_dir $file_name current_content
    let new_content []
    let _line_count 0
@@ -264,7 +314,6 @@ def main
   ife $edit_cmd 'i'              / insert
    pol $edit_tokens line_number
    int line_number $line_number
-   sub line_number $line_number 1
    pol $edit_tokens line_content
    get $curr_dir $file_name current_content
    let new_content []
@@ -282,7 +331,6 @@ def main
   ife $edit_cmd 'r'              / replace
    pol $edit_tokens line_number
    int line_number $line_number
-   sub line_number $line_number 1
    pol $edit_tokens line_content
    get $curr_dir $file_name current_content
    let new_content []
@@ -334,11 +382,12 @@ def main
    / write to file
    pol $tokens f
    ife $f $nil
-    cal print_error 'Parse error'
+    cal print_error 'File name missing'
    els
     cal get_current_dir
     let curr_dir $ret
     get $curr_dir $f fd
+    prt $fd
     ife $fd $nil
      put $curr_dir $f $s
     els
@@ -358,21 +407,23 @@ def main
    / append to file
    pol $tokens f
    ife $f $nil
-    cal print_error 'Parse error'
+    cal print_error 'File name missing'
     jmp repl_loop
    els
     cal get_current_dir
-    get $ret $f fc
+    let curr_dir $ret
+    get $curr_dir $f fc
     ife $fc $nil
      put $curr_dir $f $s
     els
-     cal check_executable $fc
-     ife $ret 1
-      cal print_error 'Cannot write to an executable file'
-     els
+     typ _ft $fc
+     ife $_ft 'str'
       add fc $fc '\n'
       add fc $fc $s
       put $curr_dir $f $fc
+     els
+      cal print_error 'Can only write to a raw file'
+      jmp repl_loop
      fin
     fin
    fin

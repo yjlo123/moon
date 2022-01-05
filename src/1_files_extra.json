@@ -4,11 +4,13 @@
     },
     "programs": {
         "hello": [
+            ["exe"],
             "prt 'Hello!'",
             "slp 500",
             "prt 'Bye~'"
         ],
         "count": [
+            ["exe"],
             "let n 5",
             "#loop",
             "prt $n",
@@ -17,6 +19,7 @@
             "jne $n 0 loop"
         ],
         "compute_age": [
+            ["exe"],
             "prt 'Input year born:'",
             "inp _year",
             "int _year $_year",
@@ -26,6 +29,7 @@
             "prt $age"
         ],
         "slow_print": [
+            ["exe"],
             "let msg 'Hello World!\\n'",
             "jeq $0 $nil continue",
             "let msg $0",
@@ -40,6 +44,7 @@
             "#done"
         ],
         "time": [
+            ["exe"],
             "tim _hour hour",
             "tim _minute minute",
             "tim _second second",
@@ -52,6 +57,7 @@
             "prt $time_str"
         ],
         "date": [
+            ["exe"],
             "let days []",
             "psh $days 'Sun' 'Mon' 'Tue' 'Wed' 'Thu' 'Fri' 'Sat'",
             "let months []",

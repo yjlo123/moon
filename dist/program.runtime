@@ -15,20 +15,23 @@ def init_files
 
  / :/home
  let _path_home {}
- let _notes ''
- psh $_notes '----------- Moon OS Manual ------------\n'
- psh $_notes 'ls [<p>]-- list directory contents\n'
- psh $_notes 'pwd -- return working directory name\n'
- psh $_notes 'cd <d> -- change directory\n'
- psh $_notes 'mkdir <d> -- make a directory\n'
- psh $_notes 'cat <f> -- concatenate and print a file\n'
- psh $_notes 'rm <f/d> -- remove a directory entry\n'
- psh $_notes 'echo <s> -- output an argument\n'
- psh $_notes '..[> <f>] -- write to a file\n'
- psh $_notes '..[>> <f>] -- append to a file\n'
- psh $_notes 'run <f> -- run an executable file\n'
- psh $_notes 'edit <f> -- edit an executable file\n'
- psh $_notes 'exit -- shut down system\n'
+ let _notes []
+ let _notes_meta []
+ psh $_notes_meta 'txt'
+ psh $_notes $_notes_meta
+ psh $_notes '----------- Moon OS Manual ------------'
+ psh $_notes 'ls [<p>]-- list directory contents'
+ psh $_notes 'pwd -- return working directory name'
+ psh $_notes 'cd <d> -- change directory'
+ psh $_notes 'mkdir <d> -- make a directory'
+ psh $_notes 'cat <f> -- concatenate and print a file'
+ psh $_notes 'rm <f/d> -- remove a directory entry'
+ psh $_notes 'echo <s> -- output an argument'
+ psh $_notes '..[> <f>] -- write to a file'
+ psh $_notes '..[>> <f>] -- append to a file'
+ psh $_notes 'run <f> -- run an executable file'
+ psh $_notes 'edit <f> -- edit an executable file'
+ psh $_notes 'exit -- shut down system'
  psh $_notes '---------------------------------------'
  put $_path_home 'note' $_notes
 
@@ -42,7 +45,7 @@ end
 
 cal init_files
 def load_extra_files
- prs _fs '{"mnt": {"test": "hello"}, "programs": {"hello": ["prt \'Hello!\'", "slp 500", "prt \'Bye~\'"], "count": ["let n 5", "#loop", "prt $n", "sub n $n 1", "slp 600", "jne $n 0 loop"], "compute_age": ["prt \'Input year born:\'", "inp _year", "int _year $_year", "tim _current year", "sub age $_current $_year", "prt \'Age:\'", "prt $age"], "slow_print": ["let msg \'Hello World!\\n\'", "jeq $0 $nil continue", "let msg $0", "add msg $msg \'\\n\'", "#continue", "#loop", "pol $msg c", "jeq $c \'\' done", "slp 100", "prt $c \'\'", "jmp loop", "#done"], "time": ["tim _hour hour", "tim _minute minute", "tim _second second", "let time_str \'\'", "add time_str $time_str $_hour", "add time_str $time_str \':\'", "add time_str $time_str $_minute", "add time_str $time_str \':\'", "add time_str $time_str $_second", "prt $time_str"], "date": ["let days []", "psh $days \'Sun\' \'Mon\' \'Tue\' \'Wed\' \'Thu\' \'Fri\' \'Sat\'", "let months []", "psh $months \'Jan\' \'Feb\' \'Mar\' \'Apr\' \'May\' \'Jun\' \'Jul\' \'Aug\' \'Sep\' \'Oct\' \'Nov\' \'Dec\'", "tim _day day", "get $days $_day _day_str", "tim _month month", "get $months $_month _month_str", "tim _date date", "tim _year year", "let date_str \'\'", "add date_str $date_str $_day_str", "add date_str $date_str \' \'", "add date_str $date_str $_month_str", "add date_str $date_str \' \'", "add date_str $date_str $_date", "add date_str $date_str \' \'", "add date_str $date_str $_year", "prt $date_str"]}}'
+ prs _fs '{"mnt": {"test": "hello"}, "programs": {"hello": [["exe"], "prt \'Hello!\'", "slp 500", "prt \'Bye~\'"], "count": [["exe"], "let n 5", "#loop", "prt $n", "sub n $n 1", "slp 600", "jne $n 0 loop"], "compute_age": [["exe"], "prt \'Input year born:\'", "inp _year", "int _year $_year", "tim _current year", "sub age $_current $_year", "prt \'Age:\'", "prt $age"], "slow_print": [["exe"], "let msg \'Hello World!\\n\'", "jeq $0 $nil continue", "let msg $0", "add msg $msg \'\\n\'", "#continue", "#loop", "pol $msg c", "jeq $c \'\' done", "slp 100", "prt $c \'\'", "jmp loop", "#done"], "time": [["exe"], "tim _hour hour", "tim _minute minute", "tim _second second", "let time_str \'\'", "add time_str $time_str $_hour", "add time_str $time_str \':\'", "add time_str $time_str $_minute", "add time_str $time_str \':\'", "add time_str $time_str $_second", "prt $time_str"], "date": [["exe"], "let days []", "psh $days \'Sun\' \'Mon\' \'Tue\' \'Wed\' \'Thu\' \'Fri\' \'Sat\'", "let months []", "psh $months \'Jan\' \'Feb\' \'Mar\' \'Apr\' \'May\' \'Jun\' \'Jul\' \'Aug\' \'Sep\' \'Oct\' \'Nov\' \'Dec\'", "tim _day day", "get $days $_day _day_str", "tim _month month", "get $months $_month _month_str", "tim _date date", "tim _year year", "let date_str \'\'", "add date_str $date_str $_day_str", "add date_str $date_str \' \'", "add date_str $date_str $_month_str", "add date_str $date_str \' \'", "add date_str $date_str $_date", "add date_str $date_str \' \'", "add date_str $date_str $_year", "prt $date_str"]}}'
  for _d $_fs
   get $_fs $_d _content
   put $root $_d $_content
@@ -479,7 +482,10 @@ def check_executable
  let _file $0
  typ file_type $_file
  ife $file_type 'list'
-  ret 1
+  cal get_list_type $_file
+  ife $ret 'exe'
+   ret 1
+  fin
  fin
  ret 0
 end
@@ -542,6 +548,18 @@ def replace_esc_in_str
  nxt
  ret $new
 end
+
+def get_list_type
+ let _fc $0
+ get $_fc 0 _meta
+ typ _line_1_typ $_meta
+ ife $_line_1_typ 'list'
+  get $_meta 0 _t
+  ret $_t
+ els
+  ret $nil
+ fin
+end
 def welcome_info
  prt 'Moon OS  v1.02'
  prt 'Copyright (c) 1992 RunTech, Inc.'
@@ -593,10 +611,21 @@ def main
    get $_dir $f fc 
    typ ft $fc
    ife $ft 'str'
-    prt '<TXT> ' ''
+    prt '<RAW> ' ''
    fin
    ife $ft 'list'
-    prt '<EXE> ' ''
+    cal get_list_type $fc
+    let _t $ret
+    ife $_t 'exe'
+     prt '<EXE> ' ''
+     jmp list_type_done
+    fin
+    ife $_t 'txt'
+     prt '<TXT> ' ''
+     jmp list_type_done
+    fin
+    prt '<XXX> ' ''
+    #list_type_done
    fin
    ife $ft 'map'
     prt '<DIR> ' ''
@@ -678,16 +707,32 @@ def main
      let cat_success 1
     fin
     ife $file_type 'list'
-     let _i 1    / line number
-     for _row $_file_content
-      cal replace_char_in_str $_row '\n' '\\n'
-      let _row $ret
-      add _ln $_i ' |'
-      add _row $_ln $_row
-      prt $_row
-      add _i $_i 1
-     nxt
-     let cat_success 1
+     cal get_list_type $_file_content
+     let _lt $ret
+     ife $_lt 'exe'
+      let _i 0
+      for _row $_file_content
+       jeq $_i 0 skip_exe_meta
+       cal replace_char_in_str $_row '\n' '\\n'
+       let _row $ret
+       add _ln $_i ' |'
+       add _row $_ln $_row
+       prt $_row
+       #skip_exe_meta
+       add _i $_i 1
+      nxt
+      let cat_success 1
+     fin
+     ife $_lt 'txt'
+      let _i 0
+      for _row $_file_content
+       jeq $_i 0 skip_txt_meta
+       prt $_row
+       #skip_txt_meta
+       add _i $_i 1
+      nxt
+      let cat_success 1
+     fin
     fin
     ife $cat_success 0
      cal print_error 'Unsupported file type.'
@@ -721,7 +766,15 @@ def main
   els
    cal check_executable $_file_content
    ife $ret 1
-    cal runtime $_file_content $tokens
+    let _exe []
+    len $_file_content _length
+    sub _length $_length 1   / skip frist meta line
+    for _i $_length
+     add _j $_i 1
+     get $_file_content $_j _line
+     psh $_exe $_line
+    nxt
+    cal runtime $_exe $tokens
    els
     cal print_error 'File not executable'
    fin
@@ -743,24 +796,38 @@ def main
   / create file if not exist
   ife $fc $nil
    let file_content []
+   let _file_meta []
+   prt 'Create a new file?'
+   prt 't:txt(default) e:exe c:<cancel>'
+   inp _choice
+   jeq $_choice 'c' repl_loop
+   ife $_choice 'e'
+    psh $_file_meta 'exe'
+   els
+    psh $_file_meta 'txt'
+   fin
+   psh $file_content $_file_meta
    put $curr_dir $file_name $file_content
    prt 'File created.'
   fin
   get $curr_dir $file_name fc
 
-  / check file executable
-  cal check_executable $fc
-  ife $ret 1
+  / check file editable
+  typ file_type $fc
+  ife $file_type 'list'
    jmp edit_file_valid
   fin
-  cal print_error 'Not an executable file'
+  cal print_error 'Not an editable file'
   jmp repl_loop
   #edit_file_valid
 
   prt '== Edit v0.1'
   prt '== v:view a:append i:insert r:replace q:quit'
   prt '== File: ' ''
-  prt $file_name
+  prt $file_name ' '
+  prt 'Type: ' ''
+  cal get_list_type $fc
+  prt $ret
 
   #edit_loop
   prt '#' ''
@@ -772,13 +839,15 @@ def main
   jeq $edit_cmd 'q' repl_loop   / quit
   ife $edit_cmd 'v'             / view
    get $curr_dir $file_name fc
-   let _i 1    / line number
+   let _i 0    / line number
    for _row $fc
+    jeq $_i 0 edit_view_skip_meta
     cal replace_char_in_str $_row '\n' '\\n'
     let _row $ret
     add _ln $_i ' |'
     add _row $_ln $_row
     prt $_row
+    #edit_view_skip_meta
     add _i $_i 1
    nxt
   fin
@@ -791,7 +860,6 @@ def main
   ife $edit_cmd 'd'             / delete
    pol $edit_tokens line_number
    int line_number $line_number
-   sub line_number $line_number 1
    get $curr_dir $file_name current_content
    let new_content []
    let _line_count 0
@@ -808,7 +876,6 @@ def main
   ife $edit_cmd 'i'              / insert
    pol $edit_tokens line_number
    int line_number $line_number
-   sub line_number $line_number 1
    pol $edit_tokens line_content
    get $curr_dir $file_name current_content
    let new_content []
@@ -826,7 +893,6 @@ def main
   ife $edit_cmd 'r'              / replace
    pol $edit_tokens line_number
    int line_number $line_number
-   sub line_number $line_number 1
    pol $edit_tokens line_content
    get $curr_dir $file_name current_content
    let new_content []
@@ -878,11 +944,12 @@ def main
    / write to file
    pol $tokens f
    ife $f $nil
-    cal print_error 'Parse error'
+    cal print_error 'File name missing'
    els
     cal get_current_dir
     let curr_dir $ret
     get $curr_dir $f fd
+    prt $fd
     ife $fd $nil
      put $curr_dir $f $s
     els
@@ -902,21 +969,23 @@ def main
    / append to file
    pol $tokens f
    ife $f $nil
-    cal print_error 'Parse error'
+    cal print_error 'File name missing'
     jmp repl_loop
    els
     cal get_current_dir
-    get $ret $f fc
+    let curr_dir $ret
+    get $curr_dir $f fc
     ife $fc $nil
      put $curr_dir $f $s
     els
-     cal check_executable $fc
-     ife $ret 1
-      cal print_error 'Cannot write to an executable file'
-     els
+     typ _ft $fc
+     ife $_ft 'str'
       add fc $fc '\n'
       add fc $fc $s
       put $curr_dir $f $fc
+     els
+      cal print_error 'Can only write to a raw file'
+      jmp repl_loop
      fin
     fin
    fin
