@@ -177,7 +177,7 @@ def main
   els
    cal check_executable $_file_content
    ife $ret 1
-    cal runtime $_file_content
+    cal runtime $_file_content $tokens
    els
     cal print_error 'File not executable'
    fin

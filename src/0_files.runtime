@@ -68,6 +68,10 @@ def init_files
 
  let _slow_print_p []
  psh $_slow_print_p 'let msg \'Hello World!\n\''
+ psh $_slow_print_p 'jeq $0 $nil continue'
+ psh $_slow_print_p 'let msg $0'
+ psh $_slow_print_p 'add msg $msg \'\n\''
+ psh $_slow_print_p '#continue'
  psh $_slow_print_p '#loop'
  psh $_slow_print_p 'pol $msg c'
  psh $_slow_print_p 'jeq $c \'\' done'

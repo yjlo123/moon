@@ -34,10 +34,19 @@ end
 / ** main eval **
 def runtime
  let _src $0
+ let _args $1
  let env {}
+ let i 0
+ ife $_args $nil
+ els
+  for _arg $_args
+    put $env $i $_arg
+    add i $i 1
+  nxt
+ fin
  let _p {}
  let _lbl {}
- cal parse $_src $_p $_lbl
+ cal parse_src $_src $_p $_lbl
  let _pc 0
  
  #eval

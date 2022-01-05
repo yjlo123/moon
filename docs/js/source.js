@@ -1,6 +1,4 @@
-/* Built on
-Tue 4 Jan 2022 18:58:05 EST
-*/
+/* Built on Wed  5 Jan 2022 00:09:27 EST */
 let moonSrc = `
 
 let root {}
@@ -72,6 +70,10 @@ def init_files
 
  let _slow_print_p []
  psh $_slow_print_p 'let msg \\'Hello World!\\n\\''
+ psh $_slow_print_p 'jeq $0 $nil continue'
+ psh $_slow_print_p 'let msg $0'
+ psh $_slow_print_p 'add msg $msg \\'\\n\\''
+ psh $_slow_print_p '#continue'
  psh $_slow_print_p '#loop'
  psh $_slow_print_p 'pol $msg c'
  psh $_slow_print_p 'jeq $c \\'\\' done'
@@ -178,7 +180,7 @@ def parse_line
  ret $_tokens
 end
 
-def parse
+def parse_src
  let _src $0
  let _p $1  / map ref
  let _lbl $2  / map ref
@@ -277,10 +279,19 @@ end
 / ** main eval **
 def runtime
  let _src $0
+ let _args $1
  let env {}
+ let i 0
+ ife $_args $nil
+ els
+  for _arg $_args
+    put $env $i $_arg
+    add i $i 1
+  nxt
+ fin
  let _p {}
  let _lbl {}
- cal parse $_src $_p $_lbl
+ cal parse_src $_src $_p $_lbl
  let _pc 0
  
  #eval
@@ -793,7 +804,7 @@ def main
   els
    cal check_executable $_file_content
    ife $ret 1
-    cal runtime $_file_content
+    cal runtime $_file_content $tokens
    els
     cal print_error 'File not executable'
    fin

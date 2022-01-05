@@ -1,33 +1,39 @@
 #!/bin/bash
 rm -r dist
 mkdir dist
-rm ./src/1files_extra.runtime
-touch ./src/1files_extra.runtime
-echo 'def load_extra_files' >> ./src/1files_extra.runtime
-echo -e " prs _fs '\c" >> ./src/1files_extra.runtime
-python3 -c "import json; f=open('src/1files_extra.json'); print(json.dumps(json.load(f)), end = '');f.close()" >> ./src/1files_extra.runtime
-echo "'" >> ./src/1files_extra.runtime
-echo " for _d \$_fs" >> ./src/1files_extra.runtime
-echo "  get \$_fs \$_d _content" >> ./src/1files_extra.runtime
-echo "  put \$root \$_d \$_content" >> ./src/1files_extra.runtime
-echo " nxt" >> ./src/1files_extra.runtime
-echo "end" >> ./src/1files_extra.runtime
-echo "cal load_extra_files" >> ./src/1files_extra.runtime
 
+
+files_extra="./src/1_files_extra.runtime"
+echo -e "def load_extra_files
+ prs _fs '\c" >> $files_extra
+python3 -c "
+import json
+f=open('src/1_files_extra.json')
+print(json.dumps(json.load(f)), end = '')
+f.close()" >> $files_extra
+echo "'
+ for _d \$_fs
+  get \$_fs \$_d _content
+  put \$root \$_d \$_content
+ nxt
+end
+cal load_extra_files" >> $files_extra
+
+dist_program="./dist/program.runtime"
 for filename in ./src/*.runtime; do
 	echo $filename
-	cat $filename >> ./dist/program.runtime
+	cat $filename >> $dist_program
 done
 
-rm ./src/1files_extra.runtime
+rm $files_extra
 
-echo '/* Built on' >> ./dist/source.js
-echo `date` >> ./dist/source.js
-echo '*/' >> ./dist/source.js
-echo 'let moonSrc = `' >> ./dist/source.js
-cat ./dist/program.runtime >> ./dist/source.js
-echo '`' >> ./dist/source.js
-sed -i '' 's/\\/\\\\/g' ./dist/source.js
+source_js="./dist/source.js"
+now=$(date)
+echo "/* Built on $now */" >> $source_js
+echo 'let moonSrc = `' >> $source_js
+cat $dist_program >> $source_js
+echo '`' >> $source_js
+sed -i '' 's/\\/\\\\/g' $source_js
 
-cp ./dist/source.js ./docs/js/source.js
-rm ./dist/source.js
+cp $source_js ./docs/js/source.js
+rm $source_js

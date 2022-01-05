@@ -46,7 +46,7 @@ def parse_line
  ret $_tokens
 end
 
-def parse
+def parse_src
  let _src $0
  let _p $1  / map ref
  let _lbl $2  / map ref
