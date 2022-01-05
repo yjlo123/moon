@@ -8,37 +8,10 @@ def init_files
  let path []
  let env_path '/env/path'
 
- / :/env
+ / /env
  let _path_env {}
  put $_path_env 'path' '/programs'
  put $root 'env' $_path_env
-
- / :/home
- let _path_home {}
- let _notes []
- let _notes_meta []
- psh $_notes_meta 'txt'
- psh $_notes $_notes_meta
- psh $_notes '----------- Moon OS Manual ------------'
- psh $_notes 'ls [<p>]-- list directory contents'
- psh $_notes 'pwd -- return working directory name'
- psh $_notes 'cd <d> -- change directory'
- psh $_notes 'mkdir <d> -- make a directory'
- psh $_notes 'cat <f> -- concatenate and print a file'
- psh $_notes 'rm <f/d> -- remove a directory entry'
- psh $_notes 'echo <s> -- output an argument'
- psh $_notes '..[> <f>] -- write to a file'
- psh $_notes '..[>> <f>] -- append to a file'
- psh $_notes 'run <f> -- run an executable file'
- psh $_notes 'edit <f> -- edit an executable file'
- psh $_notes 'exit -- shut down system'
- psh $_notes '---------------------------------------'
- put $_path_home 'note' $_notes
-
- let _misc {}
- put $_misc 'test' 'Hello World!'
- put $_path_home 'misc' $_misc
- put $root 'home' $_path_home
 
  psh $path 'home'
 end

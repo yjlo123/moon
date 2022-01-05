@@ -8,44 +8,17 @@ def init_files
  let path []
  let env_path '/env/path'
 
- / :/env
+ / /env
  let _path_env {}
  put $_path_env 'path' '/programs'
  put $root 'env' $_path_env
-
- / :/home
- let _path_home {}
- let _notes []
- let _notes_meta []
- psh $_notes_meta 'txt'
- psh $_notes $_notes_meta
- psh $_notes '----------- Moon OS Manual ------------'
- psh $_notes 'ls [<p>]-- list directory contents'
- psh $_notes 'pwd -- return working directory name'
- psh $_notes 'cd <d> -- change directory'
- psh $_notes 'mkdir <d> -- make a directory'
- psh $_notes 'cat <f> -- concatenate and print a file'
- psh $_notes 'rm <f/d> -- remove a directory entry'
- psh $_notes 'echo <s> -- output an argument'
- psh $_notes '..[> <f>] -- write to a file'
- psh $_notes '..[>> <f>] -- append to a file'
- psh $_notes 'run <f> -- run an executable file'
- psh $_notes 'edit <f> -- edit an executable file'
- psh $_notes 'exit -- shut down system'
- psh $_notes '---------------------------------------'
- put $_path_home 'note' $_notes
-
- let _misc {}
- put $_misc 'test' 'Hello World!'
- put $_path_home 'misc' $_misc
- put $root 'home' $_path_home
 
  psh $path 'home'
 end
 
 cal init_files
 def load_extra_files
- prs _fs '{"mnt": {"test": "hello"}, "programs": {"hello": [["exe"], "prt \'Hello!\'", "slp 500", "prt \'Bye~\'"], "count": [["exe"], "let n 5", "#loop", "prt $n", "sub n $n 1", "slp 600", "jne $n 0 loop"], "compute_age": [["exe"], "prt \'Input year born:\'", "inp _year", "int _year $_year", "tim _current year", "sub age $_current $_year", "prt \'Age:\'", "prt $age"], "slow_print": [["exe"], "let msg \'Hello World!\\n\'", "jeq $0 $nil continue", "let msg $0", "add msg $msg \'\\n\'", "#continue", "#loop", "pol $msg c", "jeq $c \'\' done", "slp 100", "prt $c \'\'", "jmp loop", "#done"], "time": [["exe"], "tim _hour hour", "tim _minute minute", "tim _second second", "let time_str \'\'", "add time_str $time_str $_hour", "add time_str $time_str \':\'", "add time_str $time_str $_minute", "add time_str $time_str \':\'", "add time_str $time_str $_second", "prt $time_str"], "date": [["exe"], "let days []", "psh $days \'Sun\' \'Mon\' \'Tue\' \'Wed\' \'Thu\' \'Fri\' \'Sat\'", "let months []", "psh $months \'Jan\' \'Feb\' \'Mar\' \'Apr\' \'May\' \'Jun\' \'Jul\' \'Aug\' \'Sep\' \'Oct\' \'Nov\' \'Dec\'", "tim _day day", "get $days $_day _day_str", "tim _month month", "get $months $_month _month_str", "tim _date date", "tim _year year", "let date_str \'\'", "add date_str $date_str $_day_str", "add date_str $date_str \' \'", "add date_str $date_str $_month_str", "add date_str $date_str \' \'", "add date_str $date_str $_date", "add date_str $date_str \' \'", "add date_str $date_str $_year", "prt $date_str"]}}'
+ prs _fs '{"mnt": {"test": "hello"}, "home": {"note": [["txt"], "----------- Moon OS Manual ------------", "ls [<p>]-- list directory contents", "pwd -- return working directory name", "cd <d> -- change directory", "mkdir <d> -- make a directory", "cat <f> -- concatenate and print a file", "rm <f/d> -- remove a directory entry", "echo <s> -- output an argument", "..[> <f>] -- write to a file", "..[>> <f>] -- append to a file", "run <f> -- run an executable file", "edit <f> -- edit an executable file", "exit -- shut down system", "---------------------------------------"], "misc": {"test": "Hello World!"}}, "programs": {"hello": [["exe"], "prt \'Hello!\'", "slp 500", "prt \'Bye~\'"], "count": [["exe"], "let n 5", "#loop", "prt $n", "sub n $n 1", "slp 600", "jne $n 0 loop"], "compute_age": [["exe"], "prt \'Input year born:\'", "inp _year", "int _year $_year", "tim _current year", "sub age $_current $_year", "prt \'Age:\'", "prt $age"], "slow_print": [["exe"], "let msg \'Hello World!\\n\'", "jeq $0 $nil continue", "let msg $0", "add msg $msg \'\\n\'", "#continue", "#loop", "pol $msg c", "jeq $c \'\' done", "slp 100", "prt $c \'\'", "jmp loop", "#done"], "time": [["exe"], "tim _hour hour", "tim _minute minute", "tim _second second", "let time_str \'\'", "add time_str $time_str $_hour", "add time_str $time_str \':\'", "add time_str $time_str $_minute", "add time_str $time_str \':\'", "add time_str $time_str $_second", "prt $time_str"], "date": [["exe"], "let days []", "psh $days \'Sun\' \'Mon\' \'Tue\' \'Wed\' \'Thu\' \'Fri\' \'Sat\'", "let months []", "psh $months \'Jan\' \'Feb\' \'Mar\' \'Apr\' \'May\' \'Jun\' \'Jul\' \'Aug\' \'Sep\' \'Oct\' \'Nov\' \'Dec\'", "tim _day day", "get $days $_day _day_str", "tim _month month", "get $months $_month _month_str", "tim _date date", "tim _year year", "let date_str \'\'", "add date_str $date_str $_day_str", "add date_str $date_str \' \'", "add date_str $date_str $_month_str", "add date_str $date_str \' \'", "add date_str $date_str $_date", "add date_str $date_str \' \'", "add date_str $date_str $_year", "prt $date_str"]}}'
  for _d $_fs
   get $_fs $_d _content
   put $root $_d $_content
@@ -138,6 +111,10 @@ def parse_input
  let _s ''
  #parse_string_char
  pol $_input _c
+ ife $_c ''
+  psh $_tokens $_s
+  jmp next_token
+ fin
  ife $_c $_q
   psh $_tokens $_s
   jmp next_token

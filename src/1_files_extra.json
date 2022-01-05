@@ -2,6 +2,28 @@
     "mnt": {
         "test": "hello"
     },
+    "home": {
+        "note": [
+            ["txt"],
+            "----------- Moon OS Manual ------------",
+            "ls [<p>]-- list directory contents",
+            "pwd -- return working directory name",
+            "cd <d> -- change directory",
+            "mkdir <d> -- make a directory",
+            "cat <f> -- concatenate and print a file",
+            "rm <f/d> -- remove a directory entry",
+            "echo <s> -- output an argument",
+            "..[> <f>] -- write to a file",
+            "..[>> <f>] -- append to a file",
+            "run <f> -- run an executable file",
+            "edit <f> -- edit an executable file",
+            "exit -- shut down system",
+            "---------------------------------------"
+        ],
+        "misc": {
+            "test": "Hello World!"
+        }
+    },
     "programs": {
         "hello": [
             ["exe"],
