@@ -1,5 +1,5 @@
 # moon
-A linux-like terminal game written in Runtime Script
+A linux-like terminal emulator written in Runtime Script
 
 ## Web
 [https://yjlo123.github.io/moon/](https://yjlo123.github.io/moon/)
