@@ -1,0 +1,52 @@
+def lib_get_path
+ let _path_str $0
+ let _is_file $1
+ ife $_path_str $nil
+  let _path []
+  for _p $path
+   psh $_path $_p
+  nxt
+  ret $_path
+ fin
+ cal get_path_by_str $_path_str $_is_file
+ ret $ret
+end
+
+def lib_get_file_list
+ let _path $0
+ cal get_by_path $_path
+ let _curr_dir $ret
+ let _result []
+ for _f $_curr_dir
+  psh $_result $_f
+ nxt
+ ret $_result
+end
+
+def lib_get_file_type
+ let _path $0
+ let _file_name $1
+ cal get_by_path $_path
+ let _dir $ret
+ get $_dir $_file_name _fc
+ typ _ft $_fc
+ ife $_ft 'str'
+  ret 'raw'
+ fin
+ ife $_ft 'map'
+  ret 'dir'
+ fin
+ ife $_ft 'list'
+  cal get_list_type $_fc
+  ret $ret
+ fin
+ ret 'xxx'
+end
+
+def lib_get_file_content
+ let _path $0
+ let _file_name $1
+ cal get_by_path $_path
+ get $ret $_file_name _file_content
+ ret $_file_content
+end

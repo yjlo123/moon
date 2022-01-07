@@ -17,62 +17,6 @@ def main
 
  jeq $cmd 'exit' exit
 
- / -- PWD --
- ife $cmd 'pwd'
-  cal get_current_path_str
-  prt $ret
-  jmp repl_loop
- fin
-
- / -- LS --
- ife $cmd 'ls'
-  pol $tokens _path
-  ife $_path $nil
-   / default: current directory
-   cal get_current_dir
-   let _dir $ret
-  els
-   / specified directory
-   cal get_path_by_str $_path
-   ife $ret $nil
-    cal print_error 'Invalid path'
-    jmp repl_loop
-   fin
-   let _dir $root
-   for _d $ret
-    get $_dir $_d _dir
-   nxt
-  fin
-
-  key $_dir files
-  for f $files
-   get $_dir $f fc 
-   typ ft $fc
-   ife $ft 'str'
-    prt '<RAW> ' ''
-   fin
-   ife $ft 'list'
-    cal get_list_type $fc
-    let _t $ret
-    ife $_t 'exe'
-     prt '<EXE> ' ''
-     jmp list_type_done
-    fin
-    ife $_t 'txt'
-     prt '<TXT> ' ''
-     jmp list_type_done
-    fin
-    prt '<XXX> ' ''
-    #list_type_done
-   fin
-   ife $ft 'map'
-    prt '<DIR> ' ''
-   fin
-   prt $f
-  nxt
-  jmp repl_loop
- fin
-
  / -- CD --
  ife $cmd 'cd'
   pol $tokens _path

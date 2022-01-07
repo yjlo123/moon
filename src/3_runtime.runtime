@@ -8,6 +8,12 @@ def expr
  jeq $_i $nil continue
  ret $_i
  #continue
+ ife $_expr '[]'
+  ret []
+ fin
+ ife $_expr '{}'
+  ret {}
+ fin
  pol $_expr _c1
  ife $_c1 '$'
   get $env $_expr _val
@@ -16,9 +22,6 @@ def expr
  ife $_c1 '\''
   pop $_expr _
   ret $_expr
- fin
- ife $_c1 '['
-  ret []
  fin
  ret $_original
 end
@@ -174,6 +177,15 @@ def runtime
     psh $_list $_val
   nxt
  fin
+ ife $_cmd 'put'
+  cal eval_param $_line 1
+  let _map $ret
+  cal eval_param $_line 2
+  let _key $ret
+  cal eval_param $_line 3
+  let _val $ret
+  put $_map $_key $_val
+ fin
  ife $_cmd 'get'
   cal eval_param $_line 1
   let _list $ret
@@ -183,6 +195,49 @@ def runtime
   let _var $ret
   get $_list $_key _val
   put $env $_var $_val
+ fin
+
+ / ** system library **
+ ife $_cmd 'lib'
+  cal eval_param $_line 1
+  let _lib_name $ret
+  ife $_lib_name 'os.get_current_path'
+   cal lib_get_path
+   get $_line 2 _name
+   put $env $_name $ret
+  fin
+  ife $_lib_name 'os.get_file_list'
+   cal eval_param $_line 2
+   let _path $ret
+   cal lib_get_file_list $_path
+   get $_line 3 _name
+   put $env $_name $ret
+  fin
+  ife $_lib_name 'os.get_file_type'
+   cal eval_param $_line 2
+   let _path $ret
+   cal eval_param $_line 3
+   let _file_name $ret
+   cal lib_get_file_type $_path $_file_name
+   get $_line 4 _file_type_name
+   put $env $_file_type_name $ret
+  fin
+  ife $_lib_name 'os.get_file_content'
+   cal eval_param $_line 2
+   let _path $ret
+   cal eval_param $_line 3
+   let _file_name $ret
+   cal lib_get_file_content $_path $_file_name
+   get $_line 4 _file_content_name
+   put $env $_file_content_name $ret
+  fin
+  ife $_lib_name 'util.get_path_by_str'
+   cal eval_param $_line 2
+   let _path_str $ret
+   cal get_path_by_str $_path_str
+   get $_line 3 _name
+   put $env $_name $ret
+  fin
  fin
 
  add _pc $_pc 1

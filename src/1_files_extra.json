@@ -22,64 +22,43 @@
         ],
         "misc": {
             "test": "Hello World!"
+        },
+        "test": [
+            ["exe"],
+            "lib 'os.get_current_path' path",
+            "prt $path"
+        ],
+        "sample": {
+            "hello": [
+                ["exe"],
+                "prt 'Hello!'",
+                "slp 500",
+                "prt 'Bye~'"
+            ],
+            "count": [
+                ["exe"],
+                "let n 5",
+                "#loop",
+                "prt $n",
+                "sub n $n 1",
+                "slp 600",
+                "jne $n 0 loop"
+            ],
+            "compute_age": [
+                ["exe"],
+                "prt 'Input year born:'",
+                "inp _year",
+                "int _year $_year",
+                "tim _current year",
+                "sub age $_current $_year",
+                "prt 'Age:'",
+                "prt $age"
+            ]
         }
     },
     "programs": {
-        "hello": [
-            ["exe"],
-            "prt 'Hello!'",
-            "slp 500",
-            "prt 'Bye~'"
-        ],
-        "count": [
-            ["exe"],
-            "let n 5",
-            "#loop",
-            "prt $n",
-            "sub n $n 1",
-            "slp 600",
-            "jne $n 0 loop"
-        ],
-        "compute_age": [
-            ["exe"],
-            "prt 'Input year born:'",
-            "inp _year",
-            "int _year $_year",
-            "tim _current year",
-            "sub age $_current $_year",
-            "prt 'Age:'",
-            "prt $age"
-        ],
-        "slow_print": [
-            ["exe"],
-            "let msg 'Hello World!\\n'",
-            "jeq $0 $nil continue",
-            "let msg $0",
-            "add msg $msg '\\n'",
-            "#continue",
-            "#loop",
-            "pol $msg c",
-            "jeq $c '' done",
-            "slp 100",
-            "prt $c ''",
-            "jmp loop",
-            "#done"
-        ],
-        "time": [
-            ["exe"],
-            "tim _hour hour",
-            "tim _minute minute",
-            "tim _second second",
-            "let time_str ''",
-            "add time_str $time_str $_hour",
-            "add time_str $time_str ':'",
-            "add time_str $time_str $_minute",
-            "add time_str $time_str ':'",
-            "add time_str $time_str $_second",
-            "prt $time_str"
-        ],
         "date": [
-            ["exe"],
+            ["exe", "display date"],
             "let days []",
             "psh $days 'Sun' 'Mon' 'Tue' 'Wed' 'Thu' 'Fri' 'Sat'",
             "let months []",
@@ -99,6 +78,95 @@
             "add date_str $date_str ' '",
             "add date_str $date_str $_year",
             "prt $date_str"
+        ],
+        "ls": [
+            ["exe", "list directory contents"],
+            "let type_map {}",
+            "put $type_map 'txt' 'TXT'",
+            "put $type_map 'exe' 'EXE'",
+            "put $type_map 'raw' 'RAW'",
+            "put $type_map 'dir' 'DIR'",
+            "jeq $0 $nil use_current_path",
+            "lib 'util.get_path_by_str' $0 path",
+            "jeq $path $nil print_error",
+            "jmp continue_with_path",
+            "#use_current_path",
+            "lib 'os.get_current_path' path",
+            "#continue_with_path",
+            "lib 'os.get_file_list' $path lst",
+            "#loop",
+            "pol $lst f",
+            "jeq $f $nil end",
+            "lib 'os.get_file_type' $path $f ft",
+            "prt '<' ''",
+            "get $type_map $ft t",
+            "prt $t ''",
+            "prt '> ' ''",
+            "prt $f",
+            "jmp loop",
+            "jmp end",
+            "#print_error",
+            "prt 'ERR Invalid path'",
+            "#end"
+        ],
+        "programs": [
+            ["exe", "show available programs"],
+            "lib 'util.get_path_by_str' '/programs' path",
+            "lib 'os.get_file_list' $path lst",
+            "#loop",
+            "pol $lst f",
+            "jeq $f $nil end",
+            "lib 'os.get_file_type' $path $f ft",
+            "jne $ft 'exe' loop",
+            "prt $f ''",
+            "prt ' - ' ''",
+            "lib 'os.get_file_content' $path $f fc",
+            "get $fc 0 file_meta",
+            "get $file_meta 1 file_desc",
+            "prt $file_desc",
+            "jmp loop",
+            "#end"
+        ],
+        "pwd": [
+            ["exe", "return working directory name"],
+            "lib 'os.get_current_path' path",
+            "let path_str '/'",
+            "#loop",
+            "pol $path d",
+            "jeq $d $nil done",
+            "add path_str $path_str $d",
+            "add path_str $path_str '/'",
+            "jmp loop",
+            "#done",
+            "prt $path_str"
+        ],
+        "slow_print": [
+            ["exe", "print a message character by character"],
+            "let msg 'Hello World!\\n'",
+            "jeq $0 $nil continue",
+            "let msg $0",
+            "add msg $msg '\\n'",
+            "#continue",
+            "#loop",
+            "pol $msg c",
+            "jeq $c '' done",
+            "slp 100",
+            "prt $c ''",
+            "jmp loop",
+            "#done"
+        ],
+        "time": [
+            ["exe", "display time"],
+            "tim _hour hour",
+            "tim _minute minute",
+            "tim _second second",
+            "let time_str ''",
+            "add time_str $time_str $_hour",
+            "add time_str $time_str ':'",
+            "add time_str $time_str $_minute",
+            "add time_str $time_str ':'",
+            "add time_str $time_str $_second",
+            "prt $time_str"
         ]
     }
 }
