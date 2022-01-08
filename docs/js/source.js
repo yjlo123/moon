@@ -1,4 +1,4 @@
-/* Built on Fri  7 Jan 2022 21:23:30 EST */
+/* Built on Fri  7 Jan 2022 23:30:59 EST */
 let moonSrc = `
 
 let root {}
@@ -209,6 +209,7 @@ def runtime
   cal expr $_val
   let _val $ret
   get $_line 2 _val2
+  slp 5
   ife $_val2 $nil
    prt $_val
   els

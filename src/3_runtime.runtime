@@ -65,6 +65,7 @@ def runtime
   cal expr $_val
   let _val $ret
   get $_line 2 _val2
+  slp 5
   ife $_val2 $nil
    prt $_val
   els

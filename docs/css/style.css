@@ -5,7 +5,7 @@ body {
 
 .wrapper {
     text-align: center;
-    width: 500px;
+    width: 600px;
     margin: auto;
 }
 
@@ -14,11 +14,59 @@ body {
 }
 
 .console-view {
-    height: 400px;
+    margin: auto;
+    height: 374px;
+    padding: 10px;
     text-align: left;
     background-color: #1a1a1a;
+    border: 10px solid #444;
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: 20px;
+}
+
+.monitor-shell {
+    position: relative;
+    margin: auto;
+    width: 500px;
+    background-color: rgb(134, 134, 134);
+    padding: 30px 30px 50px 30px;
+    border-radius: 30px;
+}
+
+.monitor-speaker {
+    position: absolute;
+    bottom: 0;
+    left: 40px;
+    width: 100px;
+    height: 30px;
+}
+
+.monitor-speaker div {
+    width: 10px;
+    height: 30px;
+    background-color: #666;
+    float: left;
+    margin-right: 5px;
+    border-radius: 3px 3px 0 0;
+}
+
+.monitor-led {
+    width: 110px;
+    height: 30px;
+    position: absolute;
+    bottom: 0;
+    right: 40px;
+    background-color: #666;
+    border-radius: 10px 10px 0 0;
+}
+
+.monitor-led div{
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    float: left;
+    margin: 10px 12px;
+    background-color: rgb(129, 129, 129);
 }
 
 .app-info p {
@@ -27,8 +75,9 @@ body {
 }
 
 #console {
-    width: 500px;
-    height: 400px;
+    width: 450px;
+    height: 374px;
+    padding-right: 10px;
 }
 
 .app-info {
