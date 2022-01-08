@@ -155,6 +155,13 @@ def runtime
   tim _val $_time
   put $env $_var $_val
  fin
+ ife $_cmd 'len'
+  cal eval_param $_line 1
+  let _list $ret
+  get $_line 2 _name
+  len $_list _len
+  put $env $_name $_len
+ fin
  ife $_cmd 'pol'
   cal eval_param $_line 1
   let _list $ret
@@ -164,6 +171,16 @@ def runtime
   pol $_list_name x
   put $env $_list_name $_list
   put $env $_name $_first
+ fin
+ ife $_cmd 'pop'
+  cal eval_param $_line 1
+  let _list $ret
+  get $_line 2 _name
+  pop $_list _last
+  get $_line 1 _list_name
+  pol $_list_name x
+  put $env $_list_name $_list
+  put $env $_name $_last
  fin
  ife $_cmd 'psh'
   cal eval_param $_line 1
@@ -176,6 +193,9 @@ def runtime
     let _val $ret
     psh $_list $_val
   nxt
+  get $_line 1 _list_name
+  pol $_list_name x
+  put $env $_list_name $_list
  fin
  ife $_cmd 'put'
   cal eval_param $_line 1
@@ -206,6 +226,21 @@ def runtime
    get $_line 2 _name
    put $env $_name $ret
   fin
+  ife $_lib_name 'os.set_current_path'
+   cal eval_param $_line 2
+   cal lib_set_path $ret
+  fin
+  ife $_lib_name 'os.delete_path'
+   cal eval_param $_line 2
+   cal lib_delete_path $ret
+  fin
+  ife $_lib_name 'os.make_dir'
+   cal eval_param $_line 2
+   let _path $ret
+   cal eval_param $_line 3
+   let _name $ret
+   cal lib_make_dir $_path $_name
+  fin
   ife $_lib_name 'os.get_file_list'
    cal eval_param $_line 2
    let _path $ret
@@ -234,8 +269,10 @@ def runtime
   ife $_lib_name 'util.get_path_by_str'
    cal eval_param $_line 2
    let _path_str $ret
-   cal get_path_by_str $_path_str
-   get $_line 3 _name
+   cal eval_param $_line 3
+   let _is_file $ret
+   cal get_path_by_str $_path_str $_is_file
+   get $_line 4 _name
    put $env $_name $ret
   fin
  fin

@@ -1,5 +1,5 @@
 def welcome_info
- prt 'Moon OS  v1.02'
+ prt 'Moon OS  v1.1'
  prt 'Copyright (c) 1992 RunTech, Inc.'
  prt 'All rights reserved.'
  prt ''
@@ -16,45 +16,6 @@ def main
  pol $tokens cmd
 
  jeq $cmd 'exit' exit
-
- / -- CD --
- ife $cmd 'cd'
-  pol $tokens _path
-  ife $_path $nil
-   cal print_error 'invalid directory name'
-   jmp repl_loop
-  fin
-  cal get_path_by_str $_path
-  ife $ret $nil
-   cal print_error 'Invalid path'
-   jmp repl_loop
-  fin
-  let _full_path $ret
-
-  let path []
-  for _d $_full_path
-   psh $path $_d
-  nxt
-  jmp repl_loop
- fin
-
- / -- MKDIR --
- ife $cmd 'mkdir'
-  pol $tokens d
-  ife $d $nil
-   cal print_error 'Invalid directory name'
-   jmp repl_loop
-  fin
-  cal get_current_dir
-  let curr_dir $ret
-  get $curr_dir $d dr
-  ife $dr $nil
-   put $curr_dir $d {}
-  els
-   cal print_error 'Directory/file exists'
-  fin
-  jmp repl_loop
- fin
 
  / -- CAT --
  ife $cmd 'cat'
@@ -292,24 +253,6 @@ def main
   fin
   / prt 'File updated.'
   jmp edit_loop
- fin
-
- / -- RM --
- ife $cmd 'rm'
-  pol $tokens d
-  ife $d $nil
-   cal print_error 'Invalid file/directory name'
-   jmp repl_loop
-  fin
-  cal get_current_dir
-  let curr_dir $ret
-  get $curr_dir $d dr
-  ife $dr $nil
-   cal print_error 'File/directory not found'
-  els
-   del $curr_dir $d
-  fin
-  jmp repl_loop
  fin
 
  / -- ECHO --

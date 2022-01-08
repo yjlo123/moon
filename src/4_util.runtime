@@ -95,9 +95,14 @@ def verify_path
  let _path $0
  let _if_file $1
  let _curr_path $root
+ let _i 0
  #verify_path_next
- pol $_path _p
- jeq $_p $nil verify_path_true
+ get $_path $_i _p
+ ife $_p $nil
+  len $_path _path_len
+  jeq $_i $_path_len verify_path_true
+  ret 0
+ fin
  typ _path_typ $_curr_path
  ife $_path_typ 'map'
   get $_curr_path $_p _curr_path
@@ -107,6 +112,7 @@ def verify_path
  els
   ret 0
  fin
+ add _i $_i 1
  jmp verify_path_next
  #verify_path_true
  ife $_if_file 1

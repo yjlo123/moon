@@ -12,6 +12,45 @@ def lib_get_path
  ret $ret
 end
 
+def lib_set_path
+ let _path $0
+ cal verify_path $_path
+ let _is_valid $ret
+ ife $_is_valid 1
+  let path []
+  for _p $_path
+   psh $path $_p
+  nxt
+ fin
+end
+
+def lib_delete_path
+ let _path $0
+ len $_path _len
+ ifg $_len 0
+  sub _path_len $_len 1
+  let _current_path $root
+  sub _last_idx $_len 1
+  get $_path $_last_idx _last
+  for _i $_path_len
+   get $_path $_i _d
+   get $_current_path $_d _current_path
+  nxt
+  del $_current_path $_last
+ fin
+end
+
+def lib_make_dir
+ let _path $0
+ let _name $1
+ cal get_by_path $_path
+ let _dir $ret
+ get $_dir $_name _exist
+ ife $_exist $nil
+  put $_dir $_name {}
+ fin
+end
+
 def lib_get_file_list
  let _path $0
  cal get_by_path $_path

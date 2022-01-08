@@ -1,4 +1,4 @@
-/* Built on Fri  7 Jan 2022 13:02:28 EST */
+/* Built on Fri  7 Jan 2022 21:11:59 EST */
 let moonSrc = `
 
 let root {}
@@ -20,7 +20,7 @@ end
 
 cal init_files
 def load_extra_files
- prs _fs '{"mnt": {"test": "hello"}, "home": {"note": [["txt"], "----------- Moon OS Manual ------------", "ls [<p>]-- list directory contents", "pwd -- return working directory name", "cd <d> -- change directory", "mkdir <d> -- make a directory", "cat <f> -- concatenate and print a file", "rm <f/d> -- remove a directory entry", "echo <s> -- output an argument", "..[> <f>] -- write to a file", "..[>> <f>] -- append to a file", "run <f> -- run an executable file", "edit <f> -- edit an executable file", "exit -- shut down system", "---------------------------------------"], "misc": {"test": "Hello World!"}, "test": [["exe"], "lib \\'os.get_current_path\\' path", "prt $path"], "sample": {"hello": [["exe"], "prt \\'Hello!\\'", "slp 500", "prt \\'Bye~\\'"], "count": [["exe"], "let n 5", "#loop", "prt $n", "sub n $n 1", "slp 600", "jne $n 0 loop"], "compute_age": [["exe"], "prt \\'Input year born:\\'", "inp _year", "int _year $_year", "tim _current year", "sub age $_current $_year", "prt \\'Age:\\'", "prt $age"]}}, "programs": {"date": [["exe", "display date"], "let days []", "psh $days \\'Sun\\' \\'Mon\\' \\'Tue\\' \\'Wed\\' \\'Thu\\' \\'Fri\\' \\'Sat\\'", "let months []", "psh $months \\'Jan\\' \\'Feb\\' \\'Mar\\' \\'Apr\\' \\'May\\' \\'Jun\\' \\'Jul\\' \\'Aug\\' \\'Sep\\' \\'Oct\\' \\'Nov\\' \\'Dec\\'", "tim _day day", "get $days $_day _day_str", "tim _month month", "get $months $_month _month_str", "tim _date date", "tim _year year", "let date_str \\'\\'", "add date_str $date_str $_day_str", "add date_str $date_str \\' \\'", "add date_str $date_str $_month_str", "add date_str $date_str \\' \\'", "add date_str $date_str $_date", "add date_str $date_str \\' \\'", "add date_str $date_str $_year", "prt $date_str"], "ls": [["exe", "list directory contents"], "let type_map {}", "put $type_map \\'txt\\' \\'TXT\\'", "put $type_map \\'exe\\' \\'EXE\\'", "put $type_map \\'raw\\' \\'RAW\\'", "put $type_map \\'dir\\' \\'DIR\\'", "jeq $0 $nil use_current_path", "lib \\'util.get_path_by_str\\' $0 path", "jeq $path $nil print_error", "jmp continue_with_path", "#use_current_path", "lib \\'os.get_current_path\\' path", "#continue_with_path", "lib \\'os.get_file_list\\' $path lst", "#loop", "pol $lst f", "jeq $f $nil end", "lib \\'os.get_file_type\\' $path $f ft", "prt \\'<\\' \\'\\'", "get $type_map $ft t", "prt $t \\'\\'", "prt \\'> \\' \\'\\'", "prt $f", "jmp loop", "jmp end", "#print_error", "prt \\'ERR Invalid path\\'", "#end"], "programs": [["exe", "show available programs"], "lib \\'util.get_path_by_str\\' \\'/programs\\' path", "lib \\'os.get_file_list\\' $path lst", "#loop", "pol $lst f", "jeq $f $nil end", "lib \\'os.get_file_type\\' $path $f ft", "jne $ft \\'exe\\' loop", "prt $f \\'\\'", "prt \\' - \\' \\'\\'", "lib \\'os.get_file_content\\' $path $f fc", "get $fc 0 file_meta", "get $file_meta 1 file_desc", "prt $file_desc", "jmp loop", "#end"], "pwd": [["exe", "return working directory name"], "lib \\'os.get_current_path\\' path", "let path_str \\'/\\'", "#loop", "pol $path d", "jeq $d $nil done", "add path_str $path_str $d", "add path_str $path_str \\'/\\'", "jmp loop", "#done", "prt $path_str"], "slow_print": [["exe", "print a message character by character"], "let msg \\'Hello World!\\\\n\\'", "jeq $0 $nil continue", "let msg $0", "add msg $msg \\'\\\\n\\'", "#continue", "#loop", "pol $msg c", "jeq $c \\'\\' done", "slp 100", "prt $c \\'\\'", "jmp loop", "#done"], "time": [["exe", "display time"], "tim _hour hour", "tim _minute minute", "tim _second second", "let time_str \\'\\'", "add time_str $time_str $_hour", "add time_str $time_str \\':\\'", "add time_str $time_str $_minute", "add time_str $time_str \\':\\'", "add time_str $time_str $_second", "prt $time_str"]}}'
+ prs _fs '{"mnt": {"test": "hello"}, "home": {"note": [["txt"], "----------- Moon OS Manual ------------", "ls [<d>]-- list directory contents", "pwd -- return working directory name", "cd <d> -- change directory", "mkdir <d> -- make a directory", "cat <f> -- concatenate and print a file", "rm <f/d> -- remove a file/directory", "echo <s> -- output an argument", "..[> <f>] -- write to a file", "..[>> <f>] -- append to a file", "run <f> -- run an executable file", "edit <f> -- edit an executable file", "exit -- shut down system", "---------------------------------------"], "misc": {"test": "Hello World!"}, "test": [["exe"], "lib \\'os.get_current_path\\' path", "prt $path"], "mk": [["exe"], "let path_str $0", "jeq $path_str $nil print_error_invalid_name", "let new_dir_name \\'\\'", "#extract_last", "pop $path_str c", "jeq $c \\'\\' continue", "jeq $c \\'/\\' continue", "add new_dir_name $c $new_dir_name", "jmp extract_last", "#continue", "psh $path_str $c", "lib \\'util.get_path_by_str\\' $path_str 0 path", "jeq $path $nil print_error_invalid_path", "lib \\'os.make_dir\\' $path $new_dir_name", "jmp done", "#print_error_invalid_name", "prt \\'ERR Invalid file/directory name\\'", "jmp done", "#print_error_invalid_path", "prt \\'ERR No such file/directory\\'", "#done"], "sample": {"hello": [["exe"], "prt \\'Hello!\\'", "slp 500", "prt \\'Bye~\\'"], "count": [["exe"], "let n 5", "#loop", "prt $n", "sub n $n 1", "slp 600", "jne $n 0 loop"], "compute_age": [["exe"], "prt \\'Input year born:\\'", "inp _year", "int _year $_year", "tim _current year", "sub age $_current $_year", "prt \\'Age:\\'", "prt $age"]}}, "programs": {"cd": [["exe", "change directory"], "let path_str $0", "jeq $path_str $nil print_error_invalid_name", "lib \\'util.get_path_by_str\\' $path_str 0 path", "jeq $path $nil print_error_invalid_path", "lib \\'os.set_current_path\\' $path", "jmp done", "#print_error_invalid_name", "prt \\'ERR Invalid directory name\\'", "jmp done", "#print_error_invalid_path", "prt \\'ERR Invalid path\\'", "#done"], "date": [["exe", "display date"], "let days []", "psh $days \\'Sun\\' \\'Mon\\' \\'Tue\\' \\'Wed\\' \\'Thu\\' \\'Fri\\' \\'Sat\\'", "let months []", "psh $months \\'Jan\\' \\'Feb\\' \\'Mar\\' \\'Apr\\' \\'May\\' \\'Jun\\' \\'Jul\\' \\'Aug\\' \\'Sep\\' \\'Oct\\' \\'Nov\\' \\'Dec\\'", "tim _day day", "get $days $_day _day_str", "tim _month month", "get $months $_month _month_str", "tim _date date", "tim _year year", "let date_str \\'\\'", "add date_str $date_str $_day_str", "add date_str $date_str \\' \\'", "add date_str $date_str $_month_str", "add date_str $date_str \\' \\'", "add date_str $date_str $_date", "add date_str $date_str \\' \\'", "add date_str $date_str $_year", "prt $date_str"], "ls": [["exe", "list directory contents"], "let type_map {}", "put $type_map \\'txt\\' \\'TXT\\'", "put $type_map \\'exe\\' \\'EXE\\'", "put $type_map \\'raw\\' \\'RAW\\'", "put $type_map \\'dir\\' \\'DIR\\'", "jeq $0 $nil use_current_path", "lib \\'util.get_path_by_str\\' $0 0 path", "jeq $path $nil print_error", "jmp continue_with_path", "#use_current_path", "lib \\'os.get_current_path\\' path", "#continue_with_path", "lib \\'os.get_file_list\\' $path lst", "#loop", "pol $lst f", "jeq $f $nil end", "lib \\'os.get_file_type\\' $path $f ft", "prt \\'<\\' \\'\\'", "get $type_map $ft t", "prt $t \\'\\'", "prt \\'> \\' \\'\\'", "prt $f", "jmp loop", "jmp end", "#print_error", "prt \\'ERR Invalid path\\'", "#end"], "programs": [["exe", "show available programs"], "lib \\'util.get_path_by_str\\' \\'/programs\\' 0 path", "lib \\'os.get_file_list\\' $path lst", "#loop", "pol $lst f", "jeq $f $nil end", "lib \\'os.get_file_type\\' $path $f ft", "jne $ft \\'exe\\' loop", "prt $f \\'\\'", "prt \\' - \\' \\'\\'", "lib \\'os.get_file_content\\' $path $f fc", "get $fc 0 file_meta", "get $file_meta 1 file_desc", "prt $file_desc", "jmp loop", "#end"], "pwd": [["exe", "return working directory name"], "lib \\'os.get_current_path\\' path", "let path_str \\'/\\'", "#loop", "pol $path d", "jeq $d $nil done", "add path_str $path_str $d", "add path_str $path_str \\'/\\'", "jmp loop", "#done", "prt $path_str"], "rm": [["exe", "remove a file or directory entry"], "let path_str $0", "jeq $path_str $nil print_error_invalid_name", "lib \\'util.get_path_by_str\\' $path_str 1 path", "jeq $path $nil print_error_invalid_path", "lib \\'os.delete_path\\' $path", "jmp done", "#print_error_invalid_name", "prt \\'ERR Invalid file/directory name\\'", "jmp done", "#print_error_invalid_path", "prt \\'ERR No such file/directory\\'", "#done"], "slow_print": [["exe", "print a message character by character"], "let msg \\'Hello World!\\\\n\\'", "jeq $0 $nil continue", "let msg $0", "add msg $msg \\'\\\\n\\'", "#continue", "#loop", "pol $msg c", "jeq $c \\'\\' done", "slp 100", "prt $c \\'\\'", "jmp loop", "#done"], "time": [["exe", "display time"], "tim _hour hour", "tim _minute minute", "tim _second second", "let time_str \\'\\'", "add time_str $time_str $_hour", "add time_str $time_str \\':\\'", "add time_str $time_str $_minute", "add time_str $time_str \\':\\'", "add time_str $time_str $_second", "prt $time_str"]}}'
  for _d $_fs
   get $_fs $_d _content
   put $root $_d $_content
@@ -299,6 +299,13 @@ def runtime
   tim _val $_time
   put $env $_var $_val
  fin
+ ife $_cmd 'len'
+  cal eval_param $_line 1
+  let _list $ret
+  get $_line 2 _name
+  len $_list _len
+  put $env $_name $_len
+ fin
  ife $_cmd 'pol'
   cal eval_param $_line 1
   let _list $ret
@@ -308,6 +315,16 @@ def runtime
   pol $_list_name x
   put $env $_list_name $_list
   put $env $_name $_first
+ fin
+ ife $_cmd 'pop'
+  cal eval_param $_line 1
+  let _list $ret
+  get $_line 2 _name
+  pop $_list _last
+  get $_line 1 _list_name
+  pol $_list_name x
+  put $env $_list_name $_list
+  put $env $_name $_last
  fin
  ife $_cmd 'psh'
   cal eval_param $_line 1
@@ -320,6 +337,9 @@ def runtime
     let _val $ret
     psh $_list $_val
   nxt
+  get $_line 1 _list_name
+  pol $_list_name x
+  put $env $_list_name $_list
  fin
  ife $_cmd 'put'
   cal eval_param $_line 1
@@ -350,6 +370,21 @@ def runtime
    get $_line 2 _name
    put $env $_name $ret
   fin
+  ife $_lib_name 'os.set_current_path'
+   cal eval_param $_line 2
+   cal lib_set_path $ret
+  fin
+  ife $_lib_name 'os.delete_path'
+   cal eval_param $_line 2
+   cal lib_delete_path $ret
+  fin
+  ife $_lib_name 'os.make_dir'
+   cal eval_param $_line 2
+   let _path $ret
+   cal eval_param $_line 3
+   let _name $ret
+   cal lib_make_dir $_path $_name
+  fin
   ife $_lib_name 'os.get_file_list'
    cal eval_param $_line 2
    let _path $ret
@@ -378,8 +413,10 @@ def runtime
   ife $_lib_name 'util.get_path_by_str'
    cal eval_param $_line 2
    let _path_str $ret
-   cal get_path_by_str $_path_str
-   get $_line 3 _name
+   cal eval_param $_line 3
+   let _is_file $ret
+   cal get_path_by_str $_path_str $_is_file
+   get $_line 4 _name
    put $env $_name $ret
   fin
  fin
@@ -486,9 +523,14 @@ def verify_path
  let _path $0
  let _if_file $1
  let _curr_path $root
+ let _i 0
  #verify_path_next
- pol $_path _p
- jeq $_p $nil verify_path_true
+ get $_path $_i _p
+ ife $_p $nil
+  len $_path _path_len
+  jeq $_i $_path_len verify_path_true
+  ret 0
+ fin
  typ _path_typ $_curr_path
  ife $_path_typ 'map'
   get $_curr_path $_p _curr_path
@@ -498,6 +540,7 @@ def verify_path
  els
   ret 0
  fin
+ add _i $_i 1
  jmp verify_path_next
  #verify_path_true
  ife $_if_file 1
@@ -612,27 +655,6 @@ def main
  pol $tokens cmd
 
  jeq $cmd 'exit' exit
-
- / -- CD --
- ife $cmd 'cd'
-  pol $tokens _path
-  ife $_path $nil
-   cal print_error 'invalid directory name'
-   jmp repl_loop
-  fin
-  cal get_path_by_str $_path
-  ife $ret $nil
-   cal print_error 'Invalid path'
-   jmp repl_loop
-  fin
-  let _full_path $ret
-
-  let path []
-  for _d $_full_path
-   psh $path $_d
-  nxt
-  jmp repl_loop
- fin
 
  / -- MKDIR --
  ife $cmd 'mkdir'
@@ -890,24 +912,6 @@ def main
   jmp edit_loop
  fin
 
- / -- RM --
- ife $cmd 'rm'
-  pol $tokens d
-  ife $d $nil
-   cal print_error 'Invalid file/directory name'
-   jmp repl_loop
-  fin
-  cal get_current_dir
-  let curr_dir $ret
-  get $curr_dir $d dr
-  ife $dr $nil
-   cal print_error 'File/directory not found'
-  els
-   del $curr_dir $d
-  fin
-  jmp repl_loop
- fin
-
  / -- ECHO --
  ife $cmd 'echo'
   pol $tokens s
@@ -1051,6 +1055,45 @@ def lib_get_path
  fin
  cal get_path_by_str $_path_str $_is_file
  ret $ret
+end
+
+def lib_set_path
+ let _path $0
+ cal verify_path $_path
+ let _is_valid $ret
+ ife $_is_valid 1
+  let path []
+  for _p $_path
+   psh $path $_p
+  nxt
+ fin
+end
+
+def lib_delete_path
+ let _path $0
+ len $_path _len
+ ifg $_len 0
+  sub _path_len $_len 1
+  let _current_path $root
+  sub _last_idx $_len 1
+  get $_path $_last_idx _last
+  for _i $_path_len
+   get $_path $_i _d
+   get $_current_path $_d _current_path
+  nxt
+  del $_current_path $_last
+ fin
+end
+
+def lib_make_dir
+ let _path $0
+ let _name $1
+ cal get_by_path $_path
+ let _dir $ret
+ get $_dir $_name _exist
+ ife $_exist $nil
+  put $_dir $_name {}
+ fin
 end
 
 def lib_get_file_list
