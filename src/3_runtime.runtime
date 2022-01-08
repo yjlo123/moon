@@ -217,6 +217,18 @@ def runtime
   get $_list $_key _val
   put $env $_var $_val
  fin
+ 
+ / ** special **
+ ife $_cmd 'led'
+  cal eval_param $_line 1
+  let _led_val $ret
+  jeq $_led_val 0 valid_led_value
+  jeq $_led_val 1 valid_led_value
+  jmp led_done
+  #valid_led_value
+  cal set_led 2 $_led_val
+  #led_done
+ fin
 
  / ** system library **
  ife $_cmd 'lib'

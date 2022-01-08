@@ -2,6 +2,7 @@
 let root {}
 let path []
 let env_path ''
+let leds []
 
 def init_files
  let root {}
@@ -13,6 +14,12 @@ def init_files
  put $_path_env 'path' '/programs'
  put $root 'env' $_path_env
 
+ / init leds
+ put $leds 0 0
+ put $leds 1 0
+ put $leds 2 0
+ 
+ / set home dir
  psh $path 'home'
 end
 

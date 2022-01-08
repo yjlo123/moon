@@ -89,6 +89,18 @@
 
 	runtime.restart();
 	runtime.executeAll(null, moonSrc);
+
+	let ledClock = setInterval(function(){
+		let env = runtime.getEnv(false);
+		let leds = env.global.leds;
+		for (let i = 0; i < 3; i++) {
+			let color = "rgb(129, 129, 129)"
+			if (leds[i] === 1) {
+				color = "#ff0000";
+			}
+			$(`.monitor-led div:nth-child(${i+1})`).css( "background", color);
+		}
+	}, 1000);
 })();
 
 /*

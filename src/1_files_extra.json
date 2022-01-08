@@ -28,6 +28,25 @@
             "lib 'os.get_current_path' path",
             "prt $path"
         ],
+        "led": [
+            ["exe"],
+            "let val $0",
+            "jeq $val $nil error",
+            "jeq $val 1 turn_on",
+            "jeq $val 0 turn_off",
+            "jmp error",
+            "#turn_on",
+            "led 1",
+            "prt 'LED ON'",
+            "jmp end",
+            "#turn_off",
+            "led 0",
+            "prt 'LED OFF'",
+            "jmp end",
+            "#error",
+            "prt '1: ON; 0: OFF'",
+            "#end"
+        ],
         "sample": {
             "hello": [
                 ["exe"],

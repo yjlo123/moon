@@ -209,3 +209,9 @@ def get_list_type
   ret $nil
  fin
 end
+
+def set_led
+ let _idx $0
+ let _val $1
+ put $leds $_idx $_val
+end
