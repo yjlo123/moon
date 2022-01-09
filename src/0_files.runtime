@@ -2,17 +2,20 @@
 let root {}
 let path []
 let env_path ''
+let env_prompt ''
 let leds []
 
 def init_files
  let root {}
  let path []
  let env_path '/env/path'
+ let env_prompt '/env/prompt'
 
  / /env
- let _path_env {}
- put $_path_env 'path' '/programs'
- put $root 'env' $_path_env
+ let _env_dir {}
+ put $_env_dir 'path' '/programs'
+ put $_env_dir 'prompt' '$p \'#\''
+ put $root 'env' $_env_dir
 
  / init leds
  put $leds 0 0

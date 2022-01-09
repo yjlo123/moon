@@ -50,6 +50,19 @@ def split_str
  ret $_res
 end
 
+def path_to_str
+ let _path $0
+ let _str ''
+ for _p $_path
+  add _str $_str '/'
+  add _str $_str $_p
+ nxt
+ ife $_str ''
+  ret '/'
+ fin
+ ret $_str
+end
+
 def get_path_by_str
  let _path_str $0    / assert non-empty
  let _is_file $1     / pass in 1 if is file

@@ -1,20 +1,23 @@
-/* Built on Sat  8 Jan 2022 17:18:30 EST */
+/* Built on Sun  9 Jan 2022 15:19:24 EST */
 let moonSrc = `
 
 let root {}
 let path []
 let env_path ''
+let env_prompt ''
 let leds []
 
 def init_files
  let root {}
  let path []
  let env_path '/env/path'
+ let env_prompt '/env/prompt'
 
  / /env
- let _path_env {}
- put $_path_env 'path' '/programs'
- put $root 'env' $_path_env
+ let _env_dir {}
+ put $_env_dir 'path' '/programs'
+ put $_env_dir 'prompt' '$p \\'#\\''
+ put $root 'env' $_env_dir
 
  / init leds
  put $leds 0 0
@@ -498,6 +501,19 @@ def split_str
  ret $_res
 end
 
+def path_to_str
+ let _path $0
+ let _str ''
+ for _p $_path
+  add _str $_str '/'
+  add _str $_str $_p
+ nxt
+ ife $_str ''
+  ret '/'
+ fin
+ ret $_str
+end
+
 def get_path_by_str
  let _path_str $0    / assert non-empty
  let _is_file $1     / pass in 1 if is file
@@ -673,7 +689,28 @@ end
 
 def main
  #repl_loop
- prt '>' ''
+
+ cal get_path_by_str '/env' 0
+ cal get_by_path $ret
+ let _env_dir $ret
+ get $_env_dir 'prompt' _prompt
+ ife $_prompt $nil
+  let _prompt_str '>'
+ els
+  let _prompt_str ''
+  cal parse_input $_prompt
+  for _tk $ret
+   ife $_tk '$p'
+    cal path_to_str $path
+    add _prompt_str $_prompt_str $ret
+    jmp parse_prompt_next
+   fin
+   add _prompt_str $_prompt_str $_tk
+   #parse_prompt_next
+  nxt
+ fin
+
+ prt $_prompt_str ''
  inp in
  cal parse_input $in
  let tokens $ret
