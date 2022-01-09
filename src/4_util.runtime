@@ -310,5 +310,4 @@ def set_led
  let _idx $0
  let _val $1
  put $leds $_idx $_val
- prt $leds
 end

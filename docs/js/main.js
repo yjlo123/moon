@@ -152,6 +152,8 @@
 	let ledClock = setInterval(function(){
 		let env = runtime.getEnv(false);
 		let leds = env.global.leds;
+		let devLed = env.global.root.dev.led;
+		leds[0] = parseInt(devLed) === 1 ? 1 : 0;
 		for (let i = 0; i < 3; i++) {
 			let color = "rgb(129, 129, 129)"
 			if (leds[i] === 1) {

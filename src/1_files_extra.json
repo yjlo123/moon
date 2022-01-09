@@ -23,10 +23,13 @@
         "misc": {
             "test": "Hello World!"
         },
-        "test": [
-            ["exe"],
-            "lib 'os.get_current_path' path",
-            "prt $path"
+        "challenge": [
+            ["txt"],
+            "=== CHALLENGE ===",
+            "Turn on the 3 LEDs on the bottom right of the monitor",
+            "Do not hack the front-end webpage",
+            "Use only the supported commands in Moon OS",
+            "~Siwei"
         ],
         "led": [
             ["exe"],
