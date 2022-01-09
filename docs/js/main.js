@@ -70,6 +70,14 @@
 				for (let i = 0; i < pathTokens.length-1; i++) {
 					if (pathTokens[i] == '..') {
 						path.pop();
+					} else if (pathTokens[i] == '~') {
+						// home dir
+						let envHomeDir = env.global.env_home.split("/").filter(i => i);
+						let tempPath = root;
+						for (let i = 0; i < envHomeDir.length; i++) {
+							tempPath = tempPath[envHomeDir[i]];
+						}
+						path = tempPath.split("/").filter(i => i);
 					} else {
 						path.push(pathTokens[i]);
 					}

@@ -1,3 +1,74 @@
+def get_prompt_str
+ cal get_path_by_str '/env' 0
+ cal get_by_path $ret
+ let _env_dir $ret
+ get $_env_dir 'prompt' _prompt
+ ife $_prompt $nil
+  let _prompt_str '>'
+ els
+  let _prompt_str ''
+  cal parse_input $_prompt
+  for _tk $ret
+   ife $_tk '$p'
+    cal shorten_home_path $path
+    cal path_to_str $ret
+    add _prompt_str $_prompt_str $ret
+    jmp parse_prompt_next
+   fin
+   add _prompt_str $_prompt_str $_tk
+   #parse_prompt_next
+  nxt
+ fin
+ ret $_prompt_str
+end
+
+def shorten_home_path
+ / change home dir to ~
+ let _path $0
+ cal get_home_path
+ let _home_path $ret
+ len $_path _path_len
+ len $_home_path _home_path_len
+ ifg $_home_path_len $_path_len
+  ret $_path
+ fin
+ let _i 0
+ let _in_home 1
+ #check_home_path_loop
+ jeq $_i $_home_path_len check_home_path_done
+ get $_home_path $_i _home_d
+ get $_path $_i _path_d
+ ife $_home_d $_path_d
+  add _i $_i 1
+  jmp check_home_path_loop
+ els
+  let _in_home 0
+ fin
+ #check_home_path_done
+ ife $_in_home 0
+  ret $_path
+ fin
+ let _in_home_path []
+ psh $_in_home_path '~'
+ sub _rest_path_len $_path_len $_i
+ for _j $_rest_path_len
+  add _k $_j $_i
+  get $_path $_k _d
+  psh $_in_home_path $_d
+ nxt
+ ret $_in_home_path
+end
+
+def get_home_path
+ cal get_path_by_str $env_home 1
+ let _env_home_path $ret
+ pop $_env_home_path _env_home_filename
+ cal get_by_path $_env_home_path
+ get $ret $_env_home_filename _home_path_str
+ cal get_path_by_str $_home_path_str
+ ret $ret
+end
+
 def get_current_path_str
  let _path '/'
  for _d $path
@@ -51,11 +122,16 @@ def split_str
 end
 
 def path_to_str
+ / convert path list to string (no validation)
  let _path $0
  let _str ''
  for _p $_path
-  add _str $_str '/'
-  add _str $_str $_p
+  ife $_p '~'
+   add _str $_str $_p
+  els
+   add _str $_str '/'
+   add _str $_str $_p
+  fin
  nxt
  ife $_str ''
   ret '/'
@@ -73,10 +149,17 @@ def get_path_by_str
   / absolute path
   let _full_path []
  els
-  / relative path
-  for _p $path
-   psh $_full_path $_p
-  nxt
+  ife $_path_first_c '~'
+   / home path
+   cal get_home_path
+   let _full_path $ret
+   pol $_path_str x
+  els
+   / relative path
+   for _p $path
+    psh $_full_path $_p
+   nxt
+  fin
  fin
  
  cal split_str $_path_str '/'
@@ -227,4 +310,5 @@ def set_led
  let _idx $0
  let _val $1
  put $leds $_idx $_val
+ prt $leds
 end

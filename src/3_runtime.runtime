@@ -234,6 +234,11 @@ def runtime
  ife $_cmd 'lib'
   cal eval_param $_line 1
   let _lib_name $ret
+  ife $_lib_name 'os.get_home_path'
+   cal get_home_path
+   get $_line 2 _name
+   put $env $_name $ret
+  fin
   ife $_lib_name 'os.get_current_path'
    cal lib_get_path
    get $_line 2 _name
@@ -287,6 +292,11 @@ def runtime
    cal get_path_by_str $_path_str $_is_file
    get $_line 4 _name
    put $env $_name $ret
+  fin
+  ife $_lib_name 'dev.set_led'
+   cal eval_param $_line 2
+   let _val $ret
+   cal lib_set_led $_val
   fin
  fin
 

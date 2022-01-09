@@ -1,3 +1,8 @@
+def lib_get_home_path
+ cal get_home_path
+ ret $ret
+end
+
 def lib_get_path
  let _path_str $0
  let _is_file $1
@@ -88,4 +93,9 @@ def lib_get_file_content
  cal get_by_path $_path
  get $ret $_file_name _file_content
  ret $_file_content
+end
+
+def lib_set_led
+ let _val $0
+ cal set_led 1 $_val
 end

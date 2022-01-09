@@ -1,10 +1,11 @@
-/* Built on Sun  9 Jan 2022 15:19:24 EST */
+/* Built on Sun  9 Jan 2022 18:04:05 EST */
 let moonSrc = `
 
 let root {}
 let path []
 let env_path ''
 let env_prompt ''
+let env_home ''
 let leds []
 
 def init_files
@@ -12,25 +13,30 @@ def init_files
  let path []
  let env_path '/env/path'
  let env_prompt '/env/prompt'
+ let env_home '/env/home'
 
  / /env
  let _env_dir {}
+ put $_env_dir 'home' '/home'
  put $_env_dir 'path' '/programs'
  put $_env_dir 'prompt' '$p \\'#\\''
  put $root 'env' $_env_dir
+
+ / /dev
+ let _dev_dir {}
+ put $_dev_dir 'led' '0'
+ put $root 'dev' $_dev_dir
 
  / init leds
  put $leds 0 0
  put $leds 1 0
  put $leds 2 0
- 
- / set home dir
- psh $path 'home'
+
 end
 
 cal init_files
 def load_extra_files
- prs _fs '{"mnt": {"test": "hello"}, "home": {"note": [["txt"], "----------- Moon OS Manual ------------", "ls [<d>]-- list directory contents", "pwd -- return working directory name", "cd <d> -- change directory", "mkdir <d> -- make a directory", "cat <f> -- concatenate and print a file", "rm <f/d> -- remove a file/directory", "echo <s> -- output an argument", "..[> <f>] -- write to a file", "..[>> <f>] -- append to a file", "run <f> -- run an executable file", "edit <f> -- edit an executable file", "exit -- shut down system", "---------------------------------------"], "misc": {"test": "Hello World!"}, "test": [["exe"], "lib \\'os.get_current_path\\' path", "prt $path"], "led": [["exe"], "let val $0", "jeq $val $nil error", "jeq $val 1 turn_on", "jeq $val 0 turn_off", "jmp error", "#turn_on", "led 1", "prt \\'LED ON\\'", "jmp end", "#turn_off", "led 0", "prt \\'LED OFF\\'", "jmp end", "#error", "prt \\'1: ON; 0: OFF\\'", "#end"], "sample": {"hello": [["exe"], "prt \\'Hello!\\'", "slp 500", "prt \\'Bye~\\'"], "count": [["exe"], "let n 5", "#loop", "prt $n", "sub n $n 1", "slp 600", "jne $n 0 loop"], "compute_age": [["exe"], "prt \\'Input year born:\\'", "inp _year", "int _year $_year", "tim _current year", "sub age $_current $_year", "prt \\'Age:\\'", "prt $age"]}}, "programs": {"cd": [["exe", "change directory"], "let path_str $0", "jeq $path_str $nil print_error_invalid_name", "lib \\'util.get_path_by_str\\' $path_str 0 path", "jeq $path $nil print_error_invalid_path", "lib \\'os.set_current_path\\' $path", "jmp done", "#print_error_invalid_name", "prt \\'ERR Invalid directory name\\'", "jmp done", "#print_error_invalid_path", "prt \\'ERR Invalid path\\'", "#done"], "date": [["exe", "display date"], "let days []", "psh $days \\'Sun\\' \\'Mon\\' \\'Tue\\' \\'Wed\\' \\'Thu\\' \\'Fri\\' \\'Sat\\'", "let months []", "psh $months \\'Jan\\' \\'Feb\\' \\'Mar\\' \\'Apr\\' \\'May\\' \\'Jun\\' \\'Jul\\' \\'Aug\\' \\'Sep\\' \\'Oct\\' \\'Nov\\' \\'Dec\\'", "tim _day day", "get $days $_day _day_str", "tim _month month", "get $months $_month _month_str", "tim _date date", "tim _year year", "let date_str \\'\\'", "add date_str $date_str $_day_str", "add date_str $date_str \\' \\'", "add date_str $date_str $_month_str", "add date_str $date_str \\' \\'", "add date_str $date_str $_date", "add date_str $date_str \\' \\'", "add date_str $date_str $_year", "prt $date_str"], "ls": [["exe", "list directory contents"], "let type_map {}", "put $type_map \\'txt\\' \\'TXT\\'", "put $type_map \\'exe\\' \\'EXE\\'", "put $type_map \\'raw\\' \\'RAW\\'", "put $type_map \\'dir\\' \\'DIR\\'", "jeq $0 $nil use_current_path", "lib \\'util.get_path_by_str\\' $0 0 path", "jeq $path $nil print_error", "jmp continue_with_path", "#use_current_path", "lib \\'os.get_current_path\\' path", "#continue_with_path", "lib \\'os.get_file_list\\' $path lst", "#loop", "pol $lst f", "jeq $f $nil end", "lib \\'os.get_file_type\\' $path $f ft", "prt \\'<\\' \\'\\'", "get $type_map $ft t", "prt $t \\'\\'", "prt \\'> \\' \\'\\'", "prt $f", "jmp loop", "jmp end", "#print_error", "prt \\'ERR Invalid path\\'", "#end"], "mkdir": [["exe", "make a directory"], "let path_str $0", "jeq $path_str $nil print_error_invalid_name", "let new_dir_name \\'\\'", "#extract_last", "pop $path_str c", "jeq $c \\'\\' continue", "jeq $c \\'/\\' continue", "add new_dir_name $c $new_dir_name", "jmp extract_last", "#continue", "psh $path_str $c", "lib \\'util.get_path_by_str\\' $path_str 0 path", "jeq $path $nil print_error_invalid_path", "lib \\'os.make_dir\\' $path $new_dir_name", "jmp done", "#print_error_invalid_name", "prt \\'ERR Invalid file/directory name\\'", "jmp done", "#print_error_invalid_path", "prt \\'ERR No such file/directory\\'", "#done"], "programs": [["exe", "show available programs"], "lib \\'util.get_path_by_str\\' \\'/programs\\' 0 path", "lib \\'os.get_file_list\\' $path lst", "#loop", "pol $lst f", "jeq $f $nil end", "lib \\'os.get_file_type\\' $path $f ft", "jne $ft \\'exe\\' loop", "prt $f \\'\\'", "prt \\' - \\' \\'\\'", "lib \\'os.get_file_content\\' $path $f fc", "get $fc 0 file_meta", "get $file_meta 1 file_desc", "prt $file_desc", "jmp loop", "#end"], "pwd": [["exe", "return working directory name"], "lib \\'os.get_current_path\\' path", "let path_str \\'/\\'", "#loop", "pol $path d", "jeq $d $nil done", "add path_str $path_str $d", "add path_str $path_str \\'/\\'", "jmp loop", "#done", "prt $path_str"], "rm": [["exe", "remove a file or directory entry"], "let path_str $0", "jeq $path_str $nil print_error_invalid_name", "lib \\'util.get_path_by_str\\' $path_str 1 path", "jeq $path $nil print_error_invalid_path", "lib \\'os.delete_path\\' $path", "jmp done", "#print_error_invalid_name", "prt \\'ERR Invalid file/directory name\\'", "jmp done", "#print_error_invalid_path", "prt \\'ERR No such file/directory\\'", "#done"], "slow_print": [["exe", "print a message character by character"], "let msg \\'Hello World!\\\\n\\'", "jeq $0 $nil continue", "let msg $0", "add msg $msg \\'\\\\n\\'", "#continue", "#loop", "pol $msg c", "jeq $c \\'\\' done", "slp 100", "prt $c \\'\\'", "jmp loop", "#done"], "time": [["exe", "display time"], "tim _hour hour", "tim _minute minute", "tim _second second", "let time_str \\'\\'", "add time_str $time_str $_hour", "add time_str $time_str \\':\\'", "add time_str $time_str $_minute", "add time_str $time_str \\':\\'", "add time_str $time_str $_second", "prt $time_str"]}}'
+ prs _fs '{"mnt": {"test": "hello"}, "home": {"note": [["txt"], "----------- Moon OS Manual ------------", "ls [<d>]-- list directory contents", "pwd -- return working directory name", "cd <d> -- change directory", "mkdir <d> -- make a directory", "cat <f> -- concatenate and print a file", "rm <f/d> -- remove a file/directory", "echo <s> -- output an argument", "..[> <f>] -- write to a file", "..[>> <f>] -- append to a file", "run <f> -- run an executable file", "edit <f> -- edit an executable file", "exit -- shut down system", "---------------------------------------"], "misc": {"test": "Hello World!"}, "test": [["exe"], "lib \\'os.get_current_path\\' path", "prt $path"], "led": [["exe"], "let val $0", "jeq $val $nil error", "jeq $val 1 turn_on", "jeq $val 0 turn_off", "jmp error", "#turn_on", "led 1", "prt \\'LED ON\\'", "jmp end", "#turn_off", "led 0", "prt \\'LED OFF\\'", "jmp end", "#error", "prt \\'1: ON; 0: OFF\\'", "#end"], "sample": {"hello": [["exe"], "prt \\'Hello!\\'", "slp 500", "prt \\'Bye~\\'"], "count": [["exe"], "let n 5", "#loop", "prt $n", "sub n $n 1", "slp 600", "jne $n 0 loop"], "compute_age": [["exe"], "prt \\'Input year born:\\'", "inp _year", "int _year $_year", "tim _current year", "sub age $_current $_year", "prt \\'Age:\\'", "prt $age"]}}, "programs": {"cd": [["exe", "change directory"], "let path_str $0", "jne $path_str $nil continue", "lib \\'os.get_home_path\\' home_path", "lib \\'os.set_current_path\\' $home_path", "jmp done", "#continue", "lib \\'util.get_path_by_str\\' $path_str 0 path", "jeq $path $nil print_error_invalid_path", "lib \\'os.set_current_path\\' $path", "jmp done", "#print_error_invalid_path", "prt \\'ERR Invalid path\\'", "#done"], "date": [["exe", "display date"], "let days []", "psh $days \\'Sun\\' \\'Mon\\' \\'Tue\\' \\'Wed\\' \\'Thu\\' \\'Fri\\' \\'Sat\\'", "let months []", "psh $months \\'Jan\\' \\'Feb\\' \\'Mar\\' \\'Apr\\'", "psh $months \\'May\\' \\'Jun\\' \\'Jul\\' \\'Aug\\'", "psh $months \\'Sep\\' \\'Oct\\' \\'Nov\\' \\'Dec\\'", "tim _day day", "get $days $_day _day_str", "tim _month month", "get $months $_month _month_str", "tim _date date", "tim _year year", "let date_str \\'\\'", "add date_str $date_str $_day_str", "add date_str $date_str \\' \\'", "add date_str $date_str $_month_str", "add date_str $date_str \\' \\'", "add date_str $date_str $_date", "add date_str $date_str \\' \\'", "add date_str $date_str $_year", "prt $date_str"], "ls": [["exe", "list directory contents"], "let type_map {}", "put $type_map \\'txt\\' \\'TXT\\'", "put $type_map \\'exe\\' \\'EXE\\'", "put $type_map \\'raw\\' \\'RAW\\'", "put $type_map \\'dir\\' \\'DIR\\'", "jeq $0 $nil use_current_path", "lib \\'util.get_path_by_str\\' $0 0 path", "jeq $path $nil print_error", "jmp continue_with_path", "#use_current_path", "lib \\'os.get_current_path\\' path", "#continue_with_path", "lib \\'os.get_file_list\\' $path lst", "#loop", "pol $lst f", "jeq $f $nil end", "lib \\'os.get_file_type\\' $path $f ft", "prt \\'<\\' \\'\\'", "get $type_map $ft t", "prt $t \\'\\'", "prt \\'> \\' \\'\\'", "prt $f", "jmp loop", "jmp end", "#print_error", "prt \\'ERR Invalid path\\'", "#end"], "mkdir": [["exe", "make a directory"], "let path_str $0", "jeq $path_str $nil print_error_invalid_name", "let new_dir_name \\'\\'", "#extract_last", "pop $path_str c", "jeq $c \\'\\' continue", "jeq $c \\'/\\' continue", "add new_dir_name $c $new_dir_name", "jmp extract_last", "#continue", "psh $path_str $c", "lib \\'util.get_path_by_str\\' $path_str 0 path", "jeq $path $nil print_error_invalid_path", "lib \\'os.make_dir\\' $path $new_dir_name", "jmp done", "#print_error_invalid_name", "prt \\'ERR Invalid file/directory name\\'", "jmp done", "#print_error_invalid_path", "prt \\'ERR No such file/directory\\'", "#done"], "programs": [["exe", "show available programs"], "lib \\'util.get_path_by_str\\' \\'/programs\\' 0 path", "lib \\'os.get_file_list\\' $path lst", "#loop", "pol $lst f", "jeq $f $nil end", "lib \\'os.get_file_type\\' $path $f ft", "jne $ft \\'exe\\' loop", "prt $f \\'\\'", "prt \\' - \\' \\'\\'", "lib \\'os.get_file_content\\' $path $f fc", "get $fc 0 file_meta", "get $file_meta 1 file_desc", "prt $file_desc", "jmp loop", "#end"], "pwd": [["exe", "return working directory name"], "lib \\'os.get_current_path\\' path", "let path_str \\'/\\'", "#loop", "pol $path d", "jeq $d $nil done", "add path_str $path_str $d", "add path_str $path_str \\'/\\'", "jmp loop", "#done", "prt $path_str"], "rm": [["exe", "remove a file or directory entry"], "let path_str $0", "jeq $path_str $nil print_error_invalid_name", "lib \\'util.get_path_by_str\\' $path_str 1 path", "jeq $path $nil print_error_invalid_path", "lib \\'os.delete_path\\' $path", "jmp done", "#print_error_invalid_name", "prt \\'ERR Invalid file/directory name\\'", "jmp done", "#print_error_invalid_path", "prt \\'ERR No such file/directory\\'", "#done"], "slow_print": [["exe", "print a message character by character"], "let msg \\'Hello World!\\\\n\\'", "jeq $0 $nil continue", "let msg $0", "add msg $msg \\'\\\\n\\'", "#continue", "#loop", "pol $msg c", "jeq $c \\'\\' done", "slp 100", "prt $c \\'\\'", "jmp loop", "#done"], "time": [["exe", "display time"], "tim _hour hour", "tim _minute minute", "tim _second second", "let time_str \\'\\'", "add time_str $time_str $_hour", "add time_str $time_str \\':\\'", "add time_str $time_str $_minute", "add time_str $time_str \\':\\'", "add time_str $time_str $_second", "prt $time_str"]}}'
  for _d $_fs
   get $_fs $_d _content
   put $root $_d $_content
@@ -388,6 +394,11 @@ def runtime
  ife $_cmd 'lib'
   cal eval_param $_line 1
   let _lib_name $ret
+  ife $_lib_name 'os.get_home_path'
+   cal get_home_path
+   get $_line 2 _name
+   put $env $_name $ret
+  fin
   ife $_lib_name 'os.get_current_path'
    cal lib_get_path
    get $_line 2 _name
@@ -442,6 +453,11 @@ def runtime
    get $_line 4 _name
    put $env $_name $ret
   fin
+  ife $_lib_name 'dev.set_led'
+   cal eval_param $_line 2
+   let _val $ret
+   cal lib_set_led $_val
+  fin
  fin
 
  add _pc $_pc 1
@@ -449,6 +465,77 @@ def runtime
  
  #eval_done
 end
+def get_prompt_str
+ cal get_path_by_str '/env' 0
+ cal get_by_path $ret
+ let _env_dir $ret
+ get $_env_dir 'prompt' _prompt
+ ife $_prompt $nil
+  let _prompt_str '>'
+ els
+  let _prompt_str ''
+  cal parse_input $_prompt
+  for _tk $ret
+   ife $_tk '$p'
+    cal shorten_home_path $path
+    cal path_to_str $ret
+    add _prompt_str $_prompt_str $ret
+    jmp parse_prompt_next
+   fin
+   add _prompt_str $_prompt_str $_tk
+   #parse_prompt_next
+  nxt
+ fin
+ ret $_prompt_str
+end
+
+def shorten_home_path
+ / change home dir to ~
+ let _path $0
+ cal get_home_path
+ let _home_path $ret
+ len $_path _path_len
+ len $_home_path _home_path_len
+ ifg $_home_path_len $_path_len
+  ret $_path
+ fin
+ let _i 0
+ let _in_home 1
+ #check_home_path_loop
+ jeq $_i $_home_path_len check_home_path_done
+ get $_home_path $_i _home_d
+ get $_path $_i _path_d
+ ife $_home_d $_path_d
+  add _i $_i 1
+  jmp check_home_path_loop
+ els
+  let _in_home 0
+ fin
+ #check_home_path_done
+ ife $_in_home 0
+  ret $_path
+ fin
+ let _in_home_path []
+ psh $_in_home_path '~'
+ sub _rest_path_len $_path_len $_i
+ for _j $_rest_path_len
+  add _k $_j $_i
+  get $_path $_k _d
+  psh $_in_home_path $_d
+ nxt
+ ret $_in_home_path
+end
+
+def get_home_path
+ cal get_path_by_str $env_home 1
+ let _env_home_path $ret
+ pop $_env_home_path _env_home_filename
+ cal get_by_path $_env_home_path
+ get $ret $_env_home_filename _home_path_str
+ cal get_path_by_str $_home_path_str
+ ret $ret
+end
+
 def get_current_path_str
  let _path '/'
  for _d $path
@@ -502,11 +589,16 @@ def split_str
 end
 
 def path_to_str
+ / convert path list to string (no validation)
  let _path $0
  let _str ''
  for _p $_path
-  add _str $_str '/'
-  add _str $_str $_p
+  ife $_p '~'
+   add _str $_str $_p
+  els
+   add _str $_str '/'
+   add _str $_str $_p
+  fin
  nxt
  ife $_str ''
   ret '/'
@@ -524,10 +616,17 @@ def get_path_by_str
   / absolute path
   let _full_path []
  els
-  / relative path
-  for _p $path
-   psh $_full_path $_p
-  nxt
+  ife $_path_first_c '~'
+   / home path
+   cal get_home_path
+   let _full_path $ret
+   pol $_path_str x
+  els
+   / relative path
+   for _p $path
+    psh $_full_path $_p
+   nxt
+  fin
  fin
  
  cal split_str $_path_str '/'
@@ -678,9 +777,10 @@ def set_led
  let _idx $0
  let _val $1
  put $leds $_idx $_val
+ prt $leds
 end
 def welcome_info
- prt 'Moon OS  v1.1'
+ prt 'Moon OS  v1.11'
  prt 'Copyright (c) 1992 RunTech, Inc.'
  prt 'All rights reserved.'
  prt ''
@@ -688,29 +788,12 @@ def welcome_info
 end
 
 def main
+ cal get_home_path
+ let path $ret
+
  #repl_loop
-
- cal get_path_by_str '/env' 0
- cal get_by_path $ret
- let _env_dir $ret
- get $_env_dir 'prompt' _prompt
- ife $_prompt $nil
-  let _prompt_str '>'
- els
-  let _prompt_str ''
-  cal parse_input $_prompt
-  for _tk $ret
-   ife $_tk '$p'
-    cal path_to_str $path
-    add _prompt_str $_prompt_str $ret
-    jmp parse_prompt_next
-   fin
-   add _prompt_str $_prompt_str $_tk
-   #parse_prompt_next
-  nxt
- fin
-
- prt $_prompt_str ''
+ cal get_prompt_str
+ prt $ret ''
  inp in
  cal parse_input $in
  let tokens $ret
@@ -1088,6 +1171,11 @@ end
 
 cal welcome_info
 cal main
+def lib_get_home_path
+ cal get_home_path
+ ret $ret
+end
+
 def lib_get_path
  let _path_str $0
  let _is_file $1
@@ -1178,5 +1266,10 @@ def lib_get_file_content
  cal get_by_path $_path
  get $ret $_file_name _file_content
  ret $_file_content
+end
+
+def lib_set_led
+ let _val $0
+ cal set_led 1 $_val
 end
 `

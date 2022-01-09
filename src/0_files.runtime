@@ -3,6 +3,7 @@ let root {}
 let path []
 let env_path ''
 let env_prompt ''
+let env_home ''
 let leds []
 
 def init_files
@@ -10,20 +11,25 @@ def init_files
  let path []
  let env_path '/env/path'
  let env_prompt '/env/prompt'
+ let env_home '/env/home'
 
  / /env
  let _env_dir {}
+ put $_env_dir 'home' '/home'
  put $_env_dir 'path' '/programs'
  put $_env_dir 'prompt' '$p \'#\''
  put $root 'env' $_env_dir
+
+ / /dev
+ let _dev_dir {}
+ put $_dev_dir 'led' '0'
+ put $root 'dev' $_dev_dir
 
  / init leds
  put $leds 0 0
  put $leds 1 0
  put $leds 2 0
- 
- / set home dir
- psh $path 'home'
+
 end
 
 cal init_files
