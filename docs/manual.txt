@@ -1,0 +1,25 @@
+== Supported Runtime Script commands in Moon OS
+let, add, sub, mul, div
+jmp, jeq, jne, inp, int
+tim, len, pol, pop, psh
+put, get
+
+~ only in Moon OS:
+led V
+lib <API> [V*] [N]
+
+~lib APIs:
+os.get_home_path
+os.get_current_path
+os.set_current_path
+os.delete_path
+os.make_dir
+os.get_file_list
+os.get_file_type
+os.get_file_content
+util.get_path_by_str
+dev.set_led
+
+== Runtime Script resources
+Tutorial: https://siwei.dev/doc/runtime/
+Cheatsheet: https://siwei.dev/doc/RuntimeScriptCheatSheet.pdf
