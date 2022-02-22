@@ -163,34 +163,3 @@
 		}
 	}, 1000);
 })();
-
-/*
-(function() {
-	let runtime = runtimeExecuter();
-	let evaluator = runtimeEvaluator();
-	let parser = runtimeParser();
-
-	let chat_console = $('#chat-console').jqconsole();
-	chat_console.SetPromptLabel('');
-
-	runtime.config(parser, evaluator, null, chat_console, null, {});
-
-	(function () {
-		chat_console.Prompt(true, function (input) {
-		});
-	})();
-	runtime.restart();
-	runtime.executeAll(null, chatSrc);
-})();
-
-let chatOpened = true;
-$('#chat-btn').click(function() {
-	if (chatOpened) {
-		$('.chat-view').addClass('chat-collapsed');
-		chatOpened = false;
-	} else {
-		$('.chat-view').removeClass('chat-collapsed');
-		chatOpened = true;
-	}
-});
-*/
