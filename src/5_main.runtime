@@ -1,19 +1,17 @@
-def welcome_info
- prt 'Moon OS  v1.11'
- prt 'Copyright (c) 1992 RunTech, Inc.'
- prt 'All rights reserved.'
- prt ''
- prt 'Welcome'
-end
-
 def main
  cal get_home_path
  let path $ret
+
+ jeq $0 $nil repl_loop
+ / continue with init program
+ let in $0
+ jmp continue_parse_input
 
  #repl_loop
  cal get_prompt_str
  prt $ret ''
  inp in
+ #continue_parse_input
  cal parse_input $in
  let tokens $ret
  #exec_tokens
@@ -388,5 +386,4 @@ def main
  prt 'Shutting down...'
 end
 
-cal welcome_info
-cal main
+cal main $init_cmd

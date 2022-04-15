@@ -99,3 +99,10 @@ def lib_set_led
  let _val $0
  cal set_led 1 $_val
 end
+
+def lib_get_os_info
+ let _info []
+ psh $_info $os_name
+ psh $_info $os_ver
+ ret $_info
+end

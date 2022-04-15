@@ -284,6 +284,11 @@ def runtime
    get $_line 4 _file_content_name
    put $env $_file_content_name $ret
   fin
+  ife $_lib_name 'os.lib_get_os_info'
+    get $_line 2 _info
+    cal lib_get_os_info
+    put $env $_info $ret
+  fin
   ife $_lib_name 'util.get_path_by_str'
    cal eval_param $_line 2
    let _path_str $ret
