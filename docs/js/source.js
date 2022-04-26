@@ -1,7 +1,7 @@
-/* Built on Tue 26 Apr 2022 18:24:01 EDT */
+/* Built on Tue 26 Apr 2022 18:58:40 EDT */
 let moonSrc = `
 let os_name 'Moon OS'
-let os_ver '1.12_a'
+let os_ver '1.12_b'
 
 let init_cmd 'hello'
 

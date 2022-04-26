@@ -1,5 +1,5 @@
 let os_name 'Moon OS'
-let os_ver '1.12_a'
+let os_ver '1.12_b'
 
 let init_cmd 'hello'
 
