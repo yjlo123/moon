@@ -1,5 +1,5 @@
 let os_name 'Moon OS'
-let os_ver '1.12_b'
+let os_ver '1.13'
 
 let init_cmd 'hello'
 
@@ -8,6 +8,8 @@ let path []
 let env_path ''
 let env_prompt ''
 let env_home ''
+
+tim boot_time now
 let leds []
 
 def init_files

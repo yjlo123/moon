@@ -82,6 +82,7 @@ def runtime
  jeq $_cmd 'sub' do_arithmetic
  jeq $_cmd 'mul' do_arithmetic
  jeq $_cmd 'div' do_arithmetic
+ jeq $_cmd 'mod' do_arithmetic
  jmp non_arithmetic
   #do_arithmetic
   get $_line 1 _var
@@ -101,6 +102,9 @@ def runtime
   ife $_cmd 'div'
    div _res $_val1 $_val2
   fin
+  ife $_cmd 'mod'
+   mod _res $_val1 $_val2
+  fin
   put $env $_var $_res
  #non_arithmetic
  ife $_cmd 'slp'
@@ -119,26 +123,44 @@ def runtime
   get $_line 1 _lbl_name
   get $_lbl $_lbl_name _pc
  fin
- ife $_cmd 'jeq'
+
+ jeq $_cmd 'jeq' do_cond_jump
+ jeq $_cmd 'jne' do_cond_jump
+ jeq $_cmd 'jgt' do_cond_jump
+ jeq $_cmd 'jlt' do_cond_jump
+ jmp non_cond_jump
+ #do_cond_jump
   cal eval_param $_line 1
   let _v1 $ret
   cal eval_param $_line 2
   let _v2 $ret
   get $_line 3 _lbl_name
-  jne $_v1 $_v2 jeq_false
-  get $_lbl $_lbl_name _pc
-  #jeq_false
- fin
- ife $_cmd 'jne'
-  cal eval_param $_line 1
-  let _v1 $ret
-  cal eval_param $_line 2
-  let _v2 $ret
-  get $_line 3 _lbl_name
-  jeq $_v1 $_v2 jne_false
-  get $_lbl $_lbl_name _pc
-  #jne_false
- fin
+  ife $_cmd 'jeq'
+    jne $_v1 $_v2 jeq_false
+    get $_lbl $_lbl_name _pc
+    #jeq_false
+  fin
+  ife $_cmd 'jne'
+    jeq $_v1 $_v2 jne_false
+    get $_lbl $_lbl_name _pc
+    #jne_false
+  fin
+  ife $_cmd 'jgt'
+    jgt $_v1 $_v2 jgt_true
+    jmp jgt_false
+    #jgt_true
+    get $_lbl $_lbl_name _pc
+    #jgt_false
+  fin
+  ife $_cmd 'jlt'
+    jlt $_v1 $_v2 jlt_true
+    jmp jlt_false
+    #jlt_true
+    get $_lbl $_lbl_name _pc
+    #jlt_false
+  fin
+ #non_cond_jump
+
  ife $_cmd 'inp'
   get $_line 1 _var
   inp _val
@@ -284,9 +306,14 @@ def runtime
    get $_line 4 _file_content_name
    put $env $_file_content_name $ret
   fin
-  ife $_lib_name 'os.lib_get_os_info'
+  ife $_lib_name 'os.get_os_info'
     get $_line 2 _info
     cal lib_get_os_info
+    put $env $_info $ret
+  fin
+  ife $_lib_name 'os.get_sys_info'
+    get $_line 2 _info
+    cal lib_get_sys_info
     put $env $_info $ret
   fin
   ife $_lib_name 'util.get_path_by_str'

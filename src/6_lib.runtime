@@ -106,3 +106,11 @@ def lib_get_os_info
  psh $_info $os_ver
  ret $_info
 end
+
+def lib_get_sys_info
+ let _info {}
+ tim _current now
+ sub _uptime $_current $boot_time
+ put $_info 'uptime' $_uptime
+ ret $_info
+end
