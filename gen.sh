@@ -36,6 +36,7 @@ echo 'let moonSrc = `' >> $source_js
 cat $dist_program >> $source_js
 echo '`' >> $source_js
 sed -i '' 's/\\/\\\\/g' $source_js
+sed -i '' 's/\\\\u/\\u/g' $source_js
 
 cp $source_js ./docs/js/source.js
 rm $source_js
