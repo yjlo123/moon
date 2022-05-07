@@ -78,7 +78,7 @@
 							tempPath = tempPath[envHomeDir[i]];
 						}
 						path = tempPath.split("/").filter(i => i);
-					} else {
+					} else if (pathTokens[i] !== '.') {
 						path.push(pathTokens[i]);
 					}
 				}
