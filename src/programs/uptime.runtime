@@ -1,0 +1,44 @@
+/show how long system has been running
+lib 'os.get_sys_info' info
+get $info 'uptime' uptime
+div uptime $uptime 1000
+tim h hour
+tim m minute
+tim s second
+jgt $h 9 show_hour
+prt '0' ''
+#show_hour
+prt $h ':'
+jgt $m 9 show_minute
+prt '0' ''
+#show_minute
+prt $m ':'
+jgt $s 9 show_second
+prt '0' ''
+#show_second
+prt $s ' up '
+div days $uptime 86400
+mod uptime $uptime 86400
+div hours $uptime 3600
+mod uptime $uptime 3600
+div minutes $uptime 60
+mod uptime $uptime 60
+jeq $days 0 show_time
+prt $days ' day'
+jeq $days 1 single_day
+prt 's' ''
+#single_day
+prt ',' ' '
+#show_time
+jgt $hours 9 hour
+prt '0' ''
+#hour
+prt $hours ':'
+jgt $minutes 9 minute
+prt '0' ''
+#minute
+prt $minutes ':'
+jgt $uptime 9 second
+prt '0' ''
+#second
+prt $uptime

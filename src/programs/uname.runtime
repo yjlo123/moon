@@ -1,0 +1,7 @@
+/print operating system name
+lib 'os.get_os_info' info
+get $info 0 os_name
+get $info 1 os_ver
+prt $os_name ''
+prt '  v' ''
+prt $os_ver

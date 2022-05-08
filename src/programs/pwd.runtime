@@ -1,0 +1,11 @@
+/return working directory name
+lib 'os.get_current_path' path
+let path_str '/'
+#loop
+pol $path d
+jeq $d $nil done
+add path_str $path_str $d
+add path_str $path_str '/'
+jmp loop
+#done
+prt $path_str

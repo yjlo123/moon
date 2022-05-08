@@ -1,0 +1,22 @@
+/make a directory
+let path_str $0
+jeq $path_str $nil print_error_invalid_name
+let new_dir_name ''
+#extract_last
+pop $path_str c
+jeq $c '' continue
+jeq $c '/' continue
+add new_dir_name $c $new_dir_name
+jmp extract_last
+#continue
+psh $path_str $c
+lib 'util.get_path_by_str' $path_str 0 path
+jeq $path $nil print_error_invalid_path
+lib 'os.make_dir' $path $new_dir_name
+jmp done
+#print_error_invalid_name
+prt 'ERR Invalid file/directory name'
+jmp done
+#print_error_invalid_path
+prt 'ERR No such file/directory'
+#done

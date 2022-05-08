@@ -8,11 +8,28 @@ echo -e "def load_extra_files
  prs _fs '\c" >> $files_extra
 python3 -c "
 import json
+import os
 f = open('src/1_files_extra.json')
-text = json.dumps(json.load(f))
+f_json = json.load(f)
+for prog in os.listdir(\"src/programs\"):
+    ff = os.path.join(\"src/programs\", prog)
+    if os.path.isdir(ff):
+        continue
+    with open(ff, 'r') as f:
+        virtual_file = []
+        description = f.readline().strip()[1:]
+        header = [\"exe\", description]
+        virtual_file.append(header)
+        row = f.readline()
+        while row:
+            virtual_file.append(row.strip())
+            row = f.readline()
+    f_json['programs'][prog.split('.')[0]] = virtual_file
+text = json.dumps(f_json)
 text = text.replace(\"'\", \"\\\\'\")
 print(text, end = '')
 f.close()" >> $files_extra
+sed -i '' 's/\\u/\\\\u/g' $files_extra
 echo "'
  for _d \$_fs
   get \$_fs \$_d _content
@@ -36,7 +53,7 @@ echo 'let moonSrc = `' >> $source_js
 cat $dist_program >> $source_js
 echo '`' >> $source_js
 sed -i '' 's/\\/\\\\/g' $source_js
-sed -i '' 's/\\\\u/\\u/g' $source_js
+sed -i '' 's/\\\\\\u/\u/g' $source_js
 
 cp $source_js ./docs/js/source.js
 rm $source_js

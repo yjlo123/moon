@@ -1,0 +1,16 @@
+/show available programs
+lib 'util.get_path_by_str' '/programs' 0 path
+lib 'os.get_file_list' $path lst
+#loop
+pol $lst f
+jeq $f $nil end
+lib 'os.get_file_type' $path $f ft
+jne $ft 'exe' loop
+prt $f ''
+prt ' - ' ''
+lib 'os.get_file_content' $path $f fc
+get $fc 0 file_meta
+get $file_meta 1 file_desc
+prt $file_desc
+jmp loop
+#end

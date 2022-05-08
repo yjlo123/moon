@@ -1,0 +1,14 @@
+/change directory
+let path_str $0
+jne $path_str $nil continue
+lib 'os.get_home_path' home_path
+lib 'os.set_current_path' $home_path
+jmp done
+#continue
+lib 'util.get_path_by_str' $path_str 0 path
+jeq $path $nil print_error_invalid_path
+lib 'os.set_current_path' $path
+jmp done
+#print_error_invalid_path
+prt 'ERR Invalid path'
+#done

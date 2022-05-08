@@ -1,0 +1,59 @@
+/list contents of directories in a tree-like format
+let stack []
+let header []
+let lvl 0
+jeq $0 $nil use_current_path
+lib 'util.get_path_by_str' $0 0 path
+jeq $path $nil print_error
+jmp continue_with_path
+#use_current_path
+lib 'os.get_current_path' path
+#continue_with_path
+#routine
+lib 'os.get_file_list' $path lst
+let cur_lst $lst
+#loop
+pol $cur_lst f
+jeq $f $nil end
+lib 'os.get_file_type' $path $f ft
+len $cur_lst cur_len
+let lvl_count 0
+#print_level
+jeq $lvl_count $lvl level_done
+get $header $lvl_count lvl_seg
+prt $lvl_seg ''
+add lvl_count $lvl_count 1
+jmp print_level
+#level_done
+let header_seg '│   '
+jeq $cur_len 0 print_last
+prt '├── ' ''
+jmp head_end
+#print_last
+prt '└── ' ''
+let header_seg '     '
+#head_end
+prt $f
+jne $ft 'dir' next
+add lvl $lvl 1
+psh $header $header_seg
+psh $path $f
+psh $stack $f
+jmp routine
+#next
+jmp loop
+#end
+len $stack stack_size
+jeq $stack_size 0 exit
+pop $stack top_f
+sub lvl $lvl 1
+pop $header _
+pop $path _
+lib 'os.get_file_list' $path cur_lst
+#skip_by_stack
+pol $cur_lst cur
+jeq $cur $top_f to_jmp_loop
+jmp skip_by_stack
+#to_jmp_loop
+jmp loop
+#exit

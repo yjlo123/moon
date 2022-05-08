@@ -1,0 +1,40 @@
+/display date and time
+let days []
+psh $days 'Sun' 'Mon' 'Tue' 'Wed' 'Thu' 'Fri' 'Sat'
+let months []
+psh $months 'Jan' 'Feb' 'Mar' 'Apr'
+psh $months 'May' 'Jun' 'Jul' 'Aug'
+psh $months 'Sep' 'Oct' 'Nov' 'Dec'
+tim _day day
+get $days $_day _day_str
+tim _month month
+get $months $_month _month_str
+tim _date date
+tim _year year
+let date_str ''
+add date_str $date_str $_day_str
+add date_str $date_str ' '
+add date_str $date_str $_date
+add date_str $date_str ' '
+add date_str $date_str $_month_str
+add date_str $date_str ' '
+add date_str $date_str $_year
+add date_str $date_str ' '
+tim _hour hour
+tim _minute minute
+tim _second second
+jgt $_hour 9 add_hour
+add date_str $date_str '0'
+#add_hour
+add date_str $date_str $_hour
+add date_str $date_str ':'
+jgt $_minute 9 add_minute
+add date_str $date_str '0'
+#add_minute
+add date_str $date_str $_minute
+add date_str $date_str ':'
+jgt $_second 9 add_second
+add date_str $date_str '0'
+#add_second
+add date_str $date_str $_second
+prt $date_str
