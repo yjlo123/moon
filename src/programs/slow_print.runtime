@@ -1,8 +1,7 @@
 /print a message character by character
-let msg 'Hello World!\\n'
+let msg 'Hello World!'
 jeq $0 $nil continue
 let msg $0
-add msg $msg '\\n'
 #continue
 #loop
 pol $msg c
@@ -11,3 +10,4 @@ slp 100
 prt $c ''
 jmp loop
 #done
+prt ''

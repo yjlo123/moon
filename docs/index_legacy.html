@@ -10,10 +10,8 @@
 
 	<script src="https://runtime.siwei.dev/ui/main/jquery-1.12.4.js"></script>
 	<script src="https://runtime.siwei.dev/ui/console/jqconsole.js"></script>
-	<script src="node_modules/xterm/lib/xterm.js"></script>
 
 	<link rel="stylesheet" href="https://runtime.siwei.dev/ui/console/jqconsole.css"/>
-	<link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
 	<link rel="stylesheet" href="css/style.css"/>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
 </head>
@@ -22,11 +20,8 @@
 	<div class="wrapper">
 		<!-- <h1>Moon OS</h1> -->
 		<div class="monitor-shell">
-			<!-- <div class="console-view">
+			<div class="console-view">
 				<div id="console"></div>
-			</div> -->
-			<div class="terminal-view">
-				<div id="terminal"></div>
 			</div>
 			
 			<div class="monitor-speaker">
@@ -41,7 +36,7 @@
 			<p><a href="manual.txt" target="_blank">Manual</a> for Runtime Script in Moon OS</p>
 			<p>Powered by <a href="https://github.com/yjlo123/runtime-script" target="_blank">Runtime Script</a>.</p>
 			<p>View source code <a href="https://raw.githubusercontent.com/yjlo123/moon/master/dist/program.runtime" target="_blank">here</a>.</p>
-			<p>Switch to <a href="index_legacy.html">legacy terminal</a>.</p>
+			<p>Switch to <a href="index.html">new terminal</a>.</p>
 			<!-- <p>Download binary: <a href="dist/Moon_macOS.zip" target="_blank">macOS</a> <a href="dist/Moon_win.zip" target="_blank">Windows</a>.</p> -->
 		</div>
 		<footer>
@@ -54,7 +49,7 @@
 	<script src="https://runtime.siwei.dev/src/executer.js"></script>
 	<script src="./js/source.js"></script>
 	<script>document.getElementById("year").innerHTML = new Date().getFullYear();</script>
-	<script src="./js/main.js"></script>
+	<script src="./js/main_legacy.js"></script>
 
 </body>
 </html>

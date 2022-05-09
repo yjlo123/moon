@@ -36,6 +36,17 @@ body {
     border-radius: 20px;
 }
 
+.terminal-view {
+    margin: auto;
+    height: 362px;
+    padding: 7px;
+    text-align: left;
+    background-color: #2D2E2C;
+    border: 10px solid #444;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
 .monitor-shell {
     position: relative;
     margin: auto;

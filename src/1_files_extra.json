@@ -68,7 +68,7 @@
             ],
             "compute_age": [
                 ["exe"],
-                "prt 'Input year born:' ''",
+                "prt 'Input year born: ' ''",
                 "inp _year",
                 "int _year $_year",
                 "tim _current year",
