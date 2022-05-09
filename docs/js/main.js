@@ -109,7 +109,9 @@
 
 	let con = {
 		Write: (text, style) => {
-			term.write(text.replace("\n", "\n\r"));
+			// text = text.replaceAll('[x1b', '\x1b');
+			text = text.replaceAll("\n", "\n\r");
+			term.write(text);
 		},
 		Input: (callback) => {
 			promptCallback = callback;
