@@ -314,7 +314,6 @@ def runtime
    cal eval_param $_line 4
    let _file_content $ret
    cal lib_write_file $_path $_file_name $_file_content
-   put $_path $_file_name $_file_content
   fin
   ife $_lib_name 'os.get_os_info'
     get $_line 2 _info

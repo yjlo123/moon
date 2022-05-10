@@ -4,6 +4,7 @@ put $type_map 'txt' 'TXT'
 put $type_map 'exe' 'EXE'
 put $type_map 'raw' 'RAW'
 put $type_map 'dir' 'DIR'
+put $type_map $nil 'NIL'
 jeq $0 $nil use_current_path
 lib 'util.get_path_by_str' $0 0 path
 jeq $path $nil print_error
