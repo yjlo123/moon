@@ -1,4 +1,4 @@
-/print a message character by character
+/speaking cow
 let msg 'Hi!'
 jeq $0 $nil continue
 let msg $0
