@@ -10,7 +10,28 @@
 	let jqconsole = $('#console').jqconsole();
 	jqconsole.SetPromptLabel('');
 
-	runtime.config(parser, evaluator, null, jqconsole, null, {});
+	let con = {
+		Write: (text, style) => {
+			if (text.length > 0) {
+				let lineContent = text.slice(0,text.length-1);
+				if (lineContent === '\\033[F') {
+					return;
+				} else if (lineContent === '\\033[2K') {
+					return;
+				}
+			}
+			jqconsole.Write(text,style);
+
+		},
+		Input: (callback) => {
+			jqconsole.Input(callback);
+		},
+		AbortInput: ()=>{
+			jqconsole.AbortInput();
+		}
+	}
+
+	runtime.config(parser, evaluator, null, con, null, {});
 
 	jqconsole.Prompt(true, function (input) {
 		jqconsole.Write('[Session Ended]\nPlease refresh this page to start a new session.', 'console-default');
