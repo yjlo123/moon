@@ -83,22 +83,22 @@
 			}
 			break;
 		case '\u007F': // Backspace (DEL)
-			// Do not delete the prompt
-			if (term._core.buffer.x > 2) {
-				if (command.length > 0) {
-					term.write('\b \b');
-					command = command.slice(0, command.length - 1);
-				}
+			if (command.length > 0) {
+				term.write('\b \b');
+				command = command.slice(0, command.length - 1);
 			}
 			break;
-		case 'x':
-			// line up
-			term.write('\033[1A');
-			// start of the previous line
-			term.write('\033[F');
-			// clear line
-			term.write('\x1b[2K');
-			break;
+		// case 'x':
+		// 	// // line up
+		// 	// term.write('\033[1A');
+		// 	// start of the previous line
+		// 	term.write('\033[F');
+		// 	// // clear line
+		// 	// term.write('\x1b[2K');
+		// 	break;
+		// case 'z':
+		// 	term.write('\033[2K');
+		// 	break;
 		default: // Print all other characters for demo
 			if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7B) || e >= '\u00a0') {
 				command += e;
@@ -109,6 +109,16 @@
 
 	let con = {
 		Write: (text, style) => {
+			if (text.length > 0) {
+				let lineContent = text.slice(0,text.length-1);
+				if (lineContent === '\\033[F') {
+					term.write('\033[F');
+					return;
+				} else if (lineContent === '\\033[2K') {
+					term.write('\033[2K');
+					return;
+				}
+			}
 			// text = text.replaceAll('[x1b', '\x1b');
 			text = text.replaceAll("\n", "\n\r");
 			term.write(text);

@@ -87,12 +87,20 @@ def lib_get_file_type
  ret 'xxx'
 end
 
-def lib_get_file_content
+def lib_read_file
  let _path $0
  let _file_name $1
  cal get_by_path $_path
  get $ret $_file_name _file_content
  ret $_file_content
+end
+
+def lib_write_file
+ let _path $0
+ let _file_name $1
+ let _file_content $2
+ cal get_by_path $_path
+ put $ret $_file_name $_file_content
 end
 
 def lib_set_led
@@ -113,4 +121,12 @@ def lib_get_sys_info
  sub _uptime $_current $boot_time
  put $_info 'uptime' $_uptime
  ret $_info
+end
+
+def lib_screen_prev_line
+ prt '\\033[F'
+end
+
+def lib_screen_clear_line
+ prt '\\033[2K'
 end

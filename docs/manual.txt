@@ -6,19 +6,24 @@ put, get
 
 ~ only in Moon OS:
 led V
-lib <API> [V*] [N]
+lib <API> [$V*] [N?]
 
 ~lib APIs:
-os.get_home_path
-os.get_current_path
-os.set_current_path
-os.delete_path
-os.make_dir
-os.get_file_list
-os.get_file_type
-os.get_file_content
-util.get_path_by_str
-dev.set_led
+os.get_home_path (path)
+os.get_current_path (path)
+os.set_current_path ($path)
+os.delete_path ($path)
+os.make_dir ($path, $name)
+os.get_file_list ($path)
+os.get_file_type ($path, $name, type_str)
+os.read_file ($path, $name, content)
+os.write_file ($path, $name, $content)
+os.get_os_info (info)
+os.get_sys_info (info)
+util.get_path_by_str ($path_str, $is_file, path)
+dev.set_led ($val)
+term.prev_line
+term.clear_line
 
 == Runtime Script resources
 Tutorial: https://siwei.dev/doc/runtime/

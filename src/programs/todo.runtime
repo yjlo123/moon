@@ -1,0 +1,94 @@
+/ manage a todo list
+prt '┌───────────── TODO ─────────────┐'
+prt '│Usage: add <t> / done <i> / exit│'
+prt '└────────────────────────────────┘'
+
+lib 'util.get_path_by_str' '/home' 0 file_path
+#load_data
+lib 'os.read_file' $file_path '_todo' file_data
+jne $file_data $nil file_loaded
+lib 'os.write_file' $file_path '_todo' []
+jmp load_data
+#file_loaded
+let todo $file_data
+len $todo size
+
+/ initial print
+let i 0
+#print_todo
+jeq $i $size print_done
+add j $i 1
+prt $j '. '
+get $todo $i item
+prt $item
+add i $i 1
+jmp print_todo
+#print_done
+
+#main_loop
+prt '>' ''
+inp input
+
+let cmd ''
+#parse
+pol $input c
+jeq $c '' parse_done
+jeq $c ' ' parse_done
+psh $cmd $c
+jmp parse
+#parse_done
+
+jeq $cmd 'exit' end
+
+let ri -1
+
+jne $cmd 'add' not_add
+psh $todo $input
+len $todo size
+let ri 0
+#not_add
+
+jne $cmd 'done' not_done
+int idx $input
+sub idx $idx 1
+put $todo $idx ''
+let new_todo []
+#update_done
+pol $todo t
+jeq $t $nil update_done_finish
+jeq $t '' update_done
+psh $new_todo $t
+jmp update_done
+#update_done_finish
+let todo $new_todo
+#not_done
+
+#rewind
+jeq $ri $size rewind_done
+lib 'term.prev_line'
+lib 'term.clear_line'
+add ri $ri 1
+jmp rewind
+#rewind_done
+
+len $todo size
+
+let i 0
+#reprint
+jeq $i $size reprint_done
+add j $i 1
+prt $j '. '
+get $todo $i item
+prt $item
+add i $i 1
+jmp reprint
+#reprint_done
+
+lib 'term.clear_line'
+let ri -1
+jmp main_loop
+
+#end
+lib 'term.clear_line'
+lib 'os.write_file' $file_path '_todo' $todo
+prt 'Bye~'

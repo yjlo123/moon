@@ -297,14 +297,24 @@ def runtime
    get $_line 4 _file_type_name
    put $env $_file_type_name $ret
   fin
-  ife $_lib_name 'os.get_file_content'
+  ife $_lib_name 'os.read_file'
    cal eval_param $_line 2
    let _path $ret
    cal eval_param $_line 3
    let _file_name $ret
-   cal lib_get_file_content $_path $_file_name
+   cal lib_read_file $_path $_file_name
    get $_line 4 _file_content_name
    put $env $_file_content_name $ret
+  fin
+  ife $_lib_name 'os.write_file'
+   cal eval_param $_line 2
+   let _path $ret
+   cal eval_param $_line 3
+   let _file_name $ret
+   cal eval_param $_line 4
+   let _file_content $ret
+   cal lib_write_file $_path $_file_name $_file_content
+   put $_path $_file_name $_file_content
   fin
   ife $_lib_name 'os.get_os_info'
     get $_line 2 _info
@@ -329,6 +339,12 @@ def runtime
    cal eval_param $_line 2
    let _val $ret
    cal lib_set_led $_val
+  fin
+  ife $_lib_name 'term.prev_line'
+    cal lib_screen_prev_line
+  fin
+  ife $_lib_name 'term.clear_line'
+    cal lib_screen_clear_line
   fin
  fin
 
