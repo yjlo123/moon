@@ -1,7 +1,9 @@
 == Supported Runtime Script commands in Moon OS
-let, add, sub, mul, div
-jmp, jeq, jne, inp, int
-tim, len, pol, pop, psh
+let, slp
+add, sub, mul, div, mod
+jmp, jeq, jne, jgt, jlt
+inp, int, tim
+len, pol, pop, psh
 put, get
 
 ~ only in Moon OS:

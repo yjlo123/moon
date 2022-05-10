@@ -1,4 +1,4 @@
-/ manage a todo list
+/manage a todo list
 prt '┌───────────── TODO ─────────────┐'
 prt '│Usage: add <t> / done <i> / exit│'
 prt '└────────────────────────────────┘'
