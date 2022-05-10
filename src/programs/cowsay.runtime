@@ -1,0 +1,38 @@
+/print a message character by character
+let msg 'Hi!'
+jeq $0 $nil continue
+let msg $0
+#continue
+
+len $msg length
+add length $length 2
+
+let i 0
+prt ' ' ''
+#upper
+jeq $i $length upper_done
+prt '_' ''
+add i $i 1
+jmp upper
+#upper_done
+prt ''
+
+prt '< ' ''
+prt $msg ''
+prt ' >'
+
+let i 0
+prt ' ' ''
+#lower
+jeq $i $length lower_done
+prt '-' ''
+add i $i 1
+jmp lower
+#lower_done
+prt ''
+
+prt '        \\   ^__^'
+prt '         \\  (oo)\\_______'
+prt '            (__)\\       )\\/\\'
+prt '                ||----w |'
+prt '                ||     ||'

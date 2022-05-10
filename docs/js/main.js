@@ -36,6 +36,7 @@
 		rows: 20
 	});
 	let command = '';
+	let cursor = 0;
 	let promptCallback = null;
 	let promptOn = false;
 
@@ -62,11 +63,12 @@
 				consoleHistoryIndex = consoleHistory.length;
 			}
 			command = '';
+			cursor = 0;
 			break;
 		case '\t': // Tab
 			processTab();
 			break;
-		case '\u001b[A': // Left Arrow
+		case '\u001b[A': // Up Arrow
 			if (consoleHistoryIndex > 0) {
 				consoleHistoryIndex -= 1;
 				setPromptText(consoleHistory[consoleHistoryIndex]);
@@ -82,27 +84,42 @@
 				}
 			}
 			break;
-		case '\u007F': // Backspace (DEL)
-			if (command.length > 0) {
-				term.write('\b \b');
-				command = command.slice(0, command.length - 1);
+		case '\x1b[C': // Right Arrow
+			if (cursor < command.length) {
+				term.write('\x1b[C');
+				cursor++;
 			}
 			break;
-		// case 'x':
-		// 	// // line up
-		// 	// term.write('\033[1A');
-		// 	// start of the previous line
-		// 	term.write('\033[F');
-		// 	// // clear line
-		// 	// term.write('\x1b[2K');
-		// 	break;
-		// case 'z':
-		// 	term.write('\033[2K');
-		// 	break;
+		case '\x1b[D': // Left Arrow
+			if (cursor > 0) {
+				term.write('\x1b[D');
+				cursor--;
+			}
+			break;
+		case '\u007F': // Backspace (DEL)
+			if (command.length > 0 && cursor > 0) {
+				term.write('\b \b');
+				let left = command.slice(0, cursor-1);
+				let right = command.slice(cursor, command.length);
+				command = left + right;
+				term.write(right + ' ');
+				for (let i = 0; i < right.length+1; i++) {
+					term.write('\x1b[D');
+				}
+				cursor--;
+			}
+			break;
 		default: // Print all other characters for demo
 			if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7B) || e >= '\u00a0') {
-				command += e;
+				let left = command.slice(0, cursor);
+				let right = command.slice(cursor, command.length);
+				command = left + e + right;
 				term.write(e);
+				term.write(right);
+				cursor++;
+				for (let i = 0; i < right.length; i++) {
+					term.write('\x1b[D');
+				}
 			}
 		}
 	});
@@ -133,16 +150,33 @@
 	runtime.config(parser, evaluator, null, con, null, {});
 
 	function clearInput() {
+		while (cursor < command.length) {
+			term.write('\x1b[C');
+			cursor++;
+		}
 		while (command.length > 0) {
 			term.write('\b \b');
 			command = command.slice(0, command.length - 1);
 		}
+		cursor = 0;
 	}
 
 	function setPromptText(text) {
 		clearInput();
 		term.write(text);
 		command = text;
+		cursor = command.length;
+	}
+
+	function moveCursorTo(pos) {
+		while (cursor < pos) {
+			cursor++;
+			term.write('\x1b[C');
+		}
+		while (cursor > pos) {
+			cursor--;
+			term.write('\x1b[D');
+		}
 	}
 
 	function parseCmdInput(str) {
@@ -236,13 +270,14 @@
 			}
 		}
 		if (candidate.length === 1) {
-			let currentTextLen = text.length;
+			// found exact one candidate
+			moveCursorTo(command.length);
 			text = text.slice(0, text.length-lastToken.length);
 			let theCandidate = candidate[0];
 			text += theCandidate;
 			command = text;
+			cursor = command.length;
 			term.write(theCandidate.slice(lastToken.length, theCandidate.length));
-			console.log(command);
 		}
 		return false;
 	}
