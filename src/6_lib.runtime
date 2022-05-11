@@ -130,3 +130,11 @@ end
 def lib_screen_clear_line
  prt '\\033[2K'
 end
+
+def lib_set_prt_delay
+ ife $0 0
+  let prt_delay_disabled 1
+ els
+  let prt_delay_disabled 0
+ fin
+end

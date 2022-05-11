@@ -1,4 +1,6 @@
 let env {}
+let prt_delay 5
+let prt_delay_disabled 0
 
 / ====== evaluating ======
 def expr
@@ -65,7 +67,9 @@ def runtime
   cal expr $_val
   let _val $ret
   get $_line 2 _val2
-  slp 5
+  ife $prt_delay_disabled 0
+   slp $prt_delay
+  fin
   ife $_val2 $nil
    prt $_val
   els
@@ -316,14 +320,14 @@ def runtime
    cal lib_write_file $_path $_file_name $_file_content
   fin
   ife $_lib_name 'os.get_os_info'
-    get $_line 2 _info
-    cal lib_get_os_info
-    put $env $_info $ret
+   get $_line 2 _info
+   cal lib_get_os_info
+   put $env $_info $ret
   fin
   ife $_lib_name 'os.get_sys_info'
-    get $_line 2 _info
-    cal lib_get_sys_info
-    put $env $_info $ret
+   get $_line 2 _info
+   cal lib_get_sys_info
+   put $env $_info $ret
   fin
   ife $_lib_name 'util.get_path_by_str'
    cal eval_param $_line 2
@@ -340,10 +344,14 @@ def runtime
    cal lib_set_led $_val
   fin
   ife $_lib_name 'term.prev_line'
-    cal lib_screen_prev_line
+   cal lib_screen_prev_line
   fin
   ife $_lib_name 'term.clear_line'
-    cal lib_screen_clear_line
+   cal lib_screen_clear_line
+  fin
+  ife $_lib_name 'term.set_prt_delay'
+   cal eval_param $_line 2
+   cal lib_set_prt_delay $ret
   fin
  fin
 

@@ -3,6 +3,7 @@ prt '┌───────────── TODO ─────────
 prt '│Usage: add <t> / done <i> / exit│'
 prt '└────────────────────────────────┘'
 
+lib 'term.set_prt_delay' 0
 lib 'util.get_path_by_str' '/home' 0 file_path
 #load_data
 lib 'os.read_file' $file_path '_todo' file_data
@@ -91,4 +92,5 @@ jmp main_loop
 #end
 lib 'term.clear_line'
 lib 'os.write_file' $file_path '_todo' $todo
+lib 'term.set_prt_delay' 1
 prt 'Bye~'
