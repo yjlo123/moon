@@ -39,6 +39,61 @@
 	let cursor = 0;
 	let promptCallback = null;
 	let promptOn = false;
+	let loggingIn = 0;
+	let inputMask = false;
+	let loginUsername = null;
+
+	function executeCommand() {
+		promptOn = false;
+		if (command === "login" || loggingIn > 0) {
+			if (loggingIn === 0) {
+				term.write("Username:");
+				promptOn = true;
+			} else if (loggingIn === 1) {
+				loginUsername = command;
+				term.write("Password:");
+				inputMask = true;
+				promptOn = true;
+			} else if (loggingIn === 2) {
+				inputMask = false;
+				term.write("Logging in...\n\r");
+				$.ajax({
+					url: "https://siwei.dev/login",
+					type: "post",
+					data: {
+						username: loginUsername,
+						password: command
+					}
+				}).done(function( data ) {
+					if (data.status === 'success') {
+						console.log(data);
+						term.write(`Logged in as ${loginUsername}\n\r`);
+					} else {
+						term.write(data.status+"\n\r");
+						loggingIn = -1;
+						promptCallback(""); // resume normal prompt
+					}
+				}).error(function(){
+					term.write("Login failed.\n\r");
+					loggingIn = -1;
+					promptCallback(""); // resume normal prompt
+				});
+			}
+			loggingIn++;
+		} else {
+			promptCallback(command);
+			// record history
+			if (command.length > 0) {
+				consoleHistory.push(command);
+				if (consoleHistory.length > MaxHistorySize) {
+					consoleHistory.shift();
+				}
+				consoleHistoryIndex = consoleHistory.length;
+			}
+		}
+		command = '';
+		cursor = 0;
+	}
 
 	term.open(document.getElementById('terminal'));
 	term.onData(e => {
@@ -52,29 +107,21 @@
 		// 	break;
 		case '\r': // Enter
 			term.write('\n\r');
-			promptOn = false;
-			promptCallback(command);
-			// record history
-			if (command.length > 0) {
-				consoleHistory.push(command);
-				if (consoleHistory.length > MaxHistorySize) {
-					consoleHistory.shift();
-				}
-				consoleHistoryIndex = consoleHistory.length;
-			}
-			command = '';
-			cursor = 0;
+			executeCommand();
 			break;
 		case '\t': // Tab
+			if (inputMask) { break; }
 			processTab();
 			break;
 		case '\u001b[A': // Up Arrow
+		if (inputMask) { break; }
 			if (consoleHistoryIndex > 0) {
 				consoleHistoryIndex -= 1;
 				setPromptText(consoleHistory[consoleHistoryIndex]);
 			}
 			break;
 		case '\u001b[B': // Down Arrow
+			if (inputMask) { break; }
 			if (consoleHistoryIndex < consoleHistory.length) {
 				consoleHistoryIndex += 1;
 				if (consoleHistoryIndex === consoleHistory.length) {
@@ -85,12 +132,14 @@
 			}
 			break;
 		case '\x1b[C': // Right Arrow
+			if (inputMask) { break; }
 			if (cursor < command.length) {
 				term.write('\x1b[C');
 				cursor++;
 			}
 			break;
 		case '\x1b[D': // Left Arrow
+			if (inputMask) { break; }
 			if (cursor > 0) {
 				term.write('\x1b[D');
 				cursor--;
@@ -114,7 +163,11 @@
 				let left = command.slice(0, cursor);
 				let right = command.slice(cursor, command.length);
 				command = left + e + right;
-				term.write(e);
+				if (inputMask) {
+					term.write("*");
+				} else {
+					term.write(e);
+				}
 				term.write(right);
 				cursor++;
 				for (let i = 0; i < right.length; i++) {
