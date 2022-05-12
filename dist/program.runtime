@@ -851,210 +851,60 @@ def set_led
  let _val $1
  put $leds $_idx $_val
 end
-def main
- cal get_home_path
- let path $ret
+/ ==== RUN ====
+def run
+ let _tokens $0
+ pol $_tokens _d
+ ife $_d $nil
+  cal print_error 'Invalid file name'
+  ret
+ fin
 
- jeq $0 $nil repl_loop
- / continue with init program
- let in $0
- jmp continue_parse_input
+ cal get_path_by_str $_d 1
+ ife $ret $nil
+  cal print_error 'File not found'
+  ret
+ fin
+ let _prog_path $ret
+ pop $_prog_path _prog
+ cal get_by_path $_prog_path
+ let prog_dir $ret
 
- #repl_loop
- cal get_prompt_str
- prt $ret ''
- inp in
- #continue_parse_input
- cal parse_input $in
- let tokens $ret
- #exec_tokens
- pol $tokens cmd
-
- jeq $cmd 'exit' exit
-
- / -- RUN --
- ife $cmd 'run'
-  pol $tokens _d
-  ife $_d $nil
-   cal print_error 'Invalid file name'
-   jmp repl_loop
-  fin
-
-  cal get_path_by_str $_d 1
-  ife $ret $nil
-   cal print_error 'File not found'
-   jmp repl_loop
-  fin
-  let _prog_path $ret
-  pop $_prog_path _prog
-  cal get_by_path $_prog_path
-  let prog_dir $ret
-
-  get $prog_dir $_prog _file_content
-  ife $_file_content $nil
-   cal print_error 'File not found'
+ get $prog_dir $_prog _file_content
+ ife $_file_content $nil
+  cal print_error 'File not found'
+ els
+  cal check_executable $_file_content
+  ife $ret 1
+   let _exe []
+   len $_file_content _length
+   sub _length $_length 1   / skip frist meta line
+   for _i $_length
+    add _j $_i 1
+    get $_file_content $_j _line
+    psh $_exe $_line
+   nxt
+   cal runtime $_exe $_tokens
   els
-   cal check_executable $_file_content
-   ife $ret 1
-    let _exe []
-    len $_file_content _length
-    sub _length $_length 1   / skip frist meta line
-    for _i $_length
-     add _j $_i 1
-     get $_file_content $_j _line
-     psh $_exe $_line
-    nxt
-    cal runtime $_exe $tokens
-   els
-    cal print_error 'File not executable'
-   fin
+   cal print_error 'File not executable'
   fin
-  jmp repl_loop
  fin
+end
 
- / -- EDIT --
- ife $cmd 'edit'
-  pol $tokens file_name
-  ife $file_name $nil
-   cal print_error 'Invalid file name'
-   jmp repl_loop
-  fin
-  cal get_current_dir
-  let curr_dir $ret
-  get $curr_dir $file_name fc
-
-  / create file if not exist
-  ife $fc $nil
-   let file_content []
-   let _file_meta []
-   prt 'Create a new file?'
-   prt 't:txt(default) e:exe c:<cancel>'
-   inp _choice
-   jeq $_choice 'c' repl_loop
-   ife $_choice 'e'
-    psh $_file_meta 'exe'
-   els
-    psh $_file_meta 'txt'
-   fin
-   psh $file_content $_file_meta
-   put $curr_dir $file_name $file_content
-   prt 'File created.'
-  fin
-  get $curr_dir $file_name fc
-
-  / check file editable
-  typ file_type $fc
-  ife $file_type 'list'
-   jmp edit_file_valid
-  fin
-  cal print_error 'Not an editable file'
-  jmp repl_loop
-  #edit_file_valid
-
-  prt '== Edit v0.1'
-  prt '== v:view a:append i:insert r:replace q:quit'
-  prt '== File: ' ''
-  prt $file_name ' '
-  prt 'Type: ' ''
-  cal get_list_type $fc
-  prt $ret
-
-  #edit_loop
-  prt '#' ''
-  inp edit_in
-  cal parse_input $edit_in
-  let edit_tokens $ret
-  pol $edit_tokens edit_cmd
-
-  jeq $edit_cmd 'q' repl_loop   / quit
-  ife $edit_cmd 'v'             / view
-   get $curr_dir $file_name fc
-   let _i 0    / line number
-   for _row $fc
-    jeq $_i 0 edit_view_skip_meta
-    cal replace_char_in_str $_row '\n' '\\n'
-    let _row $ret
-    add _ln $_i ' |'
-    add _row $_ln $_row
-    prt $_row
-    #edit_view_skip_meta
-    add _i $_i 1
-   nxt
-  fin
-  ife $edit_cmd 'a'             / append
-   pol $edit_tokens line_content
-   get $curr_dir $file_name current_content
-   cal replace_esc_in_str $line_content
-   psh $current_content $ret
-  fin
-  ife $edit_cmd 'd'             / delete
-   pol $edit_tokens line_number
-   int line_number $line_number
-   get $curr_dir $file_name current_content
-   let new_content []
-   let _line_count 0
-   for line $current_content
-    ife $_line_count $line_number
-     jmp _edit_delete_continue
-    fin
-    psh $new_content $line
-    #_edit_delete_continue
-    add _line_count $_line_count 1
-   nxt
-   put $curr_dir $file_name $new_content
-  fin
-  ife $edit_cmd 'i'              / insert
-   pol $edit_tokens line_number
-   int line_number $line_number
-   pol $edit_tokens line_content
-   get $curr_dir $file_name current_content
-   let new_content []
-   let _line_count 0
-   for line $current_content
-    ife $_line_count $line_number
-     cal replace_esc_in_str $line_content
-     psh $new_content $ret
-    fin
-    psh $new_content $line
-    add _line_count $_line_count 1
-   nxt
-   put $curr_dir $file_name $new_content
-  fin
-  ife $edit_cmd 'r'              / replace
-   pol $edit_tokens line_number
-   int line_number $line_number
-   pol $edit_tokens line_content
-   get $curr_dir $file_name current_content
-   let new_content []
-   let _line_count 0
-   for line $current_content
-    ife $_line_count $line_number
-    cal replace_esc_in_str $line_content
-     psh $new_content $ret
-    els
-     psh $new_content $line
-    fin
-    add _line_count $_line_count 1
-   nxt
-   put $curr_dir $file_name $new_content
-  fin
-  / prt 'File updated.'
-  jmp edit_loop
- fin
-
- / -- ECHO --
- ife $cmd 'echo'
-  pol $tokens s
+/ ==== ECHO ====
+def echo
+ let _tokens $0
+ pol $_tokens s
   ife $s $nil
    let s ''
   fin
-  pol $tokens p
+  pol $_tokens p
   ife $p $nil
    prt $s
   fin
   ife $p '>'
    / write to file
-   pol $tokens f
+   pol $_tokens f
    ife $f $nil
     cal print_error 'File name missing'
    els
@@ -1079,10 +929,10 @@ def main
   fin
   ife $p '>>'
    / append to file
-   pol $tokens f
+   pol $_tokens f
    ife $f $nil
     cal print_error 'File name missing'
-    jmp repl_loop
+    ret
    els
     cal get_current_dir
     let curr_dir $ret
@@ -1097,11 +947,179 @@ def main
       put $curr_dir $f $fc
      els
       cal print_error 'Can only write to a raw file'
-      jmp repl_loop
+      ret
      fin
     fin
    fin
   fin
+end
+
+/ ==== EDIT ====
+def edit
+ let $_tokens $0
+ pol $_tokens file_name
+ ife $file_name $nil
+  cal print_error 'Invalid file name'
+  ret
+ fin
+ cal get_current_dir
+ let curr_dir $ret
+ get $curr_dir $file_name fc
+
+ / create file if not exist
+ ife $fc $nil
+  let file_content []
+  let _file_meta []
+  prt 'Create a new file?'
+  prt 't:txt(default) e:exe c:<cancel>'
+  inp _choice
+  jeq $_choice 'c' exit_edit
+  ife $_choice 'e'
+   psh $_file_meta 'exe'
+  els
+   psh $_file_meta 'txt'
+  fin
+  psh $file_content $_file_meta
+  put $curr_dir $file_name $file_content
+  prt 'File created.'
+ fin
+ get $curr_dir $file_name fc
+
+ / check file editable
+ typ file_type $fc
+ ife $file_type 'list'
+  jmp edit_file_valid
+ fin
+ cal print_error 'Not an editable file'
+ ret
+ #edit_file_valid
+
+ prt '== Edit v0.1'
+ prt '== v:view a:append i:insert r:replace q:quit'
+ prt '== File: ' ''
+ prt $file_name ' '
+ prt 'Type: ' ''
+ cal get_list_type $fc
+ prt $ret
+
+ #edit_loop
+ prt '#' ''
+ inp edit_in
+ cal parse_input $edit_in
+ let edit_tokens $ret
+ pol $edit_tokens edit_cmd
+
+ jeq $edit_cmd 'q' exit_edit   / quit
+ ife $edit_cmd 'v'             / view
+  get $curr_dir $file_name fc
+  let _i 0    / line number
+  for _row $fc
+   jeq $_i 0 edit_view_skip_meta
+   cal replace_char_in_str $_row '\n' '\\n'
+   let _row $ret
+   add _ln $_i ' |'
+   add _row $_ln $_row
+   prt $_row
+   #edit_view_skip_meta
+   add _i $_i 1
+  nxt
+ fin
+ ife $edit_cmd 'a'             / append
+  pol $edit_tokens line_content
+  get $curr_dir $file_name current_content
+  cal replace_esc_in_str $line_content
+  psh $current_content $ret
+ fin
+ ife $edit_cmd 'd'             / delete
+  pol $edit_tokens line_number
+  int line_number $line_number
+  get $curr_dir $file_name current_content
+  let new_content []
+  let _line_count 0
+  for line $current_content
+   ife $_line_count $line_number
+    jmp _edit_delete_continue
+   fin
+   psh $new_content $line
+   #_edit_delete_continue
+   add _line_count $_line_count 1
+  nxt
+  put $curr_dir $file_name $new_content
+ fin
+ ife $edit_cmd 'i'              / insert
+  pol $edit_tokens line_number
+  int line_number $line_number
+  pol $edit_tokens line_content
+  get $curr_dir $file_name current_content
+  let new_content []
+  let _line_count 0
+  for line $current_content
+   ife $_line_count $line_number
+    cal replace_esc_in_str $line_content
+    psh $new_content $ret
+   fin
+   psh $new_content $line
+   add _line_count $_line_count 1
+  nxt
+  put $curr_dir $file_name $new_content
+ fin
+ ife $edit_cmd 'r'              / replace
+  pol $edit_tokens line_number
+  int line_number $line_number
+  pol $edit_tokens line_content
+  get $curr_dir $file_name current_content
+  let new_content []
+  let _line_count 0
+  for line $current_content
+   ife $_line_count $line_number
+   cal replace_esc_in_str $line_content
+    psh $new_content $ret
+   els
+    psh $new_content $line
+   fin
+   add _line_count $_line_count 1
+  nxt
+  put $curr_dir $file_name $new_content
+ fin
+ / prt 'File updated.'
+ #exit_edit
+end
+def main
+ cal get_home_path
+ let path $ret
+
+ jeq $0 $nil repl_loop
+ / continue with init program
+ let in $0
+ jmp continue_parse_input
+
+ #repl_loop
+ cal get_prompt_str
+ prt $ret ''
+ inp in
+ #continue_parse_input
+ cal parse_input $in
+ let tokens $ret
+ #exec_tokens
+ pol $tokens cmd
+
+ jeq $cmd 'exit' exit
+
+ / -- RUN --
+ ife $cmd 'run'
+  cal run $tokens
+  jmp repl_loop
+ fin
+
+ / -- EDIT --
+ ife $cmd 'edit'
+  cal edit $tokens
+  jmp edit_loop
+ fin
+
+ / -- ECHO --
+ ife $cmd 'echo'
+  cal echo $tokens
   jmp repl_loop
  fin
 

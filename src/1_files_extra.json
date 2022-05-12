@@ -6,7 +6,7 @@
         "note": [
             ["txt"],
             "----------- Moon OS Manual ------------",
-            "programs -- view the available programs",
+            "programs -- list all available programs",
             "ls [<d>]-- list directory contents",
             "pwd -- return working directory name",
             "cd <d> -- change directory",

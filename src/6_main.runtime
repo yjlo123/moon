@@ -1,0 +1,106 @@
+def main
+ cal get_home_path
+ let path $ret
+
+ jeq $0 $nil repl_loop
+ / continue with init program
+ let in $0
+ jmp continue_parse_input
+
+ #repl_loop
+ cal get_prompt_str
+ prt $ret ''
+ inp in
+ #continue_parse_input
+ cal parse_input $in
+ let tokens $ret
+ #exec_tokens
+ pol $tokens cmd
+
+ jeq $cmd 'exit' exit
+
+ / -- RUN --
+ ife $cmd 'run'
+  cal run $tokens
+  jmp repl_loop
+ fin
+
+ / -- EDIT --
+ ife $cmd 'edit'
+  cal edit $tokens
+  jmp edit_loop
+ fin
+
+ / -- ECHO --
+ ife $cmd 'echo'
+  cal echo $tokens
+  jmp repl_loop
+ fin
+
+ / -- SAVE --
+ ife $cmd 'save'
+  sav 'moon.sav' $root
+  prt '[Saved]'
+  jmp repl_loop
+ fin
+
+ / -- LOAD --
+ ife $cmd 'load'
+  lod 'moon.sav' loaded_data
+  ife $loaded_data $nil
+   cal print_error 'There is no saved data'
+  els
+   let root $loaded_data
+   prt '[Loaded]'
+  fin
+  jmp repl_loop
+ fin
+
+ / -- (EMPTY) --
+ ife $cmd $nil
+  jmp repl_loop
+ fin
+
+ / -- (ENV PROGRAM) --
+ cal split_str $env_path '/'
+ cal get_by_path $ret
+ let _env_path_str $ret
+ cal get_path_by_str $_env_path_str
+ ife $ret $nil
+  jmp skip_env_program
+ fin
+ 
+ let _program_dir $root
+ for _d $ret
+  get $_program_dir $_d _program_dir
+ nxt
+ let _has_program 0
+ for _p $_program_dir
+  ife $_p $cmd
+   let _has_program 1
+  fin
+ nxt
+ ife $_has_program 1
+  let _new_tokens []
+  psh $_new_tokens 'run'
+  add _prog_path $_env_path_str '/'
+  add _prog_path $_prog_path $cmd
+  psh $_new_tokens $_prog_path
+  for t $tokens
+   psh $_new_tokens $t
+  nxt
+  let tokens $_new_tokens
+  jmp exec_tokens
+ fin
+ #skip_env_program
+
+ / -- (INVALID) --
+ add err_msg 'Unknown command: ' $cmd
+ cal print_error $err_msg
+ jmp repl_loop
+
+ #exit
+ prt 'Shutting down...'
+end
+
+cal main $init_cmd
