@@ -46,6 +46,7 @@
 	function executeCommand() {
 		promptOn = false;
 		if (command === "login" || loggingIn > 0) {
+			console.log(loggingIn);
 			if (loggingIn === 0) {
 				term.write("Username:");
 				promptOn = true;
@@ -70,13 +71,13 @@
 						term.write(`Logged in as ${loginUsername}\n\r`);
 					} else {
 						term.write(data.status+"\n\r");
-						loggingIn = -1;
-						promptCallback(""); // resume normal prompt
+						loggingIn = 0;
+						return promptCallback(""); // resume normal prompt
 					}
 				}).error(function(){
 					term.write("Login failed.\n\r");
-					loggingIn = -1;
-					promptCallback(""); // resume normal prompt
+					loggingIn = 0;
+					return promptCallback(""); // resume normal prompt
 				});
 			}
 			loggingIn++;
