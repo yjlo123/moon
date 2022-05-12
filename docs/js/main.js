@@ -72,13 +72,7 @@
 			if (data.status === 0) {
 				let env = runtime.getEnv(false);
 				env.global.root.home = JSON.parse(data.home);
-				console.log(env.global.root.env.home);
-				let envHomePath = env.global.root.env.home.split("/");
-				let homePath = env.global.root;
-				for (let i = 0; i < envHomePath.length-1; i++) {
-					homePath = homePath[envHomePath[i]];
-				}
-				homePath[envHomePath[envHomePath.length-1]] = '/home';
+				env.global.root.env.home = "/home";
 				env.global.path = ["home"]
 			} else {
 				term.write("\n\rLoad files error status.\n\r");
