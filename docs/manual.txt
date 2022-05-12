@@ -2,7 +2,7 @@
 prt, let, slp
 add, sub, mul, div, mod
 jmp, jeq, jne, jgt, jlt
-inp, int, tim
+inp, int, str, typ, tim
 len, pol, pop, psh
 put, get
 

@@ -1,0 +1,63 @@
+/concatenate a file to the terminal output
+let path_str $0
+jeq $path_str $nil print_error_invalid_name
+lib 'util.get_path_by_str' $path_str 1 path
+jeq $path $nil print_error_invalid_path
+pop $path file_name
+lib 'os.read_file' $path $file_name file_content
+lib 'os.get_file_type' $path $file_name file_type
+
+jeq $file_type 'raw' raw_file
+jeq $file_type 'txt' txt_file
+jeq $file_type 'exe' exe_file
+jeq $file_type 'dir' print_error_directory
+jmp unsupported_file_type
+
+#raw_file
+prt $file_content
+jmp done
+
+#txt_file
+let i 1
+len $file_content file_len
+jeq $file_len 0 done
+#print_txt_loop
+jeq $i $file_len done
+get $file_content $i line
+prt $line
+add i $i 1
+jmp print_txt_loop
+jmp done
+
+#exe_file
+let i 1
+len $file_content file_len
+jeq $file_len 0 done
+#print_exe_loop
+jeq $i $file_len done
+get $file_content $i line
+/replace_char_in_str $line '\n' '\\n'
+prt $i ''
+prt ' |' ''
+prt $line
+add i $i 1
+jmp print_exe_loop
+jmp done
+
+#unsupported_file_type
+prt 'ERR Unsupported file type'
+jmp done
+
+#print_error_invalid_name
+prt 'ERR Invalid file name'
+jmp done
+
+#print_error_directory
+prt 'ERR \"' ''
+prt $file_name ''
+prt '\" is a directory'
+jmp done
+
+#print_error_invalid_path
+prt 'ERR File not found'
+#done
