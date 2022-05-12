@@ -1,0 +1,6 @@
+/login remote user
+/ A Terminal builtin program (if available)
+/  to login a remote user
+/ Relevant commands:
+/ logout: sync and logout current remote user
+/ sync: upload files in /home to remote server

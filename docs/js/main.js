@@ -216,10 +216,14 @@
 			return;
 		}
 		switch (e) {
-		// case '\u0003': // Ctrl+C
-		// 	term.write('^C');
-		// 	prompt(term);
-		// 	break;
+		case '\u0003': // Ctrl+C
+			term.write('\n\r');
+			command = '';
+			cursor = 0;
+			loggingIn = 0;
+			inputMask = false;
+			promptCallback("");
+			break;
 		case '\r': // Enter
 			term.write('\n\r');
 			executeCommand();

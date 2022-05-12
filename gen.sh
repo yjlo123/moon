@@ -36,7 +36,9 @@ echo "'
   put \$root \$_d \$_content
  nxt
 end
-cal load_extra_files" >> $files_extra
+cal load_extra_files
+let os_build '$(date "+%y%m%d.%H%M")'
+" >> $files_extra
 
 dist_program="./dist/program.runtime"
 for filename in ./src/*.runtime; do

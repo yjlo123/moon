@@ -112,6 +112,7 @@ def lib_get_os_info
  let _info []
  psh $_info $os_name
  psh $_info $os_ver
+ psh $_info $os_build
  ret $_info
 end
 

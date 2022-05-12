@@ -2,9 +2,12 @@
 lib 'os.get_os_info' info
 get $info 0 os_name
 get $info 1 os_ver
+get $info 2 os_build
 prt $os_name ''
 prt '  v' ''
-prt $os_ver
+prt $os_ver ' (build '
+prt $os_build ')'
+prt ''
 prt 'Copyright (c) 1992 RunTech, Inc.'
 prt 'All rights reserved.'
 prt ''
