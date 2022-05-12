@@ -2,7 +2,7 @@
     "mnt": {
         "test": "hello"
     },
-    "root": {
+    "guest": {
         "note": [
             ["txt"],
             "----------- Moon OS Manual ------------",

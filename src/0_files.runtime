@@ -21,7 +21,7 @@ def init_files
 
  / /env
  let _env_dir {}
- put $_env_dir 'home' '/root'
+ put $_env_dir 'home' '/guest'
  put $_env_dir 'path' '/programs'
  put $_env_dir 'prompt' '$p \'#\''
  put $root 'env' $_env_dir

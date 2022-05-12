@@ -133,6 +133,17 @@
 		promptOn = false;
 		if (command === "login" || loggingIn > 0) {
 			executeLogin();
+		} else if (command === "logout") {
+			$.ajax({
+				url: "https://siwei.dev/logout",
+				type: "get",
+				data: {}
+			})
+		} else if (command === "sync") {
+
+		} else if (command === "whoami") {
+			term.write((loginUsername || "guest") + "\n\r");
+			promptCallback("");
 		} else {
 			promptCallback(command);
 			// record history
