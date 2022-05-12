@@ -85,7 +85,7 @@
 						password: command
 					}
 				}).done(function( data ) {
-					if (data.status === 'success') {
+					if (data.status === 'success' || data.status === 'already logged in') {
 						term.write(`Logged in as ${loginUsername}\n\r`);
 						loggedIn = true;
 						loadUserFiles();
