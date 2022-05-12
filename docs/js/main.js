@@ -6,6 +6,12 @@
 	let consoleHistory = [];
 	let consoleHistoryIndex = -1;
 	const MaxHistorySize = 20;
+	const API_AUTH_HOST = "https://siwei.dev";
+	const API_AUTH_SESSION = API_AUTH_HOST + "/session";
+	const API_AUTH_LOGIN = API_AUTH_HOST + "/login";
+	const API_AUTH_LOGOUT = API_AUTH_HOST + "/logout";
+	const API_FILES_LOAD = API_AUTH_HOST + "/api/fs/load"
+	const API_FILES_SAVE= API_AUTH_HOST + "/api/fs/save"
 
 	let baseTheme = {
 		foreground: '#F8F8F8',
@@ -46,7 +52,7 @@
 
 	function checkLogin() {
 		$.ajax({
-			url: "https://siwei.dev/session",
+			url: API_AUTH_SESSION,
 			type: "post"
 		}).done(function( data ) {
 			if (data.status === "0") {
@@ -66,7 +72,7 @@
 
 	function loadUserFiles() {
 		$.ajax({
-			url: "https://siwei.dev/api/fs/load",
+			url: API_FILES_LOAD,
 			type: "get"
 		}).done(function( data ) {
 			if (data.status === 0) {
@@ -85,20 +91,21 @@
 	function executeSync(callback) {
 		let env = runtime.getEnv(false);
 		$.ajax({
-			url: "https://siwei.dev/api/fs/save",
+			url: API_FILES_SAVE,
 			type: "post",
 			data: {
 				data: JSON.stringify(env.global.root.home)
 			}
 		}).done(function( data ) {
 			if (data.status === 0) {
-				term.write("\n\rSaved files successfully.\n\r");
-				callback();
+				term.write("Saved files successfully.\n\r");
 			} else {
-				term.write("\n\rSave files error status.\n\r");
+				term.write("Save files error status.\n\r");
 			}
+			callback();
 		}).error(function(){
 			term.write("\n\rRequest saving files failed.\n\r");
+			callback();
 		});
 	}
 
@@ -124,7 +131,7 @@
 			inputMask = false;
 			term.write("Logging in...\n\r");
 			$.ajax({
-				url: "https://siwei.dev/login",
+				url: API_AUTH_LOGIN,
 				type: "post",
 				data: {
 					username: loginUsername,
@@ -151,7 +158,7 @@
 
 	function executeLogout() {
 		$.ajax({
-			url: "https://siwei.dev/logout",
+			url: API_AUTH_LOGOUT,
 			type: "get",
 			data: {}
 		}).done(()=>{
@@ -165,32 +172,40 @@
 		});
 	}
 
+	function recordCommandHistory() {
+		if (command.length > 0) {
+			consoleHistory.push(command);
+			if (consoleHistory.length > MaxHistorySize) {
+				consoleHistory.shift();
+			}
+			consoleHistoryIndex = consoleHistory.length;
+		}
+	}
+
 	function executeCommand() {
 		promptOn = false;
 		if (command === "login" || loggingIn > 0) {
 			executeLogin();
-		} else if (command === "logout") {
-			executeSync(()=>{
-				executeLogout();
-			});
-		} else if (command === "sync") {
-			executeSync(()=>{
-				promptCallback("");
-			});
-		} else if (command === "whoami") {
-			term.write((loggedIn && loginUsername || "guest") + "\n\r");
-			promptCallback("");
-		} else {
-			promptCallback(command);
-			// record history
-			if (command.length > 0) {
-				consoleHistory.push(command);
-				if (consoleHistory.length > MaxHistorySize) {
-					consoleHistory.shift();
-				}
-				consoleHistoryIndex = consoleHistory.length;
+			if (command === "login") {
+				recordCommandHistory();
 			}
-		}
+		} else {
+			if (command === "logout") {
+				executeSync(()=>{
+					executeLogout();
+				});
+			} else if (command === "sync") {
+				executeSync(()=>{
+					promptCallback("");
+				});
+			} else if (command === "whoami") {
+				term.write((loggedIn && loginUsername || "guest") + "\n\r");
+				promptCallback("");
+			} else {
+				promptCallback(command);
+			}
+			recordCommandHistory();
+		} 
 		command = '';
 		cursor = 0;
 	}

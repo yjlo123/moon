@@ -4,7 +4,11 @@ prt '│Usage: add <t> / done <i> / exit│'
 prt '└────────────────────────────────┘'
 
 lib 'term.set_prt_delay' 0
+
 lib 'util.get_path_by_str' '/home' 0 file_path
+jne $file_path $nil load_data
+lib 'util.get_path_by_str' '/guest' 0 file_path
+
 #load_data
 lib 'os.read_file' $file_path '_todo' file_data
 jne $file_data $nil file_loaded
