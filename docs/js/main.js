@@ -42,11 +42,30 @@
 	let loggingIn = 0;
 	let inputMask = false;
 	let loginUsername = null;
+	let loggedIn = false;
+
+	function loadUserFiles() {
+		$.ajax({
+			url: "https://siwei.dev/api/fs/load",
+			type: "get"
+		}).done(function( data ) {
+			if (data.status === 0) {
+				console.log(data.home);
+			} else {
+				term.write("\n\rLoad files error status.\n\r");
+			}
+		}).error(function(){
+			term.write("\n\rRequest files failed.\n\r");
+		});
+	}
 
 	function executeCommand() {
 		promptOn = false;
 		if (command === "login" || loggingIn > 0) {
-			console.log(loggingIn);
+			if (loggedIn) {
+				term.writeln("Already logged in as " + loginUsername);
+				return promptCallback("");
+			}
 			if (loggingIn === 0) {
 				term.write("Username:");
 				promptOn = true;
@@ -67,13 +86,14 @@
 					}
 				}).done(function( data ) {
 					if (data.status === 'success') {
-						console.log(data);
 						term.write(`Logged in as ${loginUsername}\n\r`);
+						loggedIn = true;
+						loadUserFiles();
 					} else {
 						term.write(data.status+"\n\r");
-						loggingIn = 0;
-						return promptCallback(""); // resume normal prompt
 					}
+					loggingIn = 0;
+					return promptCallback(""); // resume normal prompt
 				}).error(function(){
 					term.write("Login failed.\n\r");
 					loggingIn = 0;
