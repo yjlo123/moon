@@ -41,7 +41,7 @@
 	let promptOn = false;
 	let loggingIn = 0;
 	let inputMask = false;
-	let loginUsername = null;
+	let loginUsername = undefined;
 	let loggedIn = undefined;
 
 	function checkLogin() {
@@ -138,11 +138,14 @@
 				url: "https://siwei.dev/logout",
 				type: "get",
 				data: {}
-			})
+			});
+			loggedIn = false;
+			loginUsername = undefined;
+			promptCallback("");
 		} else if (command === "sync") {
 
 		} else if (command === "whoami") {
-			term.write((loginUsername || "guest") + "\n\r");
+			term.write((loggedIn && loginUsername || "guest") + "\n\r");
 			promptCallback("");
 		} else {
 			promptCallback(command);
