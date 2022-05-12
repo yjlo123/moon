@@ -1,5 +1,5 @@
 /show the current username
 / A terminal builtin program (if available)
-/  to show the current user's username
-/ Local user will be "guest"
+/  to show the current username
+/ Local user will be guest
 prt 'guest'
