@@ -70,9 +70,9 @@
 			type: "get"
 		}).done(function( data ) {
 			if (data.status === 0) {
-				console.log(JSON.parse(data.home));
 				let env = runtime.getEnv(false);
 				env.global.root.home = JSON.parse(data.home);
+				console.log(env.global.root.env.home);
 				let envHomePath = env.global.root.env.home.split("/");
 				let homePath = env.global.root;
 				for (let i = 0; i < envHomePath.length-1; i++) {
