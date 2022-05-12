@@ -44,6 +44,23 @@
 	let loginUsername = null;
 	let loggedIn = false;
 
+	function checkLogin() {
+		$.ajax({
+			url: "https://siwei.dev/session",
+			type: "post"
+		}).done(function( data ) {
+			if (data.status === "0") {
+				loginUsername = data.username;
+				return true;
+			} else {
+				return false;
+			}
+		}).error(function(){
+			console.log("Check login status failed.");
+			return false;
+		});
+	}
+
 	function loadUserFiles() {
 		$.ajax({
 			url: "https://siwei.dev/api/fs/load",
@@ -62,7 +79,7 @@
 	function executeCommand() {
 		promptOn = false;
 		if (command === "login" || loggingIn > 0) {
-			if (loggedIn) {
+			if (loggedIn || checkLogin()) {
 				term.writeln("Already logged in as " + loginUsername);
 				return promptCallback("");
 			}
