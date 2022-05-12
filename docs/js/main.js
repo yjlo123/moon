@@ -42,7 +42,7 @@
 	let loggingIn = 0;
 	let inputMask = false;
 	let loginUsername = null;
-	let loggedIn = false;
+	let loggedIn = undefined;
 
 	function checkLogin() {
 		$.ajax({
@@ -51,14 +51,17 @@
 		}).done(function( data ) {
 			if (data.status === "0") {
 				loginUsername = data.username;
-				return true;
+				loggedIn = true;
 			} else {
-				return false;
+				loggedIn = false;
 			}
+			executeLogin();
 		}).error(function(){
 			console.log("Check login status failed.");
-			return false;
+			loggedIn = false;
+			executeLogin();
 		});
+		return null;
 	}
 
 	function loadUserFiles() {
@@ -76,48 +79,56 @@
 		});
 	}
 
+	function executeLogin() {
+		if (typeof loggedIn === "undefined") {
+			console.log("check login")
+			return checkLogin();
+		}
+		if (loggedIn) {
+			term.writeln("Already logged in as " + loginUsername);
+			return promptCallback("");
+		}
+		if (loggingIn === 0) {
+			term.write("Username:");
+			promptOn = true;
+		} else if (loggingIn === 1) {
+			loginUsername = command;
+			term.write("Password:");
+			inputMask = true;
+			promptOn = true;
+		} else if (loggingIn === 2) {
+			inputMask = false;
+			term.write("Logging in...\n\r");
+			$.ajax({
+				url: "https://siwei.dev/login",
+				type: "post",
+				data: {
+					username: loginUsername,
+					password: command
+				}
+			}).done(function( data ) {
+				if (data.status === 'success' || data.status === 'already logged in') {
+					term.write(`Logged in as ${loginUsername}\n\r`);
+					loggedIn = true;
+					loadUserFiles();
+				} else {
+					term.write(data.status+"\n\r");
+				}
+				loggingIn = 0;
+				return promptCallback(""); // resume normal prompt
+			}).error(function(){
+				term.write("Login failed.\n\r");
+				loggingIn = 0;
+				return promptCallback(""); // resume normal prompt
+			});
+		}
+		loggingIn++;
+	}
+
 	function executeCommand() {
 		promptOn = false;
 		if (command === "login" || loggingIn > 0) {
-			if (loggedIn || checkLogin()) {
-				term.writeln("Already logged in as " + loginUsername);
-				return promptCallback("");
-			}
-			if (loggingIn === 0) {
-				term.write("Username:");
-				promptOn = true;
-			} else if (loggingIn === 1) {
-				loginUsername = command;
-				term.write("Password:");
-				inputMask = true;
-				promptOn = true;
-			} else if (loggingIn === 2) {
-				inputMask = false;
-				term.write("Logging in...\n\r");
-				$.ajax({
-					url: "https://siwei.dev/login",
-					type: "post",
-					data: {
-						username: loginUsername,
-						password: command
-					}
-				}).done(function( data ) {
-					if (data.status === 'success' || data.status === 'already logged in') {
-						term.write(`Logged in as ${loginUsername}\n\r`);
-						loggedIn = true;
-						loadUserFiles();
-					} else {
-						term.write(data.status+"\n\r");
-					}
-					loggingIn = 0;
-					return promptCallback(""); // resume normal prompt
-				}).error(function(){
-					term.write("Login failed.\n\r");
-					loggingIn = 0;
-					return promptCallback(""); // resume normal prompt
-				});
-			}
-			loggingIn++;
+			executeLogin();
 		} else {
 			promptCallback(command);
 			// record history
