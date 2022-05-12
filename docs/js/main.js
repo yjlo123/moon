@@ -82,6 +82,26 @@
 		});
 	}
 
+	function executeSync(callback) {
+		let env = runtime.getEnv(false);
+		$.ajax({
+			url: "https://siwei.dev/api/fs/save",
+			type: "post",
+			data: {
+				data: JSON.stringify(env.global.root.home)
+			}
+		}).done(function( data ) {
+			if (data.status === 0) {
+				term.write("\n\rSaved files successfully.\n\r");
+				callback();
+			} else {
+				term.write("\n\rSave files error status.\n\r");
+			}
+		}).error(function(){
+			term.write("\n\rRequest saving files failed.\n\r");
+		});
+	}
+
 	function executeLogin() {
 		if (typeof loggedIn === "undefined") {
 			console.log("check login")
@@ -129,21 +149,34 @@
 		loggingIn++;
 	}
 
+	function executeLogout() {
+		$.ajax({
+			url: "https://siwei.dev/logout",
+			type: "get",
+			data: {}
+		}).done(()=>{
+			loggedIn = false;
+			loginUsername = undefined;
+			let env = runtime.getEnv(false);
+			delete env.global.root.home;
+			env.global.root.env.home = "/guest";
+			env.global.path = ["guest"]
+			promptCallback("");
+		});
+	}
+
 	function executeCommand() {
 		promptOn = false;
 		if (command === "login" || loggingIn > 0) {
 			executeLogin();
 		} else if (command === "logout") {
-			$.ajax({
-				url: "https://siwei.dev/logout",
-				type: "get",
-				data: {}
+			executeSync(()=>{
+				executeLogout();
 			});
-			loggedIn = false;
-			loginUsername = undefined;
-			promptCallback("");
 		} else if (command === "sync") {
-
+			executeSync(()=>{
+				promptCallback("");
+			});
 		} else if (command === "whoami") {
 			term.write((loggedIn && loginUsername || "guest") + "\n\r");
 			promptCallback("");
