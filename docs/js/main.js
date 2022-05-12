@@ -70,7 +70,9 @@
 			type: "get"
 		}).done(function( data ) {
 			if (data.status === 0) {
-				console.log(data.home);
+				console.log(JSON.parse(data.home));
+				let env = runtime.getEnv(false);
+				env.global.root.home = JSON.parse(data.home);
 			} else {
 				term.write("\n\rLoad files error status.\n\r");
 			}
@@ -86,6 +88,7 @@
 		}
 		if (loggedIn) {
 			term.writeln("Already logged in as " + loginUsername);
+			loadUserFiles();
 			return promptCallback("");
 		}
 		if (loggingIn === 0) {
