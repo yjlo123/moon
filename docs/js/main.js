@@ -209,6 +209,22 @@
 		cursor = 0;
 	}
 
+	function insertToCommand(text) {
+		let left = command.slice(0, cursor);
+		let right = command.slice(cursor, command.length);
+		command = left + text + right;
+		if (inputMask) {
+			term.write("*".repeat(text.length));
+		} else {
+			term.write(text);
+		}
+		term.write(right);
+		cursor += text.length;
+		for (let i = 0; i < right.length; i++) {
+			term.write('\x1b[D');
+		}
+	}
+
 	term.open(document.getElementById('terminal'));
 	term.onData(e => {
 		if (!promptOn && e !== '\u0003') {
@@ -283,19 +299,7 @@
 			break;
 		default: // Print all other characters for demo
 			if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7B) || e >= '\u00a0') {
-				let left = command.slice(0, cursor);
-				let right = command.slice(cursor, command.length);
-				command = left + e + right;
-				if (inputMask) {
-					term.write("*");
-				} else {
-					term.write(e);
-				}
-				term.write(right);
-				cursor++;
-				for (let i = 0; i < right.length; i++) {
-					term.write('\x1b[D');
-				}
+				insertToCommand(e);
 			}
 		}
 	});
