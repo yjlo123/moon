@@ -116,7 +116,8 @@
 		}
 		if (loggedIn) {
 			term.writeln("Already logged in as " + loginUsername);
-			loadUserFiles(()=>{
+			loggingIn = 0;
+			return loadUserFiles(()=>{
 				promptCallback("cd");
 			});
 		}
