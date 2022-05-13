@@ -12,7 +12,15 @@ jmp extract_last
 psh $path_str $c
 lib 'util.get_path_by_str' $path_str 0 path
 jeq $path $nil print_error_invalid_path
+
+lib 'os.read_file' $path $new_dir_name existing
+jne $existing $nil print_error_exists
+
 lib 'os.make_dir' $path $new_dir_name
+jmp done
+
+#print_error_exists
+prt 'ERR File/directory exists'
 jmp done
 #print_error_invalid_name
 prt 'ERR Invalid file/directory name'
