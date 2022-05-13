@@ -50,7 +50,7 @@
 	let loginUsername = undefined;
 	let loggedIn = undefined;
 
-	function checkLogin() {
+	function checkLogin(callback) {
 		$.ajax({
 			url: API_AUTH_SESSION,
 			type: "post"
@@ -61,11 +61,11 @@
 			} else {
 				loggedIn = false;
 			}
-			executeLogin();
+			callback();
 		}).error(function(){
 			console.log("Check login status failed.");
 			loggedIn = false;
-			executeLogin();
+			callback();
 		});
 		return null;
 	}
@@ -111,7 +111,8 @@
 
 	function executeLogin() {
 		if (typeof loggedIn === "undefined") {
-			checkLogin();
+			// checkLogin sets loggedIn true/false
+			return checkLogin(executeLogin);
 		}
 		if (loggedIn) {
 			term.writeln("Already logged in as " + loginUsername);
