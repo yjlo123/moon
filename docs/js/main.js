@@ -111,8 +111,7 @@
 
 	function executeLogin() {
 		if (typeof loggedIn === "undefined") {
-			console.log("check login")
-			return checkLogin();
+			checkLogin();
 		}
 		if (loggedIn) {
 			term.writeln("Already logged in as " + loginUsername);
