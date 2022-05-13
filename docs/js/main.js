@@ -77,9 +77,9 @@
 		}).done(function( data ) {
 			if (data.status === 0) {
 				let env = runtime.getEnv(false);
-				env.global.root.home = JSON.parse(data.home);
-				env.global.root.env.home = "/home";
-				env.global.path = ["home"]
+				env.global.root.home[loginUsername] = JSON.parse(data.home);
+				env.global.root.env.home = "/home/"+loginUsername;
+				env.global.path = ["home", loginUsername]
 			} else {
 				term.write("\n\rLoad files error status.\n\r");
 			}
@@ -166,8 +166,8 @@
 			loginUsername = undefined;
 			let env = runtime.getEnv(false);
 			delete env.global.root.home;
-			env.global.root.env.home = "/guest";
-			env.global.path = ["guest"]
+			env.global.root.env.home = "/home/guest";
+			env.global.path = ["home", "guest"]
 			promptCallback("");
 		});
 	}

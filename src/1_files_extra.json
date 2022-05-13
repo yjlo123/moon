@@ -1,81 +1,80 @@
 {
-    "mnt": {
-        "test": "hello"
-    },
-    "guest": {
-        "note": [
-            ["txt"],
-            "----------- Moon OS Manual ------------",
-            "programs -- list all available programs",
-            "ls [<d>]-- list directory contents",
-            "pwd -- return working directory name",
-            "cd <d> -- change directory",
-            "mkdir <d> -- make a directory",
-            "cat <f> -- concatenate and print a file",
-            "rm <f/d> -- remove a file/directory",
-            "echo <s> -- output an argument",
-            "..[> <f>] -- write to a file",
-            "..[>> <f>] -- append to a file",
-            "run <f> -- run an executable file",
-            "edit <f> -- edit an executable file",
-            "---------------------------------------"
-        ],
-        "misc": {
-            "test": "Hello World!"
-        },
-        "challenge": [
-            ["txt"],
-            "=== CHALLENGE ===",
-            "Turn on the 3 LEDs on the bottom right of the monitor",
-            "Do not hack the front-end webpage",
-            "Use only the supported commands in Moon OS",
-            "~Siwei"
-        ],
-        "led": [
-            ["exe"],
-            "let val $0",
-            "jeq $val $nil error",
-            "jeq $val 1 turn_on",
-            "jeq $val 0 turn_off",
-            "jmp error",
-            "#turn_on",
-            "led 1",
-            "prt 'LED ON'",
-            "jmp end",
-            "#turn_off",
-            "led 0",
-            "prt 'LED OFF'",
-            "jmp end",
-            "#error",
-            "prt '1: ON; 0: OFF'",
-            "#end"
-        ],
-        "sample": {
-            "hello": [
-                ["exe"],
-                "prt 'Hello!'",
-                "slp 500",
-                "prt 'Bye~'"
+    "home": {
+        "guest": {
+            "note": [
+                ["txt"],
+                "----------- Moon OS Manual ------------",
+                "programs -- list all available programs",
+                "ls [<d>]-- list directory contents",
+                "pwd -- return working directory name",
+                "cd <d> -- change directory",
+                "mkdir <d> -- make a directory",
+                "cat <f> -- concatenate and print a file",
+                "rm <f/d> -- remove a file/directory",
+                "echo <s> -- output an argument",
+                "..[> <f>] -- write to a file",
+                "..[>> <f>] -- append to a file",
+                "run <f> -- run an executable file",
+                "edit <f> -- edit an executable file",
+                "---------------------------------------"
             ],
-            "count": [
-                ["exe"],
-                "let n 5",
-                "#loop",
-                "prt $n",
-                "sub n $n 1",
-                "slp 600",
-                "jne $n 0 loop"
+            "misc": {
+                "test": "Hello World!"
+            },
+            "challenge": [
+                ["txt"],
+                "=== CHALLENGE ===",
+                "Turn on the 3 LEDs on the bottom right of the monitor",
+                "Do not hack the front-end webpage",
+                "Use only the supported commands in Moon OS",
+                "~Siwei"
             ],
-            "compute_age": [
+            "led": [
                 ["exe"],
-                "prt 'Input year born: ' ''",
-                "inp _year",
-                "int _year $_year",
-                "tim _current year",
-                "sub age $_current $_year",
-                "prt 'Age: ' ''",
-                "prt $age"
-            ]
+                "let val $0",
+                "jeq $val $nil error",
+                "jeq $val 1 turn_on",
+                "jeq $val 0 turn_off",
+                "jmp error",
+                "#turn_on",
+                "led 1",
+                "prt 'LED ON'",
+                "jmp end",
+                "#turn_off",
+                "led 0",
+                "prt 'LED OFF'",
+                "jmp end",
+                "#error",
+                "prt '1: ON; 0: OFF'",
+                "#end"
+            ],
+            "sample": {
+                "hello": [
+                    ["exe"],
+                    "prt 'Hello!'",
+                    "slp 500",
+                    "prt 'Bye~'"
+                ],
+                "count": [
+                    ["exe"],
+                    "let n 5",
+                    "#loop",
+                    "prt $n",
+                    "sub n $n 1",
+                    "slp 600",
+                    "jne $n 0 loop"
+                ],
+                "compute_age": [
+                    ["exe"],
+                    "prt 'Input year born: ' ''",
+                    "inp _year",
+                    "int _year $_year",
+                    "tim _current year",
+                    "sub age $_current $_year",
+                    "prt 'Age: ' ''",
+                    "prt $age"
+                ]
+            }
         }
     },
     "programs": {}
