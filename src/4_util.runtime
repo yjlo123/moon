@@ -60,13 +60,14 @@ def shorten_home_path
 end
 
 def get_home_path
- cal get_path_by_str $env_home 1
- let _env_home_path $ret
- pop $_env_home_path _env_home_filename
- cal get_by_path $_env_home_path
- get $ret $_env_home_filename _home_path_str
- cal get_path_by_str $_home_path_str
- ret $ret
+ cal get_path_by_str $env_user 1
+ let _env_user_path $ret
+ pop $_env_user_path _env_user_filename
+ cal get_by_path $_env_user_path
+ get $ret $_env_user_filename _user_name
+ let _home_path []
+ psh $_home_path 'home' $_user_name
+ ret $_home_path
 end
 
 def get_current_path_str

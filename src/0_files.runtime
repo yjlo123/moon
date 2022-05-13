@@ -8,7 +8,7 @@ let root {}
 let path []
 let env_path ''
 let env_prompt ''
-let env_home ''
+let env_user ''
 
 tim boot_time now
 let leds []
@@ -18,13 +18,13 @@ def init_files
  let path []
  let env_path '/env/path'
  let env_prompt '/env/prompt'
- let env_home '/env/home'
+ let env_user '/env/user'
 
  / /env
  let _env_dir {}
- put $_env_dir 'home' '/home/guest'
  put $_env_dir 'path' '/programs'
  put $_env_dir 'prompt' '$p \'#\''
+ put $_env_dir 'user' 'guest'
  put $root 'env' $_env_dir
 
  / /dev

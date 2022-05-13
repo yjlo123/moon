@@ -70,7 +70,7 @@
 		return null;
 	}
 
-	function loadUserFiles() {
+	function loadUserFiles(callback) {
 		$.ajax({
 			url: API_FILES_LOAD,
 			type: "get"
@@ -78,8 +78,8 @@
 			if (data.status === 0) {
 				let env = runtime.getEnv(false);
 				env.global.root.home[loginUsername] = JSON.parse(data.home);
-				env.global.root.env.home = "/home/"+loginUsername;
-				env.global.path = ["home", loginUsername]
+				env.global.root.env.user = loginUsername;
+				callback();
 			} else {
 				term.write("\n\rLoad files error status.\n\r");
 			}
@@ -116,8 +116,9 @@
 		}
 		if (loggedIn) {
 			term.writeln("Already logged in as " + loginUsername);
-			loadUserFiles();
-			return promptCallback("");
+			loadUserFiles(()=>{
+				promptCallback("cd");
+			});
 		}
 		if (loggingIn === 0) {
 			term.write("Username:");
@@ -141,12 +142,13 @@
 				if (data.status === 'success' || data.status === 'already logged in') {
 					term.write(`Logged in as ${loginUsername}\n\r`);
 					loggedIn = true;
-					loadUserFiles();
+					loadUserFiles(()=>{
+						loggingIn = 0;
+						return promptCallback("cd"); // go to user home
+					});
 				} else {
 					term.write(data.status+"\n\r");
 				}
-				loggingIn = 0;
-				return promptCallback(""); // resume normal prompt
 			}).error(function(){
 				term.write("Login failed.\n\r");
 				loggingIn = 0;
@@ -162,13 +164,12 @@
 			type: "get",
 			data: {}
 		}).done(()=>{
+			let env = runtime.getEnv(false);
+			delete env.global.root.home[loginUsername];
+			env.global.root.env.user = "guest";
 			loggedIn = false;
 			loginUsername = undefined;
-			let env = runtime.getEnv(false);
-			delete env.global.root.home;
-			env.global.root.env.home = "/home/guest";
-			env.global.path = ["home", "guest"]
-			promptCallback("");
+			promptCallback("cd"); // go to guest home
 		});
 	}
 
@@ -198,9 +199,6 @@
 				executeSync(()=>{
 					promptCallback("");
 				});
-			} else if (command === "whoami") {
-				term.write((loggedIn && loginUsername || "guest") + "\n\r");
-				promptCallback("");
 			} else {
 				promptCallback(command);
 			}
