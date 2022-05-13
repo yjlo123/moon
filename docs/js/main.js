@@ -78,9 +78,7 @@
 			if (data.status === 0) {
 				let env = runtime.getEnv(false);
 				env.global.root.env.user = loginUsername;
-				let home = env.global.root.home;
-				home[loginUsername] = JSON.parse(data.home);
-				console.log(loginUsername, JSON.parse(data.home))
+				env.global.root.home[loginUsername] = JSON.parse(data.home);
 				callback();
 			} else {
 				term.write("\n\rLoad files error status.\n\r");
@@ -96,7 +94,7 @@
 			url: API_FILES_SAVE,
 			type: "post",
 			data: {
-				data: JSON.stringify(env.global.root.home)
+				data: JSON.stringify(env.global.root.home[loginUsername])
 			}
 		}).done(function( data ) {
 			if (data.status === 0) {
