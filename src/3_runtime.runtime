@@ -1,6 +1,7 @@
 let env {}
 let prt_delay 5
 let prt_delay_disabled 0
+let sig_interrupt 0
 
 / ====== evaluating ======
 def expr
@@ -53,8 +54,11 @@ def runtime
  let _lbl {}
  cal parse_src $_src $_p $_lbl
  let _pc 0
+
+ let sig_interrupt 0
  
  #eval
+ jeq $sig_interrupt 1 eval_done
  get $_p $_pc _line
  jeq $_line $nil eval_done
  get $_line 0 _cmd

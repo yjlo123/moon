@@ -1,0 +1,70 @@
+/A countdown timer
+let len_str $0
+jeq $len_str $nil err_invalid_param
+
+let map {}
+put $map 's' 1
+put $map 'm' 60
+put $map 'h' 3600
+
+pop $len_str unit
+get $map $unit unit_len
+
+int num $len_str
+mul total $unit_len $num
+
+tim now now
+div now $now 1000
+add future $now $total
+
+/ show current time
+prt 'Timer started at ' ''
+tim h hour
+tim m minute
+tim s second
+jgt $h 9 show_hour
+prt '0' ''
+#show_hour
+prt $h ':'
+jgt $m 9 show_minute
+prt '0' ''
+#show_minute
+prt $m ':'
+jgt $s 9 show_second
+prt '0' ''
+#show_second
+prt $s
+
+/ timer loop
+lib 'term.set_prt_delay' 0
+prt $total
+#loop
+tim current now
+div current $current 1000
+sub left $future $current
+jlt $left 0 finished
+lib 'term.prev_line'
+lib 'term.clear_line'
+jlt $left 3600 skip_h
+div left_h $left 3600
+prt $left_h 'h '
+#skip_h
+jlt $left 60 skip_m
+mod left_m $left 3600
+div left_m $left_m 60
+prt $left_m 'm '
+#skip_m
+mod left_s $left 60
+prt $left_s 's '
+prt ''
+slp 100
+jmp loop
+
+#err_invalid_param
+prt 'Usage: timer <duration in s/m/h>'
+prt ' e.g. set a 5 minutes timer: timer 5m'
+jmp end
+#finished
+lib 'term.set_prt_delay' 1
+prt 'Done'
+#end

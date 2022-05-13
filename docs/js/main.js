@@ -212,7 +212,8 @@
 
 	term.open(document.getElementById('terminal'));
 	term.onData(e => {
-		if (!promptOn) {
+		if (!promptOn && e !== '\u0003') {
+			// unless Ctrl+c
 			return;
 		}
 		switch (e) {
@@ -222,6 +223,10 @@
 			cursor = 0;
 			loggingIn = 0;
 			inputMask = false;
+			// clean temp status in Runtime Script env
+			let env = runtime.getEnv(false);
+			env.global.sig_interrupt = 1;
+			env.global.prt_delay_disabled = 0;
 			promptCallback("");
 			break;
 		case '\r': // Enter
