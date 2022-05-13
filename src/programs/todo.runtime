@@ -5,14 +5,12 @@ prt '└────────────────────────
 
 lib 'term.set_prt_delay' 0
 
-lib 'util.get_path_by_str' '/home' 0 file_path
-jne $file_path $nil load_data
-lib 'util.get_path_by_str' '/guest' 0 file_path
+lib 'os.get_home_path' home_path
 
 #load_data
-lib 'os.read_file' $file_path '_todo' file_data
+lib 'os.read_file' $home_path '_todo' file_data
 jne $file_data $nil file_loaded
-lib 'os.write_file' $file_path '_todo' []
+lib 'os.write_file' $home_path '_todo' []
 jmp load_data
 #file_loaded
 let todo $file_data
@@ -95,6 +93,6 @@ jmp main_loop
 
 #end
 lib 'term.clear_line'
-lib 'os.write_file' $file_path '_todo' $todo
+lib 'os.write_file' $home_path '_todo' $todo
 lib 'term.set_prt_delay' 1
 prt 'Bye~'
