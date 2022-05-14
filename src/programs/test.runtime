@@ -1,0 +1,44 @@
+/for testing
+lib 'term.get_width' w
+lib 'term.get_height' h
+
+jne $w $nil continue
+prt 'ERR your current terminal is not supported'
+jmp finished
+#continue
+
+prt '(w=' ''
+prt $w ', h='
+prt $h ')'
+prt ''
+
+prt '[' ''
+sub width $w 1
+lib 'term.move_cursor' $width 0
+prt ']' ''
+
+sub width $width 1
+mul width $width -1
+lib 'term.move_cursor' $width 0
+
+let p 0
+sub total $w 2
+#progress
+jeq $p $total progress_done
+prt '=' ''
+add p $p 1
+slp 20
+jmp progress
+#progress_done
+prt ''
+
+#finished
+
+/ == Test key press ==
+/ #loop
+/ let key $lastkey
+/ jeq $key $nil next
+/ prt $key
+/ #next
+/ slp 100
+/ jmp loop

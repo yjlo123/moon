@@ -132,6 +132,22 @@ def lib_screen_clear_line
  prt '\\033[2K'
 end
 
+def lib_screen_up_arrow
+ prt '\\x1b[A'
+end
+
+def lib_screen_down_arrow
+ prt '\\x1b[B'
+end
+
+def lib_screen_left_arrow
+ prt '\\x1b[D'
+end
+
+def lib_screen_right_arrow
+ prt '\\x1b[C'
+end
+
 def lib_set_prt_delay
  ife $0 0
   let prt_delay_disabled 1

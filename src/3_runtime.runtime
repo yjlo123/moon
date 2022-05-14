@@ -3,6 +3,9 @@ let prt_delay 5
 let prt_delay_disabled 0
 let sig_interrupt 0
 
+let runtime_running 0
+let key_press []
+
 / ====== evaluating ======
 def expr
  let _expr $0
@@ -19,11 +22,16 @@ def expr
  fin
  pol $_expr _c1
  ife $_c1 '$'
-  get $env $_expr _val
-  ret $_val
+  ife $_expr 'lastkey'
+   pol $key_press _key
+   ret $_key
+  els
+   get $env $_expr _val
+   ret $_val
+  fin
  fin
- ife $_c1 '\''
-  pop $_expr _
+ / str is parsed as %str, due to conflict with single quote
+ ife $_c1 '%'
   ret $_expr
  fin
  ret $_original
@@ -42,6 +50,8 @@ def runtime
  let _src $0
  let _args $1
  let env {}
+ let runtime_running 1
+ let key_press []
  let i 0
  ife $_args $nil
  els
@@ -64,7 +74,12 @@ def runtime
  get $_line 0 _cmd
  
  ife $_cmd 'clr'
-  clr
+  cal eval_param $_line 1
+  ife $ret $nil
+   clr
+  els
+   clr $ret
+  fin
  fin
  ife $_cmd 'prt'
   get $_line 1 _val
@@ -127,6 +142,15 @@ def runtime
   cal eval_param $_line 3
   drw $_x $_y $ret
  fin
+ ife $_cmd 'pxl'
+  get $_line 1 _name
+  cal eval_param $_line 2
+  let _x $ret
+  cal eval_param $_line 3
+  let _y $ret
+  pxl $_x $_y _val
+  put $env $_name $_val
+ fin
  ife $_cmd 'jmp'
   get $_line 1 _lbl_name
   get $_lbl $_lbl_name _pc
@@ -173,6 +197,15 @@ def runtime
   get $_line 1 _var
   inp _val
   put $env $_var $_val
+ fin
+ ife $_cmd 'rnd'
+  get $_line 1 _name
+  cal eval_param $_line 2
+  let _v1 $ret
+  cal eval_param $_line 3
+  let _v2 $ret
+  rnd _r $_v1 $_v2
+  put $env $_name $_r
  fin
  jeq $_cmd 'int' type_cmd
  jeq $_cmd 'str' type_cmd
@@ -369,10 +402,45 @@ def runtime
    cal eval_param $_line 2
    cal lib_set_prt_delay $ret
   fin
+  ife $_lib_name 'term.get_width'
+   get $_line 2 _name
+   put $env $_name $term_w
+  fin
+  ife $_lib_name 'term.get_height'
+   get $_line 2 _name
+   put $env $_name $term_h
+  fin
+  ife $_lib_name 'term.move_cursor'
+   cal eval_param $_line 2
+   let _dx $ret
+   cal eval_param $_line 3
+   let _dy $ret
+   ifg $_dx 0
+    for _ $_dx
+     cal lib_screen_right_arrow
+    nxt
+   els
+    mul _ndx $_dx -1
+    for _ $_ndx
+     cal lib_screen_left_arrow
+    nxt
+   fin
+   ifg $_dy 0
+    for _ $_dy
+     cal lib_screen_down_arrow
+    nxt
+   els
+    mul _ndy $_dy -1
+    for _ $_ndy
+     cal lib_screen_up_arrow
+    nxt
+   fin
+  fin
  fin
 
  add _pc $_pc 1
  jmp eval
  
  #eval_done
+ let runtime_running 0
 end

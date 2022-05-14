@@ -13,6 +13,9 @@
 	const API_FILES_LOAD = API_AUTH_HOST + "/api/fs/load"
 	const API_FILES_SAVE= API_AUTH_HOST + "/api/fs/save"
 
+	const TERM_COLS = 51;
+	const TERM_ROWS = 20;
+
 	let baseTheme = {
 		foreground: '#F8F8F8',
 		background: '#2D2E2C',
@@ -38,8 +41,8 @@
 		fontFamily: '"Cascadia Code", Menlo, monospace',
 		theme: baseTheme,
 		cursorBlink: true,
-		cols: 51,
-		rows: 20
+		cols: TERM_COLS,
+		rows: TERM_ROWS
 	});
 	let command = '';
 	let cursor = 0;
@@ -49,6 +52,43 @@
 	let inputMask = false;
 	let loginUsername = undefined;
 	let loggedIn = undefined;
+	const escapeMap = {
+		'\\x1b[A': '\x1b[A',
+		'\\x1b[B': '\x1b[B',
+		'\\x1b[C': '\x1b[C',
+		'\\x1b[D': '\x1b[D',
+	}
+
+	let con = {
+		Write: (text, style) => {
+			if (text.length > 0) {
+				let w = text.slice(0,text.length-1);
+				if (w.slice(0,4) === '\\x1b') {
+					term.write(escapeMap[w]);
+					return;
+				}
+
+				let lineContent = text.slice(0,text.length-1);
+				if (lineContent === '\\033[F') {
+					// prev line
+					term.write('\033[F');
+					return;
+				} else if (lineContent === '\\033[2K') {
+					// clear line
+					term.write('\033[2K');
+					return;
+				}
+			}
+			// text = text.replaceAll('[x1b', '\x1b');
+			text = text.replaceAll("\n", "\n\r");
+			term.write(text);
+		},
+		Input: (callback) => {
+			promptCallback = callback;
+			promptOn = true;
+		},
+		AbortInput: ()=>{}
+	}
 
 	function checkLogin(callback) {
 		$.ajax({
@@ -225,110 +265,6 @@
 		}
 	}
 
-	term.open(document.getElementById('terminal'));
-	term.onData(e => {
-		if (!promptOn && e !== '\u0003') {
-			// unless Ctrl+c
-			return;
-		}
-		switch (e) {
-		case '\u0003': // Ctrl+C
-			term.write('\n\r');
-			command = '';
-			cursor = 0;
-			loggingIn = 0;
-			inputMask = false;
-			// clean temp status in Runtime Script env
-			let env = runtime.getEnv(false);
-			env.global.sig_interrupt = 1;
-			env.global.prt_delay_disabled = 0;
-			promptCallback("");
-			break;
-		case '\r': // Enter
-			term.write('\n\r');
-			executeCommand();
-			break;
-		case '\t': // Tab
-			if (inputMask) { break; }
-			processTab();
-			break;
-		case '\u001b[A': // Up Arrow
-		if (inputMask) { break; }
-			if (consoleHistoryIndex > 0) {
-				consoleHistoryIndex -= 1;
-				setPromptText(consoleHistory[consoleHistoryIndex]);
-			}
-			break;
-		case '\u001b[B': // Down Arrow
-			if (inputMask) { break; }
-			if (consoleHistoryIndex < consoleHistory.length) {
-				consoleHistoryIndex += 1;
-				if (consoleHistoryIndex === consoleHistory.length) {
-					clearInput();
-				} else {
-					setPromptText(consoleHistory[consoleHistoryIndex]);
-				}
-			}
-			break;
-		case '\x1b[C': // Right Arrow
-			if (inputMask) { break; }
-			if (cursor < command.length) {
-				term.write('\x1b[C');
-				cursor++;
-			}
-			break;
-		case '\x1b[D': // Left Arrow
-			if (inputMask) { break; }
-			if (cursor > 0) {
-				term.write('\x1b[D');
-				cursor--;
-			}
-			break;
-		case '\u007F': // Backspace (DEL)
-			if (command.length > 0 && cursor > 0) {
-				term.write('\b \b');
-				let left = command.slice(0, cursor-1);
-				let right = command.slice(cursor, command.length);
-				command = left + right;
-				term.write(right + ' ');
-				for (let i = 0; i < right.length+1; i++) {
-					term.write('\x1b[D');
-				}
-				cursor--;
-			}
-			break;
-		default: // Print all other characters for demo
-			if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7B) || e >= '\u00a0') {
-				insertToCommand(e);
-			}
-		}
-	});
-
-	let con = {
-		Write: (text, style) => {
-			if (text.length > 0) {
-				let lineContent = text.slice(0,text.length-1);
-				if (lineContent === '\\033[F') {
-					term.write('\033[F');
-					return;
-				} else if (lineContent === '\\033[2K') {
-					term.write('\033[2K');
-					return;
-				}
-			}
-			// text = text.replaceAll('[x1b', '\x1b');
-			text = text.replaceAll("\n", "\n\r");
-			term.write(text);
-		},
-		Input: (callback) => {
-			promptCallback = callback;
-			promptOn = true;
-		},
-		AbortInput: ()=>{}
-	}
-
-	runtime.config(parser, evaluator, null, con, null, {});
-
 	function clearInput() {
 		while (cursor < command.length) {
 			term.write('\x1b[C');
@@ -462,8 +398,96 @@
 		return false;
 	}
 
-	runtime.restart();
-	runtime.executeAll(null, moonSrc);
+	term.open(document.getElementById('terminal'));
+
+	term.onKey(function (ev) {
+		let env = runtime.getEnv(false);
+		if (env.global.runtime_running === 1) {
+			env.global.key_press.push(ev.domEvent.keyCode);
+			env.global.key_press = env.global.key_press.slice(0,5);
+		}
+	});
+
+	term.onData(e => {
+		let env = runtime.getEnv(false);
+		if (!promptOn && e !== '\u0003') {
+			// unless Ctrl+c
+			return;
+		}
+		switch (e) {
+		case '\u0003': // Ctrl+C
+			term.write('\n\r');
+			command = '';
+			cursor = 0;
+			loggingIn = 0;
+			inputMask = false;
+			// clean temp status in Runtime Script env
+			env.global.sig_interrupt = 1;
+			env.global.prt_delay_disabled = 0;
+			env.global.runtime_running = 0;
+			promptCallback("");
+			break;
+		case '\r': // Enter
+			term.write('\n\r');
+			executeCommand();
+			break;
+		case '\t': // Tab
+			if (inputMask) { break; }
+			processTab();
+			break;
+		case '\u001b[A': // Up Arrow
+			if (inputMask) { break; }
+			if (consoleHistoryIndex > 0) {
+				consoleHistoryIndex -= 1;
+				setPromptText(consoleHistory[consoleHistoryIndex]);
+			}
+			break;
+		case '\u001b[B': // Down Arrow
+			if (inputMask) { break; }
+			if (consoleHistoryIndex < consoleHistory.length) {
+				consoleHistoryIndex += 1;
+				if (consoleHistoryIndex === consoleHistory.length) {
+					clearInput();
+				} else {
+					setPromptText(consoleHistory[consoleHistoryIndex]);
+				}
+			}
+			break;
+		case '\x1b[C': // Right Arrow
+			if (inputMask) { break; }
+			if (cursor < command.length) {
+				term.write('\x1b[C');
+				cursor++;
+			}
+			break;
+		case '\x1b[D': // Left Arrow
+			if (inputMask) { break; }
+			if (cursor > 0) {
+				term.write('\x1b[D');
+				cursor--;
+			}
+			break;
+		case '\u007F': // Backspace (DEL)
+			if (command.length > 0 && cursor > 0) {
+				term.write('\b \b');
+				let left = command.slice(0, cursor-1);
+				let right = command.slice(cursor, command.length);
+				command = left + right;
+				term.write(right + ' ');
+				for (let i = 0; i < right.length+1; i++) {
+					term.write('\x1b[D');
+				}
+				cursor--;
+			}
+			break;
+		default: // Print all other characters for demo
+			if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7B) || e >= '\u00a0') {
+				insertToCommand(e);
+			}
+		}
+	});
+
+	term.focus();
 
 	let ledClock = setInterval(function(){
 		let env = runtime.getEnv(false);
@@ -479,5 +503,56 @@
 		}
 	}, 1000);
 
-	term.focus();
+	let pixels = [];
+	let widthInBlocks = 20;
+	let canvas = {
+		drawPixel: (x, y, val) => {
+			/* x: col, y: row*/
+			x = parseInt(x)
+			y = parseInt(y)
+			pixels[widthInBlocks*x+y] = val;
+
+			let up = widthInBlocks-y;
+			for (let i = 0; i < up; i++) {
+				term.write('\x1b[A');
+			}
+			for (let i = 0; i < x-1; i++) {
+				term.write('\x1b[C');
+			}
+			
+			if (val === '0') {
+				term.write(' ');
+			} else if (val !== ''){
+				term.write('#');
+			}
+
+			for (let i = 0; i < up; i++) {
+				term.write('\x1b[B');
+			}
+			for (let i = 0; i < x; i++) {
+				term.write('\x1b[D');
+			}
+			
+		},
+		getPixel: (x, y) => {
+			x = parseInt(x)
+			y = parseInt(y)
+			return pixels[widthInBlocks*x+y] | '0';
+		},
+		clearCanvas: (size=20) => {
+			widthInBlocks = size;
+			for (let i = 0; i < size; i++) {
+				term.write('\033[F');
+				term.write('\033[2K');
+			}
+		}
+	}
+
+	// parser, evaluater, editor, consl, canvas, controls, options
+	runtime.config(parser, evaluator, null, con, canvas, {}, {});
+	runtime.restart();
+	runtime.executeAll({
+		term_w: TERM_COLS,
+		term_h: TERM_ROWS
+	}, moonSrc);
 })();

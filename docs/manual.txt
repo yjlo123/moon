@@ -1,10 +1,10 @@
 == Supported Runtime Script commands in Moon OS
-prt, let, slp
+prt, let, slp, rnd
 add, sub, mul, div, mod
 jmp, jeq, jne, jgt, jlt
 inp, int, str, typ, tim
-len, pol, pop, psh
-put, get
+len, pol, pop, psh, put, get
+clr, drw, pxl
 
 ~ only in Moon OS:
 led V
