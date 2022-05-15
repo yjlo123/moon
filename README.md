@@ -5,8 +5,10 @@ A linux-like terminal emulator written in Runtime Script
 [https://yjlo123.github.io/moon/](https://yjlo123.github.io/moon/)
 
 ## macOS & Windows
-[Download VM](https://github.com/yjlo123/runtime-go/releases/latest)  
-[Download source](https://raw.githubusercontent.com/yjlo123/moon/master/dist/program.runtime)  
+[VM](https://github.com/yjlo123/runtime-go)  
+[Moon OS source](https://raw.githubusercontent.com/yjlo123/moon/master/dist/program.runtime)  
+
+Note: GUI is not maintained.
 
 ### macOS
 - Right click on the VM app, select `Show Package Contents`
@@ -18,6 +20,3 @@ A linux-like terminal emulator written in Runtime Script
 - Create a folder `src` in the same directory as the VM program
 - Put the downloaded source file in the `src` folder
 - Restart the VM program
-
-## Packed Release
-[Latest Release](https://github.com/yjlo123/moon/releases/latest)
