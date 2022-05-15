@@ -4,6 +4,11 @@ A linux-like terminal emulator written in Runtime Script
 ## Web
 [https://yjlo123.github.io/moon/](https://yjlo123.github.io/moon/)
 
+## Architecture
+<p align="center">
+    <img alt="arch" src="https://github.com/yjlo123/moon/blob/master/arch.png?raw=true" width="500">
+</p>
+
 ## macOS & Windows
 [VM](https://github.com/yjlo123/runtime-go)  
 [Moon OS source](https://raw.githubusercontent.com/yjlo123/moon/master/dist/program.runtime)  
