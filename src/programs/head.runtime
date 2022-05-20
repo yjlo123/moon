@@ -1,4 +1,4 @@
-/concatenate a file to the terminal output
+/display first lines of a file
 let path_str $0
 jeq $path_str $nil print_error_invalid_name
 lib 'util.get_path_by_str' $path_str 1 path
@@ -7,9 +7,12 @@ pop $path file_name
 lib 'os.read_file' $path $file_name file_content
 lib 'os.get_file_type' $path $file_name file_type
 
+let default_len 10
+let line_count 0
+
 jeq $file_type 'raw' raw_file
-jeq $file_type 'txt' txt_file
-jeq $file_type 'exe' exe_file
+jeq $file_type 'txt' file_with_meta
+jeq $file_type 'exe' file_with_meta
 jeq $file_type 'dir' print_error_directory
 typ data_type $file_content
 jeq $data_type 'list' list_file
@@ -19,36 +22,19 @@ jmp unsupported_file_type
 prt $file_content
 jmp done
 
-#txt_file
+#file_with_meta
 let i 1
-jmp list_file_content
+jmp output
 #list_file
 let i 0
-#list_file_content
-len $file_content file_len
-jeq $file_len 0 done
-#print_txt_loop
-jeq $i $file_len done
+#output
 get $file_content $i line
+jeq $line $nil done
+jeq $line_count $default_len done
 prt $line
 add i $i 1
-jmp print_txt_loop
-jmp done
-
-#exe_file
-let i 1
-len $file_content file_len
-jeq $file_len 0 done
-#print_exe_loop
-jeq $i $file_len done
-get $file_content $i line
-/replace_char_in_str $line '\n' '\\n'
-prt $i ''
-prt ' |' ''
-prt $line
-add i $i 1
-jmp print_exe_loop
-jmp done
+add line_count $line_count 1
+jmp output
 
 #unsupported_file_type
 prt 'ERR Unsupported file type'
