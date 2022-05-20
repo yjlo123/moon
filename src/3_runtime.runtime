@@ -50,6 +50,7 @@ def runtime
  let _src $0
  let _args $1
  let env {}
+ let _stack []
  let runtime_running 1
  let key_press []
  let i 0
@@ -62,7 +63,8 @@ def runtime
  fin
  let _p {}
  let _lbl {}
- cal parse_src $_src $_p $_lbl
+ let _funcs {}
+ cal parse_src $_src $_p $_lbl $_funcs
  let _pc 0
 
  let sig_interrupt 0
@@ -291,6 +293,25 @@ def runtime
   let _var $ret
   get $_list $_key _val
   put $env $_var $_val
+ fin
+
+ / ** function commands **
+ jeq $_cmd 'end' func_return
+ jeq $_cmd 'ret' func_return
+ jmp not_func_return
+ #func_return
+  pop $_stack _pc
+ #not_func_return
+ ife $_cmd 'def'
+  / jump to end
+  get $_line 1 _func_name
+  add _func_end $_func_name '$$'
+  get $_funcs $_func_end _pc
+ fin
+ ife $_cmd 'cal'
+  psh $_stack $_pc
+  get $_line 1 _func_name
+  get $_funcs $_func_name _pc
  fin
  
  / ** special **

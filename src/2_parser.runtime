@@ -49,9 +49,11 @@ end
 
 def parse_src
  let _src $0
- let _p $1  / map ref
- let _lbl $2  / map ref
+ let _p $1     / ln-tokens map
+ let _lbl $2   / label-ln map
+ let _funcs $3 / func-ln map
  let _lc 0
+ let _cur_func_name 'global'
  for _line $_src
   / check label
   pol $_line _c1
@@ -60,7 +62,19 @@ def parse_src
   fin
   add _line $_c1 $_line
   cal parse_line $_line
-  put $_p $_lc $ret
+  let _line_tokens $ret
+  get $_line_tokens 0 _first_token
+  ife $_first_token 'def'
+   get $_line_tokens 1 _func_name 
+   let _cur_func_name $_func_name
+   put $_funcs $_func_name $_lc
+  fin
+  ife $_first_token 'end'
+   add _func_end $_cur_func_name '$$'
+   put $_funcs $_func_end $_lc
+   let _cur_func_name 'global'
+  fin
+  put $_p $_lc $_line_tokens
   add _lc $_lc 1
  nxt
  ret $_p

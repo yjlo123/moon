@@ -1,0 +1,17 @@
+/test function
+def my_func
+ prt 123
+end
+
+def foo
+ prt 'foo'
+ let _a 12
+ cal bar $_a
+end
+
+def bar
+ prt 'bar'
+ prt $0
+end
+
+cal foo
