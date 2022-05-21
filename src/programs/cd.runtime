@@ -5,7 +5,7 @@ lib 'os.get_home_path' home_path
 lib 'os.set_current_path' $home_path
 jmp done
 #continue
-lib 'util.get_path_by_str' $path_str 0 path
+lib 'util.get_path_by_str' $path_str 0 0 path
 jeq $path $nil print_error_invalid_path
 lib 'os.set_current_path' $path
 jmp done

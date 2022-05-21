@@ -2,7 +2,7 @@ let os_name 'Moon OS'
 let os_ver '1.16'
 let os_build 'N/A'
 
-let init_cmd 'hello'
+let init_cmd 'motd'
 
 let root {}
 let path []

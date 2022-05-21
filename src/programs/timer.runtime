@@ -61,7 +61,7 @@ slp 100
 jmp loop
 
 #err_invalid_param
-prt 'Usage: timer <duration in s/m/h>'
+prt 'USAGE timer <duration in s/m/h>'
 prt ' e.g. set a 5 minutes timer: timer 5m'
 jmp end
 #finished

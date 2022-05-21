@@ -3,7 +3,7 @@ let stack []
 let header []
 let lvl 0
 jeq $0 $nil use_current_path
-lib 'util.get_path_by_str' $0 0 path
+lib 'util.get_path_by_str' $0 0 0 path
 jeq $path $nil print_error
 jmp continue_with_path
 #use_current_path

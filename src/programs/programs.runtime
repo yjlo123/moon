@@ -1,5 +1,5 @@
 /show available programs
-lib 'util.get_path_by_str' '/programs' 0 path
+lib 'util.get_path_by_str' '/programs' 0 0 path
 lib 'os.get_file_list' $path lst
 #loop
 pol $lst f

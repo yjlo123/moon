@@ -1,12 +1,12 @@
 /remove a file or directory entry
 let path_str $0
 jeq $path_str $nil print_error_invalid_name
-lib 'util.get_path_by_str' $path_str 1 path
+lib 'util.get_path_by_str' $path_str 1 0 path
 jeq $path $nil print_error_invalid_path
 lib 'os.delete_path' $path
 jmp done
 #print_error_invalid_name
-prt 'ERR Invalid file/directory name'
+prt 'USAGE rm file/directory'
 jmp done
 #print_error_invalid_path
 prt 'ERR No such file/directory'

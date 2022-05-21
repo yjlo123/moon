@@ -143,6 +143,7 @@ end
 def get_path_by_str
  let _path_str $0    / assert non-empty
  let _is_file $1     / pass in 1 if is file
+ let _skip_varify $2     / pass in 1 to skip varify existence
  get $_path_str 0 _path_first_c
  
  let _full_path []
@@ -183,10 +184,12 @@ def get_path_by_str
    #skip_cur_dir
   fin
  nxt
+ jeq $_skip_varify 1 done_verify
  cal verify_path $_dup_full_path $_is_file
  ife $ret 0
   ret $nil
  fin
+ #done_verify
  ret $_real_full_path
 end
 

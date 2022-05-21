@@ -10,7 +10,7 @@ add new_dir_name $c $new_dir_name
 jmp extract_last
 #continue
 psh $path_str $c
-lib 'util.get_path_by_str' $path_str 0 path
+lib 'util.get_path_by_str' $path_str 0 0 path
 jeq $path $nil print_error_invalid_path
 
 lib 'os.read_file' $path $new_dir_name existing
@@ -23,7 +23,7 @@ jmp done
 prt 'ERR File/directory exists'
 jmp done
 #print_error_invalid_name
-prt 'ERR Invalid file/directory name'
+prt 'USAGE mkdir directory'
 jmp done
 #print_error_invalid_path
 prt 'ERR No such file/directory'

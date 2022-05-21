@@ -1,4 +1,4 @@
 /show the current username
-lib 'util.get_path_by_str' '/env' 0 path
+lib 'util.get_path_by_str' '/env' 0 0 path
 lib 'os.read_file' $path 'user' username
 prt $username

@@ -404,8 +404,10 @@ def runtime
    let _path_str $ret
    cal eval_param $_line 3
    let _is_file $ret
-   cal get_path_by_str $_path_str $_is_file
-   get $_line 4 _name
+   cal eval_param $_line 4
+   let _skip_verify $ret
+   cal get_path_by_str $_path_str $_is_file $_skip_verify
+   get $_line 5 _name
    put $env $_name $ret
   fin
   ife $_lib_name 'dev.set_led'
