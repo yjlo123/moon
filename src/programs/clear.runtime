@@ -1,5 +1,6 @@
 /clear the terminal screen
 lib 'term.get_height' h
+jeq $h $nil done
 sub h $h 1
 lib 'term.set_prt_delay' 0
 let i 0
