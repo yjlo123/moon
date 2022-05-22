@@ -1,0 +1,22 @@
+/clear the terminal screen
+lib 'term.get_height' h
+sub h $h 1
+lib 'term.set_prt_delay' 0
+let i 0
+#new_line_loop
+jeq $i $h clear
+prt ''
+add i $i 1
+jmp new_line_loop
+
+#clear
+
+let i 0
+#clear_loop
+jeq $i $h done
+lib 'term.prev_line'
+add i $i 1
+jmp clear_loop
+
+#done
+lib 'term.set_prt_delay' 1

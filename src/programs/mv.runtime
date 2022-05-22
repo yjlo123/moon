@@ -1,0 +1,47 @@
+/move files
+let src_path_str $0
+let dest_path_str $1
+jeq $src_path_str $nil print_error_invalid_name
+jeq $dest_path_str $nil print_error_invalid_name
+
+lib 'util.get_path_by_str' $src_path_str 1 0 src_path
+let err_param $src_path_str
+jeq $src_path $nil print_error_invalid_path
+pop $src_path src_file_name
+lib 'os.get_file_type' $src_path $src_file_name src_file_type
+jeq $src_file_type 'dir' print_error_src_dir
+lib 'os.read_file' $src_path $src_file_name file_data
+
+lib 'util.get_path_by_str' $dest_path_str 1 1 dest_path
+let err_param $dest_path_str
+jeq $dest_path $nil print_error_invalid_path
+pop $dest_path dest_file_name
+lib 'os.get_file_type' $dest_path $dest_file_name dest_file_type
+
+jne $dest_file_type 'dir' copy_as_file
+/ copy to dir
+psh $dest_path $dest_file_name
+lib 'os.write_file' $dest_path $src_file_name $file_data
+jmp delete_src
+
+#copy_as_file
+lib 'os.write_file' $dest_path $dest_file_name $file_data
+jmp delete_src
+
+#delete_src
+psh $src_path $src_file_name
+lib 'os.delete_path' $src_path
+jmp done
+
+#print_error_src_dir
+prt 'ERR ' ''
+prt $src_path_str ''
+prt ' is a directory (not copied)'
+jmp done
+#print_error_invalid_name
+prt 'USAGE mv source_file target_file/directory'
+jmp done
+#print_error_invalid_path
+prt 'ERR No such file/directory: ' ''
+prt $err_param
+#done
