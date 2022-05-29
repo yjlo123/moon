@@ -132,6 +132,28 @@ def lib_screen_clear_line
  prt '\\033[2K'
 end
 
+def lib_screen_reverse
+ prt '\\u001b[7m' ''
+end
+
+def lib_screen_reset
+ prt '\\u001b[0m' ''
+end
+
+def lib_screen_bg_color
+ let seq '\\u001b[48;5;'
+ add seq $seq $0
+ add seq $seq 'm'
+ prt $seq ''
+end
+
+def lib_screen_fg_color
+ let seq '\\u001b[38;5;'
+ add seq $seq $0
+ add seq $seq 'm'
+ prt $seq ''
+end
+
 def lib_screen_up_arrow
  prt '\\x1b[A'
 end

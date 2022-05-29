@@ -421,6 +421,20 @@ def runtime
   ife $_lib_name 'term.clear_line'
    cal lib_screen_clear_line
   fin
+  ife $_lib_name 'term.reverse'
+   cal lib_screen_reverse
+  fin
+  ife $_lib_name 'term.bg_color'
+   cal eval_param $_line 2
+   cal lib_screen_bg_color $ret
+  fin
+  ife $_lib_name 'term.fg_color'
+   cal eval_param $_line 2
+   cal lib_screen_fg_color $ret
+  fin
+  ife $_lib_name 'term.reset'
+   cal lib_screen_reset
+  fin
   ife $_lib_name 'term.set_prt_delay'
    cal eval_param $_line 2
    cal lib_set_prt_delay $ret

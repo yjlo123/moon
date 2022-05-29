@@ -77,6 +77,9 @@
 					// clear line
 					term.write('\033[2K');
 					return;
+				} else if (lineContent === '\\u001b[7m') {
+					term.write('\u001b[7m');
+					return;
 				}
 			}
 			// text = text.replaceAll('[x1b', '\x1b');

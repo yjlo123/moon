@@ -1,0 +1,227 @@
+/view file contents
+lib 'term.get_height' h
+lib 'term.get_width' w
+jeq $h $nil err_term_not_supported
+sub h $h 1
+
+let path_str $0
+jeq $path_str $nil print_usage
+lib 'util.get_path_by_str' $path_str 1 0 path
+jeq $path $nil print_error_invalid_file
+pop $path file_name
+lib 'os.read_file' $path $file_name file_content
+lib 'os.get_file_type' $path $file_name file_type
+
+/jeq $file_type 'raw' raw_file
+jeq $file_type 'txt' txt_file
+jeq $file_type 'exe' exe_file
+jeq $file_type 'dir' print_error_directory
+typ data_type $file_content
+jeq $data_type 'list' list_file
+jmp unsupported_file_type
+
+#raw_file
+prt $file_content
+jmp done
+
+#txt_file
+let start_i 1
+jmp show_content
+
+#list_file
+let start_i 0
+jmp show_content
+
+#exe_file
+let start_i 1
+jmp show_content
+
+#show_content
+
+lib 'term.set_prt_delay' 0
+
+def clear
+ let i 0
+ #clear_loop
+ jeq $i $h clear_done
+ lib 'term.clear_line'
+ lib 'term.prev_line'
+ add i $i 1
+ jmp clear_loop
+ #clear_done
+ lib 'term.clear_line'
+end
+
+let top_ln 1
+let reached_end 0
+
+#loop
+let i 0
+let max_ln $h
+let line_max 47
+add line_max_1 $line_max 1
+let displayed_ln 0
+
+#content_loop
+jeq $i $max_ln content_done
+lib 'term.bg_color' 239
+add ln $i $top_ln
+jgt $ln 9 skip_1_indent
+prt ' ' ''
+#skip_1_indent
+jgt $ln 99 skip_2_indent
+prt ' ' ''
+#skip_2_indent
+prt $ln ' '
+lib 'term.reset'
+sub li $ln 1
+add li $li $start_i
+get $file_content $li line
+add i $i 1
+jne $line $nil line_with_content
+lib 'term.clear_line'
+prt ''
+let reached_end 1
+jmp content_loop
+#line_with_content
+len $line line_len
+jlt $line_len $line_max_1 line_len_ok
+sub max_ln $max_ln 1
+/ === wrap line
+let cc 0
+let wrap_ln 0
+#line_loop
+jeq $cc $line_max line_done
+mul c_idx $line_max $wrap_ln
+add c_idx $c_idx $cc
+jeq $c_idx $line_len whole_line_done
+get $line $c_idx line_c
+prt $line_c ''
+add cc $cc 1
+jmp line_loop
+#line_done
+prt ''
+add displayed_ln $displayed_ln 1
+jeq $displayed_ln $h content_done
+lib 'term.bg_color' 239
+prt '    ' ''
+lib 'term.reset'
+add wrap_ln $wrap_ln 1
+let cc 0
+jmp line_loop
+#whole_line_done
+prt ''
+add displayed_ln $displayed_ln 1
+/ ^^^ wrap done
+jmp content_loop
+
+#line_len_ok
+prt $line
+add displayed_ln $displayed_ln 1
+jmp content_loop
+
+#content_done
+
+/ Bottom bar
+lib 'term.reverse'
+let bar_left $file_name
+add bar_left $bar_left '  '
+add bar_left $bar_left 'q:quit  ↓/↑:line  f/b:page '
+mul lli $li 100
+len $file_content total_len
+div progress $lli $total_len
+jlt $progress 101 valid_progress
+let progress 100
+#valid_progress
+add bar_right '' $progress
+add bar_right $bar_right '%'
+
+prt $bar_left ''
+
+len $bar_left left_len
+len $bar_right right_len
+sub free_len $w $left_len
+sub free_len $free_len $right_len
+mul bar_space ' ' $free_len
+prt $bar_space ''
+
+prt $bar_right ''
+lib 'term.reset'
+
+#key_listener
+let key_pressed 0
+let key $lastkey
+jne $key 81 not_q
+/ QUIT: q
+cal clear
+jmp done
+#not_q
+
+jne $key 40 not_down
+/ DOWN
+jeq $reached_end 1 not_down
+add top_ln $top_ln 1
+let key_pressed 1
+jmp continue
+#not_down
+
+jne $key 38 not_up
+/ UP
+jeq $top_ln 1 not_up
+let reached_end 0
+sub top_ln $top_ln 1
+let key_pressed 1
+jmp continue
+#not_up
+
+jne $key 70 not_forward
+/ FORWARD: f
+jeq $reached_end 1 not_forward
+add top_ln $top_ln $h
+let key_pressed 1
+jmp continue
+#not_forward
+
+jne $key 66 not_backward
+/ BACKWARD: b
+sub top_ln $top_ln $h
+jgt $top_ln 0 valid_backward
+let top_ln 1
+#valid_backward
+let reached_end 0
+let key_pressed 1
+jmp continue
+#not_backward
+
+#continue
+
+slp 50
+
+jeq $key_pressed 0 key_listener
+cal clear
+jmp loop
+
+#print_usage
+prt 'USAGE v file'
+jmp done
+
+#err_term_not_supported
+prt 'ERR Your current terminal is not supported'
+jmp done
+
+#print_error_invalid_file
+prt 'ERR No such file'
+jmp done
+
+#print_error_directory
+prt 'ERR \"' ''
+prt $file_name ''
+prt '\" is a directory'
+jmp done
+
+#unsupported_file_type
+prt 'ERR Unsupported file type'
+jmp done
+
+#done
+lib 'term.set_prt_delay' 1

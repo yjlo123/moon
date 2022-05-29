@@ -35,6 +35,10 @@ util.get_path_by_str ($path_str, $is_file, $skip_verify, path)
 dev.set_led ($val)
 term.prev_line
 term.clear_line
+term.reverse
+term.reset
+term.bg_color ($color)
+term.fg_color ($color)
 term.set_prt_delay ($enable)
 term.get_width (width)
 term.get_height (height)
