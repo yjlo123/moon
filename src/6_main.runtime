@@ -100,7 +100,7 @@ def main
  jmp repl_loop
 
  #exit
- prt 'Shutting down...'
+ prt '>> Session ended <<'
 end
 
 cal main $init_cmd

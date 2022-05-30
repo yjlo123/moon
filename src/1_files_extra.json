@@ -3,20 +3,19 @@
         "guest": {
             "note": [
                 ["txt"],
-                "----------- Moon OS Manual ------------",
+                "------------- Moon OS Manual ------------",
                 "programs -- list all available programs",
                 "ls [<d>]-- list directory contents",
-                "pwd -- return working directory name",
+                "pwd -- show path of current directory",
                 "cd <d> -- change directory",
-                "mkdir <d> -- make a directory",
                 "cat <f> -- concatenate and print a file",
-                "rm <f/d> -- remove a file/directory",
+                "v <f> -- view file contents",
+                "run <f> -- run an executable file",
                 "echo <s> -- output an argument",
                 "..[> <f>] -- write to a file",
                 "..[>> <f>] -- append to a file",
-                "run <f> -- run an executable file",
-                "edit <f> -- edit an executable file",
-                "---------------------------------------"
+                "Others: mv, cp, rm, head, tail, date ...",
+                "-----------------------------------------"
             ],
             "misc": {
                 "test": "Hello World!"
