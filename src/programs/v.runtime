@@ -58,7 +58,7 @@ let reached_end 0
 #loop
 let i 0
 let max_ln $h
-let line_max 47
+sub line_max $w 4
 add line_max_1 $line_max 1
 let displayed_ln 0
 

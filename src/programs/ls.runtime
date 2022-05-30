@@ -13,17 +13,59 @@ jmp continue_with_path
 lib 'os.get_current_path' path
 #continue_with_path
 lib 'os.get_file_list' $path lst
+
+len $lst lst_len
+/ decide number of columns
+let col 1
+lib 'term.get_width' w
+jeq $w $nil term_not_supported
+let col 2
+div col_w $w $col
+add rows $lst_len 1
+div rows $rows $col
+#term_not_supported
+
+let the_list []
+let idx 0
+let col_idx 0
+
 #loop
-pol $lst f
-jeq $f $nil end
+jeq $idx $lst_len to_print
+get $lst $idx f
+
 lib 'os.get_file_type' $path $f ft
-prt '<' ''
+let file_ent '<'
 get $type_map $ft t
-prt $t ''
-prt '> ' ''
-prt $f
+add file_ent $file_ent $t
+add file_ent $file_ent '> '
+add file_ent $file_ent $f
+
+get $the_list $col_idx cur_line
+jne $cur_line $nil append_line
+/ a new line
+psh $the_list $file_ent
+jmp continue
+#append_line
+len $cur_line cur_len
+sub rest_space $col_w $cur_len
+mul filler ' ' $rest_space
+add temp_line $cur_line $filler
+add temp_line $temp_line $file_ent
+put $the_list $col_idx $temp_line
+
+#continue
+add idx $idx 1
+add col_idx $col_idx 1
+jne $col_idx $rows loop
+let col_idx 0
 jmp loop
-jmp end
+
+#to_print
+pol $the_list line
+jeq $line $nil end
+prt $line
+jmp to_print
+
 #print_error
 prt 'ERR Invalid path'
 #end
