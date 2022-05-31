@@ -19,9 +19,21 @@ def main
 
  jeq $cmd 'exit' exit
 
- / -- RUN --
- ife $cmd 'run'
-  cal run $tokens
+ / -- RUN EXE --
+ len $cmd cmd_len
+ let _is_executable 0
+ for _c $cmd
+  ife $_c '/'
+   let _is_executable 1
+  fin
+ nxt
+ ife $_is_executable 1
+  let _tokens []
+  psh $_tokens $cmd
+  for _t $tokens
+   psh $_tokens $_t
+  nxt
+  cal run $_tokens
   jmp repl_loop
  fin
 
@@ -82,7 +94,6 @@ def main
  nxt
  ife $_has_program 1
   let _new_tokens []
-  psh $_new_tokens 'run'
   add _prog_path $_env_path_str '/'
   add _prog_path $_prog_path $cmd
   psh $_new_tokens $_prog_path

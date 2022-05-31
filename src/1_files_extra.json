@@ -10,7 +10,7 @@
                 "cd <d> -- change directory",
                 "cat <f> -- concatenate and print a file",
                 "v <f> -- view file contents",
-                "run <f> -- run an executable file",
+                "./<exe_file> -- run an executable file",
                 "echo <s> -- output an argument",
                 "..[> <f>] -- write to a file",
                 "..[>> <f>] -- append to a file",
