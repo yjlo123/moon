@@ -352,12 +352,14 @@
 					path.pop();
 				} else if (pathTokens[i] == '~') {
 					// home dir
-					let envHomeDir = env.global.env_home.split("/").filter(i => i);
+					let envUserNameDir = env.global.env_user.split("/").filter(i => i);
 					let tempPath = root;
-					for (let i = 0; i < envHomeDir.length; i++) {
-						tempPath = tempPath[envHomeDir[i]];
+					for (let i = 0; i < envUserNameDir.length; i++) {
+						tempPath = tempPath[envUserNameDir[i]];
 					}
-					path = tempPath.split("/").filter(i => i);
+					path = ['home'];
+					path.push(tempPath);
+					console.log(path);
 				} else if (pathTokens[i] !== '.') {
 					path.push(pathTokens[i]);
 				}
