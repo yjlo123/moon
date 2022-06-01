@@ -76,5 +76,11 @@
             }
         }
     },
-    "programs": {}
+    "programs": {},
+    "games": {
+        "test_game": [
+            ["exe"],
+            "prt 'This is a test game'"
+        ]
+    }
 }

@@ -18,6 +18,7 @@ def main
  pol $tokens cmd
 
  jeq $cmd 'exit' exit
+ jeq $cmd $nil repl_loop
 
  / -- RUN EXE --
  len $cmd cmd_len
