@@ -484,7 +484,8 @@
 			}
 			break;
 		default: // Print all other characters for demo
-			if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7B) || e >= '\u00a0') {
+			if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7E) || e >= '\u00a0') {
+				// 0x20 ~ 0x7e : 32 ~ 126
 				insertToCommand(e);
 			}
 		}
