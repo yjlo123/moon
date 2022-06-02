@@ -1,0 +1,48 @@
+/make a link
+let src_path_str $0
+let link_path_str $1
+jeq $src_path_str $nil print_error_invalid_name
+jeq $link_path_str $nil print_error_invalid_name
+
+lib 'util.get_path_by_str' $src_path_str 1 0 src_path
+let err_param $src_path_str
+jeq $src_path $nil print_error_invalid_path
+
+lib 'util.get_path_by_str' $link_path_str 1 0 dest_path
+let err_param $link_path_str
+
+jne $dest_path $nil print_error_exists
+lib 'util.get_path_by_str' $link_path_str 1 1 dest_path
+
+let link_meta []
+psh $link_meta 'lnk'
+psh $link_meta $src_path_str
+psh $link_meta $src_path
+let link_content []
+psh $link_content $link_meta
+pop $dest_path link_file_name
+lib 'os.write_file' $dest_path $link_file_name $link_content
+jmp done
+
+#copy_as_file
+lib 'os.write_file' $dest_path $dest_file_name $file_data
+jmp done
+
+#print_error_src_dir
+prt 'ERR ' ''
+prt $src_path_str ''
+prt ' is a directory (not copied)'
+jmp done
+#print_error_invalid_name
+prt 'USAGE cp source_file target_file/directory'
+jmp done
+#print_error_invalid_path
+prt 'ERR No such file/directory: ' ''
+prt $err_param
+jmp done
+#print_error_exists
+prt 'ERR File/directory exists: ' ''
+prt $err_param
+jmp done
+
+#done

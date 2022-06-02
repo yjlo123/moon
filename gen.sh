@@ -11,20 +11,21 @@ import json
 import os
 f = open('src/1_files_extra.json')
 f_json = json.load(f)
-for prog in os.listdir(\"src/programs\"):
-    ff = os.path.join(\"src/programs\", prog)
-    if os.path.isdir(ff):
-        continue
-    with open(ff, 'r') as f:
-        virtual_file = []
-        description = f.readline().strip()[1:]
-        header = [\"exe\", description]
-        virtual_file.append(header)
-        row = f.readline()
-        while row:
-            virtual_file.append(row.strip())
+for dir in ['programs', 'games']:
+    for prog in os.listdir(\"src/{}\".format(dir)):
+        ff = os.path.join(\"src/{}\".format(dir), prog)
+        if os.path.isdir(ff):
+            continue
+        with open(ff, 'r') as f:
+            virtual_file = []
+            description = f.readline().strip()[1:]
+            header = [\"exe\", description]
+            virtual_file.append(header)
             row = f.readline()
-    f_json['programs'][prog.split('.')[0]] = virtual_file
+            while row:
+                virtual_file.append(row.strip())
+                row = f.readline()
+        f_json[dir][prog.split('.')[0]] = virtual_file
 text = json.dumps(f_json)
 text = text.replace(\"'\", \"\\\\'\")
 print(text, end = '')

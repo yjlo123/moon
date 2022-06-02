@@ -4,6 +4,7 @@ put $type_map 'txt' 'TXT'
 put $type_map 'exe' 'EXE'
 put $type_map 'raw' 'RAW'
 put $type_map 'dir' 'DIR'
+put $type_map 'lnk' 'LNK'
 put $type_map $nil 'NIL'
 jeq $0 $nil use_current_path
 lib 'util.get_path_by_str' $0 0 0 path
@@ -33,12 +34,20 @@ let col_idx 0
 jeq $idx $lst_len to_print
 get $lst $idx f
 
-lib 'os.get_file_type' $path $f ft
+lib 'os.get_file_type' $path $f file_type
 let file_ent '<'
-get $type_map $ft t
+get $type_map $file_type t
 add file_ent $file_ent $t
 add file_ent $file_ent '> '
 add file_ent $file_ent $f
+
+jne $file_type 'lnk' not_link
+add file_ent $file_ent ' -> '
+lib 'os.read_file' $path $f file_content
+get $file_content 0 file_meta
+get $file_meta 1 link_path
+add file_ent $file_ent $link_path
+#not_link
 
 get $the_list $col_idx cur_line
 jne $cur_line $nil append_line

@@ -73,12 +73,15 @@
                     "prt 'Age: ' ''",
                     "prt $age"
                 ]
-            }
+            },
+            "games": [
+                ["lnk","/games",["games"]]
+            ]
         }
     },
     "programs": {},
     "games": {
-        "test_game": [
+        "test": [
             ["exe"],
             "prt 'This is a test game'"
         ]
