@@ -11,10 +11,25 @@ def run
  let _prog_path $ret
  pop $_prog_path _prog
  cal get_real_path $_prog_path
- cal get_by_path $ret
+ let _real_path $ret
+ cal get_by_path $_real_path
  let prog_dir $ret
 
  get $prog_dir $_prog _file_content
+ cal lib_get_file_type $_real_path $_prog
+
+ ife $ret 'lnk'
+  get $_file_content 0 _file_meta
+  get $_file_meta 1 _link_path_str
+  cal get_path_by_str $_link_path_str $_real_path
+  let _prog_path $ret
+  pop $_prog_path _prog
+  
+  cal get_by_path $_prog_path
+  let prog_dir $ret
+  get $prog_dir $_prog _file_content
+ fin
+
  ife $_file_content $nil
   cal print_error 'File not found'
  els

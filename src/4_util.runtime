@@ -171,7 +171,7 @@ def get_path_by_str
    ife $_relative_to $nil
     let _relative_to $path
    fin
-   for _p $path
+   for _p $_relative_to
     psh $_full_path $_p
    nxt
   fin

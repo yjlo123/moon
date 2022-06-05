@@ -16,15 +16,20 @@ for dir in ['programs', 'games']:
         ff = os.path.join(\"src/{}\".format(dir), prog)
         if os.path.isdir(ff):
             continue
+        ext = prog.split('.')[-1]
         with open(ff, 'r') as f:
             virtual_file = []
-            description = f.readline().strip()[1:]
-            header = [\"exe\", description]
-            virtual_file.append(header)
-            row = f.readline()
-            while row:
-                virtual_file.append(row.strip())
+            if ext == 'runtime':
+                description = f.readline().strip()[1:]
+                header = [\"exe\", description]
+                virtual_file.append(header)
                 row = f.readline()
+                while row:
+                    virtual_file.append(row.strip())
+                    row = f.readline()
+            elif ext == 'link':
+                header = [\"lnk\", f.readline().strip()]
+                virtual_file.append(header)
         f_json[dir][prog.split('.')[0]] = virtual_file
 text = json.dumps(f_json)
 text = text.replace(\"'\", \"\\\\'\")
