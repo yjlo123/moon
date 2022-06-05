@@ -1,4 +1,4 @@
-/A countdown timer
+/a countdown timer
 let len_str $0
 jeq $len_str $nil err_invalid_param
 

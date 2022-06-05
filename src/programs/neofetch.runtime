@@ -1,4 +1,4 @@
-/A system info script
+/a system info script
 let param $0
 
 let t_color 2  / title color
