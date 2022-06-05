@@ -141,18 +141,24 @@ def lib_screen_reset
  prt '\\u001b[0m' ''
 end
 
-def lib_screen_bg_color
- let seq '\\u001b[48;5;'
- add seq $seq $0
- add seq $seq 'm'
- prt $seq ''
-end
-
-def lib_screen_fg_color
- let seq '\\u001b[38;5;'
- add seq $seq $0
- add seq $seq 'm'
- prt $seq ''
+def lib_screen_color_print
+ let _text $0
+ let _fg_color $1
+ let _bg_color $2
+ let _seq ''
+ jeq $_fg_color $nil skip_fg
+ add _seq $_seq '\\u001b[38;5;'
+ add _seq $_seq $_fg_color
+ add _seq $_seq 'm'
+ #skip_fg
+ jeq $_bg_color $nil skip_bg
+ add _seq $_seq '\\u001b[48;5;'
+ add _seq $_seq $_bg_color
+ add _seq $_seq 'm'
+ #skip_bg
+ add _seq $_seq $_text
+ add _seq $_seq '\\u001b[0m'  / reset
+ prt $_seq ''
 end
 
 def lib_screen_up_arrow

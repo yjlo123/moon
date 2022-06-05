@@ -78,8 +78,11 @@
 					term.write('\033[2K');
 					return;
 				} else if (lineContent === '\\u001b[7m') {
+					// reverse
 					term.write('\u001b[7m');
 					return;
+				} else if (lineContent.startsWith('\u001b[38;5;')) {
+					term.write('\u001b[38;5;87m');
 				}
 			}
 			// text = text.replaceAll('[x1b', '\x1b');

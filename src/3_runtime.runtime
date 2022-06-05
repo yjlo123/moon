@@ -435,13 +435,14 @@ def runtime
   ife $_lib_name 'term.reverse'
    cal lib_screen_reverse
   fin
-  ife $_lib_name 'term.bg_color'
+  ife $_lib_name 'term.color_print'
    cal eval_param $_line 2
-   cal lib_screen_bg_color $ret
-  fin
-  ife $_lib_name 'term.fg_color'
-   cal eval_param $_line 2
-   cal lib_screen_fg_color $ret
+   let _text $ret
+   cal eval_param $_line 3
+   let _fg_color $ret
+   cal eval_param $_line 4
+   let _bg_color $ret
+   cal lib_screen_color_print $_text $_fg_color $_bg_color
   fin
   ife $_lib_name 'term.reset'
    cal lib_screen_reset

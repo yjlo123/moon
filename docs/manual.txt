@@ -39,8 +39,7 @@ term.prev_line
 term.clear_line
 term.reverse
 term.reset
-term.bg_color ($color)
-term.fg_color ($color)
+term.color_print ($text, $fg_color, $bg_color)
 term.set_prt_delay ($enable)
 term.get_width (width)
 term.get_height (height)

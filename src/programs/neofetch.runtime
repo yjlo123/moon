@@ -1,0 +1,122 @@
+/A system info script
+let param $0
+
+let t_color 2  / title color
+let l_color 3  / label color
+let col_offset 23
+
+let cm {}  / color map
+jeq $param $nil use_default_color
+let chars []
+psh $chars ';' 'c' 'o' 'O' 'x' 'k' 'd' 'l' 'N'
+#set_color_loop
+pol $chars c
+jeq $c $nil begin
+rnd color 1 256
+put $cm $c $color
+jmp set_color_loop
+
+#use_default_color
+put $cm ';' 238
+put $cm 'c' 240
+put $cm 'o' 242
+put $cm 'O' 244
+put $cm 'x' 246
+put $cm 'k' 248
+put $cm 'd' 250
+put $cm 'l' 252
+put $cm 'N' 254
+
+#begin
+let lines []
+psh $lines 'xxxxccccOOOOdddd       '
+psh $lines 'xxxxccccOOOOdddd       '
+psh $lines 'OOOO            kkkk   '
+psh $lines 'OOOO            kkkk   '
+psh $lines 'dddd::::ooooxxxx       '
+psh $lines 'dddd::::ooooxxxx       '
+psh $lines 'kkkk            llll   '
+psh $lines 'kkkk            llll   '
+psh $lines 'oooo            kkkk   '
+psh $lines 'oooo            kkkk   '
+
+len $lines logo_height
+
+#loop_line
+pol $lines line
+jeq $line $nil fin
+ #loop_char
+ pol $line c
+ jeq $c '' line_done
+ get $cm $c color
+ lib 'term.color_print' $c $color $nil
+ jmp loop_char
+ #line_done
+prt ''
+jmp loop_line
+#fin
+
+let i 0
+#rewind_loop
+jeq $i $logo_height rewind_done
+lib 'term.prev_line'
+add i $i 1
+jmp rewind_loop
+#rewind_done
+
+let line_count 0
+
+def offset
+ lib 'term.move_cursor' $col_offset 0
+ add line_count $line_count 1
+end
+
+cal offset
+lib 'util.get_path_by_str' '/env' path
+lib 'os.read_file' $path 'user' username
+lib 'term.color_print' $username $t_color $nil
+prt ''
+cal offset
+prt '------------'
+cal offset
+
+lib 'os.get_os_info' info
+get $info 0 os_name
+get $info 1 os_ver
+get $info 2 os_build
+lib 'term.color_print' 'OS: ' $l_color $nil
+prt $os_name
+cal offset
+lib 'term.color_print' 'OS Ver: ' $l_color $nil
+prt $os_ver
+cal offset
+lib 'term.color_print' 'OS Build: ' $l_color $nil
+prt $os_build
+cal offset
+
+lib 'term.get_height' h
+lib 'term.get_width' w
+lib 'term.color_print' 'Term Size: ' $l_color $nil
+prt $w 'x'
+prt $h
+cal offset
+lib 'term.color_print' 'Term Theme: ' $l_color $nil
+prt 'default'
+cal offset
+
+lib 'os.get_sys_info' info
+get $info 'uptime' uptime
+div uptime $uptime 1000
+lib 'term.color_print' 'Uptime: ' $l_color $nil
+prt $uptime ''
+prt 's'
+
+sub emp_line_count $logo_height $line_count
+let i 0
+#next_line_loop
+jeq $i $emp_line_count end
+prt ''
+add i $i 1
+jmp next_line_loop
+
+#end

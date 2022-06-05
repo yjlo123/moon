@@ -67,16 +67,17 @@ let displayed_ln 0
 
 #content_loop
 jeq $i $max_ln content_done
-lib 'term.bg_color' 239
+let ln_block ''
 add ln $i $top_ln
 jgt $ln 9 skip_1_indent
-prt ' ' ''
+add ln_block $ln_block ' '
 #skip_1_indent
 jgt $ln 99 skip_2_indent
-prt ' ' ''
+add ln_block $ln_block ' '
 #skip_2_indent
-prt $ln ' '
-lib 'term.reset'
+add ln_block $ln_block $ln
+add ln_block $ln_block ' '
+lib 'term.color_print' $ln_block $nil 239
 sub li $ln 1
 add li $li $start_i
 get $file_content $li line
@@ -106,9 +107,7 @@ jmp line_loop
 prt ''
 add displayed_ln $displayed_ln 1
 jeq $displayed_ln $h content_done
-lib 'term.bg_color' 239
-prt '    ' ''
-lib 'term.reset'
+lib 'term.color_print' '    ' $nil 239
 add wrap_ln $wrap_ln 1
 let cc 0
 jmp line_loop
