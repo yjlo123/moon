@@ -75,15 +75,15 @@
                 ]
             },
             "games": [
-                ["lnk","/games",["games"]]
+                ["lnk", "/games"]
             ]
         }
     },
-    "programs": {},
     "games": {
         "test": [
             ["exe"],
             "prt 'This is a test game'"
         ]
-    }
+    },
+    "programs": {}
 }

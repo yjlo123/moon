@@ -13,18 +13,19 @@ def lib_get_path
   nxt
   ret $_path
  fin
- cal get_path_by_str $_path_str $_is_file
+ cal get_path_by_str $_path_str
  ret $ret
 end
 
 def lib_set_path
  let _path $0
- cal verify_path $_path
+ cal get_real_path $_path
+ cal verify_path $ret 0
  let _is_valid $ret
  ife $_is_valid 1
   let path []
-  for _p $_path
-   psh $path $_p
+  for _px $_path
+   psh $path $_px
   nxt
  fin
 end

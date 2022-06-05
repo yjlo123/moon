@@ -4,15 +4,19 @@ let dest_path_str $1
 jeq $src_path_str $nil print_error_invalid_name
 jeq $dest_path_str $nil print_error_invalid_name
 
-lib 'util.get_path_by_str' $src_path_str 1 0 src_path
+lib 'util.get_path_by_str' $src_path_str src_path
 let err_param $src_path_str
 jeq $src_path $nil print_error_invalid_path
 pop $src_path src_file_name
+lib 'util.get_real_path' $src_path src_path
+jeq $src_path $nil print_error_invalid_path
 lib 'os.get_file_type' $src_path $src_file_name src_file_type
 jeq $src_file_type 'dir' print_error_src_dir
 lib 'os.read_file' $src_path $src_file_name file_data
+jeq $file_data $nil print_error_src_dir
 
-lib 'util.get_path_by_str' $dest_path_str 1 1 dest_path
+lib 'util.get_path_by_str' $dest_path_str dest_path
+lib 'util.get_real_path' $dest_path dest_path
 let err_param $dest_path_str
 jeq $dest_path $nil print_error_invalid_path
 pop $dest_path dest_file_name

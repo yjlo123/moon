@@ -1,8 +1,13 @@
 /remove a file or directory entry
 let path_str $0
 jeq $path_str $nil print_error_invalid_name
-lib 'util.get_path_by_str' $path_str 1 0 path
+lib 'util.get_path_by_str' $path_str path
+pop $path file
+lib 'util.get_real_path' $path path
 jeq $path $nil print_error_invalid_path
+psh $path $file
+lib 'util.verify_path' $path 1 is_valid
+jeq $is_valid 0 print_error_invalid_path
 lib 'os.delete_path' $path
 jmp done
 #print_error_invalid_name

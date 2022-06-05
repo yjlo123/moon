@@ -6,10 +6,13 @@ sub h $h 1
 
 let path_str $0
 jeq $path_str $nil print_usage
-lib 'util.get_path_by_str' $path_str 1 0 path
+lib 'util.get_path_by_str' $path_str path
 jeq $path $nil print_error_invalid_file
 pop $path file_name
+lib 'util.get_real_path' $path path
+jeq $path $nil print_error_invalid_file
 lib 'os.read_file' $path $file_name file_content
+jeq $file_content $nil print_error_invalid_file
 lib 'os.get_file_type' $path $file_name file_type
 
 /jeq $file_type 'raw' raw_file

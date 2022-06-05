@@ -328,7 +328,7 @@
 
 	function processTab() {
 		let env = runtime.getEnv(false);
-		let path = env.global.path; 
+		let path = env.global.path.slice(); // copy path
 		let root = env.global.root;
 		let text = command;
 		let tokens = parseCmdInput(text);
@@ -342,11 +342,10 @@
 			// specified path
 			let pathTokens = lastToken.split('/');
 			if (lastToken[0] === '/') {
-				// from root
+				// absolute path, from root
 				pathTokens = lastToken.slice(1).split('/');
 				path = [];
 			}
-			path = path.slice(); // copy path
 			for (let i = 0; i < pathTokens.length-1; i++) {
 				if (pathTokens[i] == '..') {
 					path.pop();
@@ -361,6 +360,7 @@
 					path.push(tempPath);
 					console.log(path);
 				} else if (pathTokens[i] !== '.') {
+
 					path.push(pathTokens[i]);
 				}
 			}
@@ -377,8 +377,21 @@
 		}
 
 		// go to path
-		for (let i = 0; i < path.length; i++) {
-			currentDir = currentDir[path[i]];
+		let pathStack = path.reverse();
+		while (pathStack.length > 0) {
+			let p = pathStack.pop();
+			currentDir = currentDir[p];
+			if (Array.isArray(currentDir) && currentDir.length > 0 &&
+				Array.isArray(currentDir[0]) && currentDir[0][0] === "lnk") {
+					let linkToPathStr = currentDir[0][1];
+					if (linkToPathStr[0] === "/") {
+						currentDir = root
+						let linkPath = linkToPathStr.split("/").filter(i => i);
+						for (let i = linkPath.length-1; i >= 0; i--) {
+							pathStack.push(linkPath[i]);
+						}
+					}
+			}
 			if (!currentDir) {
 				return false;
 			}

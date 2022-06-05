@@ -4,23 +4,27 @@ let link_path_str $1
 jeq $src_path_str $nil print_error_invalid_name
 jeq $link_path_str $nil print_error_invalid_name
 
-lib 'util.get_path_by_str' $src_path_str 1 0 src_path
-let err_param $src_path_str
-jeq $src_path $nil print_error_invalid_path
-
-lib 'util.get_path_by_str' $link_path_str 1 0 dest_path
 let err_param $link_path_str
+lib 'util.get_path_by_str' $link_path_str dest_path
+pop $dest_path link_file_name
+/ check dest path valid
+lib 'util.get_real_path' $dest_path dest_path
+lib 'util.verify_path' $dest_path 0 is_valid_path
+jeq $is_valid_path 0 print_error_invalid_path
 
-jne $dest_path $nil print_error_exists
+/ check dest not exists
+psh $dest_path $link_file_name
+lib 'util.verify_path' $dest_path 1 file_exists
+jeq $file_exists 1 print_error_exists
+pop $dest_path link_file_name
+
 lib 'util.get_path_by_str' $link_path_str 1 1 dest_path
 
 let link_meta []
 psh $link_meta 'lnk'
 psh $link_meta $src_path_str
-psh $link_meta $src_path
 let link_content []
 psh $link_content $link_meta
-pop $dest_path link_file_name
 lib 'os.write_file' $dest_path $link_file_name $link_content
 jmp done
 

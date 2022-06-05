@@ -10,8 +10,12 @@ add new_dir_name $c $new_dir_name
 jmp extract_last
 #continue
 psh $path_str $c
-lib 'util.get_path_by_str' $path_str 0 0 path
+lib 'util.get_path_by_str' $path_str path
 jeq $path $nil print_error_invalid_path
+lib 'util.get_real_path' $path path
+jeq $path $nil print_error_invalid_path
+lib 'util.verify_path' $path 0 is_valid
+jeq $is_valid 0 print_error_invalid_path
 
 lib 'os.read_file' $path $new_dir_name existing
 jne $existing $nil print_error_exists

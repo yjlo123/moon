@@ -1,4 +1,10 @@
 /show the current username
-lib 'util.get_path_by_str' '/env' 0 0 path
+lib 'util.get_path_by_str' '/env' path
+lib 'util.verify_path' $path 0 is_valid_path
+jeq $is_valid_path 1 valid_path
+prt 'ERR Invalid env path'
+jmp done
+#valid_path
 lib 'os.read_file' $path 'user' username
 prt $username
+#done

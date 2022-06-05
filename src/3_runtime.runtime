@@ -402,12 +402,23 @@ def runtime
   ife $_lib_name 'util.get_path_by_str'
    cal eval_param $_line 2
    let _path_str $ret
+   cal get_path_by_str $_path_str $_relative_to
+   get $_line 3 _name
+   put $env $_name $ret
+  fin
+  ife $_lib_name 'util.verify_path'
+   cal eval_param $_line 2
+   let _path $ret
    cal eval_param $_line 3
    let _is_file $ret
-   cal eval_param $_line 4
-   let _skip_verify $ret
-   cal get_path_by_str $_path_str $_is_file $_skip_verify
-   get $_line 5 _name
+   cal verify_path $_path $_is_file
+   get $_line 4 _name
+   put $env $_name $ret
+  fin
+  ife $_lib_name 'util.get_real_path'
+   cal eval_param $_line 2
+   cal get_real_path $ret
+   get $_line 3 _name
    put $env $_name $ret
   fin
   ife $_lib_name 'dev.set_led'

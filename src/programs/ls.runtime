@@ -7,12 +7,16 @@ put $type_map 'dir' 'DIR'
 put $type_map 'lnk' 'LNK'
 put $type_map $nil 'NIL'
 jeq $0 $nil use_current_path
-lib 'util.get_path_by_str' $0 0 0 path
+lib 'util.get_path_by_str' $0 path
 jeq $path $nil print_error
 jmp continue_with_path
 #use_current_path
 lib 'os.get_current_path' path
 #continue_with_path
+lib 'util.get_real_path' $path path
+jeq $path $nil print_error
+lib 'util.verify_path' $path 0 is_valid
+jeq $is_valid 0 print_error
 lib 'os.get_file_list' $path lst
 
 len $lst lst_len
@@ -77,4 +81,5 @@ jmp to_print
 
 #print_error
 prt 'ERR Invalid path'
+jmp end
 #end

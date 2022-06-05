@@ -1,6 +1,12 @@
 def get_prompt_str
- cal get_path_by_str '/env' 0
- cal get_by_path $ret
+ cal get_path_by_str '/env'
+ let _path $ret
+ cal verify_path $_path 0
+ ife $ret 0
+  prt 'ERR Invalid prompt path'
+  ret '>'
+ fin
+ cal get_by_path $_path
  let _env_dir $ret
  get $_env_dir 'prompt' _prompt
  ife $_prompt $nil
@@ -60,8 +66,13 @@ def shorten_home_path
 end
 
 def get_home_path
- cal get_path_by_str $env_user 1
+ cal get_path_by_str $env_user
  let _env_user_path $ret
+ cal verify_path $_env_user_path 1
+ ife $ret 0
+  prt 'ERR Invalid home path'
+  ret '/'
+ fin
  pop $_env_user_path _env_user_filename
  cal get_by_path $_env_user_path
  get $ret $_env_user_filename _user_name
@@ -141,9 +152,8 @@ def path_to_str
 end
 
 def get_path_by_str
- let _path_str $0    / assert non-empty
- let _is_file $1     / pass in 1 if is file
- let _skip_varify $2     / pass in 1 to skip varify existence
+ let _path_str $0      / assert non-empty
+ let _relative_to $1   / default relative to current path
  get $_path_str 0 _path_first_c
  
  let _full_path []
@@ -158,12 +168,16 @@ def get_path_by_str
    pol $_path_str x
   els
    / relative path
+   ife $_relative_to $nil
+    let _relative_to $path
+   fin
    for _p $path
     psh $_full_path $_p
    nxt
   fin
  fin
  
+ / split path string to list
  cal split_str $_path_str '/'
  let _path $ret
 
@@ -184,16 +198,10 @@ def get_path_by_str
    #skip_cur_dir
   fin
  nxt
- jeq $_skip_varify 1 done_verify
- cal verify_path $_dup_full_path $_is_file
- ife $ret 0
-  ret $nil
- fin
- #done_verify
  ret $_real_full_path
 end
 
-def verify_path
+def verify_path / -> 1: true, 0: false
  let _path $0
  let _if_file $1
  let _curr_path $root
@@ -224,9 +232,48 @@ def verify_path
   ife $_path_typ 'map'   / check final dir is valid
    ret 1
   els
-   ret 0
+   / check if is a link path
+   ife $_path_typ 'list'
+    get $_curr_path 0 _meta_data
+    typ _meta_data_type $_meta_data
+    ife $_meta_data_type 'list'
+     ret 1
+    fin
+    ret 0
+   els
+    ret 0
+   fin
   fin
  fin
+end
+
+/ process links
+def get_real_path
+ let _path $0
+ let _real_path []
+ let _invalid 0
+ for _pp $_path
+  cal lib_get_file_type $_real_path $_pp
+  let _file_type $ret
+  ife $_file_type 'dir'
+   psh $_real_path $_pp
+  els
+   ife $_file_type 'lnk'
+    cal lib_read_file $_real_path $_pp
+    get $ret 0 _file_meta
+    get $_file_meta 1 _link_path_str
+    cal get_path_by_str $_link_path_str $_real_path
+    let _real_path $ret
+   els
+    / Invalid path
+    let _invalid 1
+   fin
+  fin
+ nxt
+ ife $_invalid 1
+  ret $nil
+ fin
+ ret $_real_path
 end
 
 def check_executable

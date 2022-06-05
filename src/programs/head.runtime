@@ -1,12 +1,14 @@
 /display first lines of a file
 let path_str $0
 jeq $path_str $nil print_error_invalid_name
-lib 'util.get_path_by_str' $path_str 1 0 path
-jeq $path $nil print_error_invalid_path
+lib 'util.get_path_by_str' $path_str path
 pop $path file_name
+lib 'util.get_real_path' $path path
+lib 'util.verify_path' $path 1 is_valid_path
+jeq $is_valid_path 0 print_error_invalid_path
 lib 'os.read_file' $path $file_name file_content
+jeq $file_content $nil print_error_invalid_path
 lib 'os.get_file_type' $path $file_name file_type
-
 let default_len 10
 let line_count 0
 

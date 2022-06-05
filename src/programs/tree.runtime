@@ -3,11 +3,15 @@ let stack []
 let header []
 let lvl 0
 jeq $0 $nil use_current_path
-lib 'util.get_path_by_str' $0 0 0 path
-jeq $path $nil print_error
+lib 'util.get_path_by_str' $0 path
+lib 'util.get_real_path' $path path
+jeq $path $nil print_error_invalid_path
+lib 'util.verify_path' $path 0 is_valid_path
+jeq $is_valid_path 0 print_error_invalid_path
 jmp continue_with_path
 #use_current_path
 lib 'os.get_current_path' path
+lib 'util.get_real_path' $path path
 #continue_with_path
 #routine
 lib 'os.get_file_list' $path lst
@@ -33,14 +37,22 @@ jmp head_end
 prt '└── ' ''
 let header_seg '     '
 #head_end
-prt $f
-jne $ft 'dir' next
+let line $f
+jne $ft 'lnk' not_link
+lib 'os.read_file' $path $f _f_content
+get $_f_content 0 _f_meta
+get $_f_meta 1 _linked_path
+add line $line ' -> '
+add line $line $_linked_path
+#not_link
+prt $line
+jne $ft 'dir' not_dir
 add lvl $lvl 1
 psh $header $header_seg
 psh $path $f
 psh $stack $f
 jmp routine
-#next
+#not_dir
 jmp loop
 #end
 len $stack stack_size
@@ -56,4 +68,8 @@ jeq $cur $top_f to_jmp_loop
 jmp skip_by_stack
 #to_jmp_loop
 jmp loop
+
+#print_error_invalid_path
+prt 'ERR Invalid path'
+jmp exit
 #exit

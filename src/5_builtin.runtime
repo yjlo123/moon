@@ -7,14 +7,11 @@ def run
   ret
  fin
 
- cal get_path_by_str $_d 1
- ife $ret $nil
-  cal print_error 'File not found'
-  ret
- fin
+ cal get_path_by_str $_d
  let _prog_path $ret
  pop $_prog_path _prog
- cal get_by_path $_prog_path
+ cal get_real_path $_prog_path
+ cal get_by_path $ret
  let prog_dir $ret
 
  get $prog_dir $_prog _file_content
