@@ -107,7 +107,7 @@ cal offset
 lib 'os.get_sys_info' info
 get $info 'uptime' uptime
 div uptime $uptime 1000
-let uptime_str 'Uptime: '
+let uptime_str ''
 div days $uptime 86400
 mod uptime $uptime 86400
 div hours $uptime 3600
@@ -128,8 +128,8 @@ add uptime_str $uptime_str 'm '
 #skip_minute
 add uptime_str $uptime_str $uptime
 add uptime_str $uptime_str 's'
-lib 'term.color_print' $uptime_str $l_color $nil
-prt ''
+lib 'term.color_print' 'Uptime: ' $l_color $nil
+prt $uptime_str
 
 sub emp_line_count $logo_height $line_count
 let i 0
