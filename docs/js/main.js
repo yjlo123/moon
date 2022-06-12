@@ -427,9 +427,11 @@
 		loggingIn = 0;
 		inputMask = false;
 		// clean temp status in Runtime Script env
-		env.global.sig_interrupt = 1;
-		env.global.prt_delay_disabled = 0;
-		env.global.runtime_running = 0;
+		if (env.global.runtime_running === 1) {
+			env.global.sig_interrupt = 1;
+			env.global.prt_delay_disabled = 0;
+			env.global.runtime_running = 0;
+		}
 		promptCallback("");
 	}
 
@@ -465,6 +467,16 @@
 		}
 	}
 
+	function sendKeyEventToEnv(keyCode) {
+		let env = runtime.getEnv(false);
+		if (env.global.runtime_running === 1) {
+			env.global.key_press.push(keyCode);
+			env.global.key_press = env.global.key_press.slice(0,5);
+			return true;
+		}
+		return false;
+	}
+
 	$('#key-tab').click(()=>{
 		if (inputMask) { return; }
 		onTab();
@@ -476,22 +488,30 @@
 	});
 	$('#key-up').click(()=>{
 		if (inputMask) { return; }
-		onArrowUp();
+		if (!sendKeyEventToEnv(38)) {
+			onArrowUp();
+		}
 		term.focus();
 	});
 	$('#key-down').click(()=>{
 		if (inputMask) { return; }
-		onArrowDown();
+		if (!sendKeyEventToEnv(40)) {
+			onArrowDown();
+		}
 		term.focus();
 	});
 	$('#key-left').click(()=>{
 		if (inputMask) { return; }
-		onArrowLeft();
+		if (!sendKeyEventToEnv(37)) {
+			onArrowLeft();
+		}
 		term.focus();
 	});
 	$('#key-right').click(()=>{
 		if (inputMask) { return; }
-		onArrowRight();
+		if (!sendKeyEventToEnv(39)) {
+			onArrowRight();
+		}
 		term.focus();
 	});
 
@@ -499,11 +519,7 @@
 	term.open(document.getElementById('terminal'));
 
 	term.onKey(function (ev) {
-		let env = runtime.getEnv(false);
-		if (env.global.runtime_running === 1) {
-			env.global.key_press.push(ev.domEvent.keyCode);
-			env.global.key_press = env.global.key_press.slice(0,5);
-		}
+		sendKeyEventToEnv(ev.domEvent.keyCode);
 	});
 
 	term.onData(e => {
