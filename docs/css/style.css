@@ -17,7 +17,7 @@ body {
 
 .wrapper {
     text-align: center;
-    width: 600px;
+    width: 560px;
     margin: auto;
 }
 
@@ -54,6 +54,7 @@ body {
     background-color: rgb(134, 134, 134);
     padding: 30px 30px 50px 30px;
     border-radius: 30px;
+    border-bottom: 8px solid #666;
 }
 
 .monitor-speaker {
@@ -90,6 +91,49 @@ body {
     float: left;
     margin: 10px 12px;
     background-color: rgb(129, 129, 129);
+}
+
+.keypad {
+    margin: 5px 0;
+    /* background-color: #bbb; */
+    padding: 5px;
+    border-radius: 5px;;
+}
+
+.keyrow {
+    overflow: hidden;
+}
+
+.key {
+    display: inline-block;
+    padding: 5px 15px;
+    background-color: #999;
+    border-radius: 4px;
+    color: rgb(69, 69, 69);
+    border-bottom: 5px solid #888;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+@media(hover: hover) {
+    .key:hover {
+        background-color: rgb(145, 145, 145);
+    }
+}
+
+.key.left {
+    float: left;
+    margin-right: 8px;
+}
+
+.key.right {
+    float: right;
+    margin-left: 8px;
+}
+
+.key.arrow {
+    width: 15px;
 }
 
 .app-info p {

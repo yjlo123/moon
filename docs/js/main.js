@@ -329,7 +329,7 @@
 		return result;
 	}
 
-	function processTab() {
+	function onTab() {
 		let env = runtime.getEnv(false);
 		let path = env.global.path.slice(); // copy path
 		let root = env.global.root;
@@ -419,6 +419,83 @@
 		return false;
 	}
 
+	function onCtrlC() {
+		let env = runtime.getEnv(false);
+		term.write('\n\r');
+		command = '';
+		cursor = 0;
+		loggingIn = 0;
+		inputMask = false;
+		// clean temp status in Runtime Script env
+		env.global.sig_interrupt = 1;
+		env.global.prt_delay_disabled = 0;
+		env.global.runtime_running = 0;
+		promptCallback("");
+	}
+
+	function onArrowUp() {
+		if (consoleHistoryIndex > 0) {
+			consoleHistoryIndex -= 1;
+			setPromptText(consoleHistory[consoleHistoryIndex]);
+		}
+	}
+
+	function onArrowDown() {
+		if (consoleHistoryIndex < consoleHistory.length) {
+			consoleHistoryIndex += 1;
+			if (consoleHistoryIndex === consoleHistory.length) {
+				clearInput();
+			} else {
+				setPromptText(consoleHistory[consoleHistoryIndex]);
+			}
+		}
+	}
+
+	function onArrowRight() {
+		if (cursor < command.length) {
+			term.write('\x1b[C');
+			cursor++;
+		}
+	}
+
+	function onArrowLeft() {
+		if (cursor > 0) {
+			term.write('\x1b[D');
+			cursor--;
+		}
+	}
+
+	$('#key-tab').click(()=>{
+		if (inputMask) { return; }
+		onTab();
+		term.focus();
+	});
+	$('#key-ctl-c').click(()=>{
+		onCtrlC();
+		term.focus();
+	});
+	$('#key-up').click(()=>{
+		if (inputMask) { return; }
+		onArrowUp();
+		term.focus();
+	});
+	$('#key-down').click(()=>{
+		if (inputMask) { return; }
+		onArrowDown();
+		term.focus();
+	});
+	$('#key-left').click(()=>{
+		if (inputMask) { return; }
+		onArrowLeft();
+		term.focus();
+	});
+	$('#key-right').click(()=>{
+		if (inputMask) { return; }
+		onArrowRight();
+		term.focus();
+	});
+
+
 	term.open(document.getElementById('terminal'));
 
 	term.onKey(function (ev) {
@@ -430,23 +507,13 @@
 	});
 
 	term.onData(e => {
-		let env = runtime.getEnv(false);
 		if (!promptOn && e !== '\u0003') {
 			// unless Ctrl+c
 			return;
 		}
 		switch (e) {
 		case '\u0003': // Ctrl+C
-			term.write('\n\r');
-			command = '';
-			cursor = 0;
-			loggingIn = 0;
-			inputMask = false;
-			// clean temp status in Runtime Script env
-			env.global.sig_interrupt = 1;
-			env.global.prt_delay_disabled = 0;
-			env.global.runtime_running = 0;
-			promptCallback("");
+			onCtrlC();
 			break;
 		case '\r': // Enter
 			term.write('\n\r');
@@ -454,39 +521,23 @@
 			break;
 		case '\t': // Tab
 			if (inputMask) { break; }
-			processTab();
+			onTab();
 			break;
 		case '\u001b[A': // Up Arrow
 			if (inputMask) { break; }
-			if (consoleHistoryIndex > 0) {
-				consoleHistoryIndex -= 1;
-				setPromptText(consoleHistory[consoleHistoryIndex]);
-			}
+			onArrowUp();
 			break;
 		case '\u001b[B': // Down Arrow
 			if (inputMask) { break; }
-			if (consoleHistoryIndex < consoleHistory.length) {
-				consoleHistoryIndex += 1;
-				if (consoleHistoryIndex === consoleHistory.length) {
-					clearInput();
-				} else {
-					setPromptText(consoleHistory[consoleHistoryIndex]);
-				}
-			}
+			onArrowDown();
 			break;
 		case '\x1b[C': // Right Arrow
 			if (inputMask) { break; }
-			if (cursor < command.length) {
-				term.write('\x1b[C');
-				cursor++;
-			}
+			onArrowRight();
 			break;
 		case '\x1b[D': // Left Arrow
 			if (inputMask) { break; }
-			if (cursor > 0) {
-				term.write('\x1b[D');
-				cursor--;
-			}
+			onArrowLeft();
 			break;
 		case '\u007F': // Backspace (DEL)
 			if (command.length > 0 && cursor > 0) {
