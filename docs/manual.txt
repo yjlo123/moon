@@ -5,8 +5,6 @@ jmp, jeq, jne, jgt, jlt
 int, str, typ, tim
 len, pol, pop, psh, put, get
 clr, drw, pxl
-
-~ in progress:
 def, end, ret, cal
 
 ~ not supported:

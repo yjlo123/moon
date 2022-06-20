@@ -11,7 +11,40 @@ end
 
 def bar
  prt 'bar'
+ let i 0
+ #loop
+ jeq $i 3 end
+ prt $i
+ add i $i 1
+ jmp loop
+ #end
  prt $0
 end
 
 cal foo
+prt '-----'
+
+let _a 111
+let a 222
+
+def test
+ prt $0
+ let _arg $0
+ let _a 555
+ prt $_a
+ prt $a
+ add _b $_arg 2
+ #lable_001
+ ret $_b
+end
+
+cal test 45
+prt $ret
+
+let i 0
+#loop
+jeq $i 3 end
+prt $i
+add i $i 1
+jmp loop
+#end

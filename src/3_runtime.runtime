@@ -1,4 +1,6 @@
+let ctx_stack []
 let env {}
+let env_stack []
 let prt_delay 5
 let prt_delay_disabled 0
 let sig_interrupt 0
@@ -26,8 +28,8 @@ def expr
    pol $key_press _key
    ret $_key
   els
-   get $env $_expr _val
-   ret $_val
+   cal get_var_from_env $_expr
+   ret $ret
   fin
  fin
  / str is parsed as %str, due to conflict with single quote
@@ -45,14 +47,87 @@ def eval_param
  ret $ret
 end
 
+def add_var_to_env
+ let _name $0
+ let _val $1
+ get $_name 0 _c
+ ife $_c '_'
+  pop $env_stack _top_env
+  ife $_top_env $nil
+   / add to global
+   put $env $_name $_val
+   ret
+  fin
+  put $_top_env $_name $_val
+  psh $env_stack $_top_env
+ els
+  put $env $_name $_val
+ fin
+end
+
+def get_var_from_env
+ let _name $0
+ int _vi $_name
+ jeq $_vi $nil try_local_var
+ jmp local_var
+ #try_local_var
+ get $_name 0 _c
+ jne $_c '_' global_var
+  #local_var
+  pop $env_stack _top_env
+  ife $_top_env $nil
+   / get from global
+   get $env $_name _val
+   ret $_val
+  fin
+  get $_top_env $_name _val
+  psh $env_stack $_top_env
+  / ife $_val $nil
+  /  get $env $_name _val
+  /  ret $_val
+  / fin
+  ret $_val
+ #global_var
+  get $env $_name _val
+  ret $_val
+end
+
+def look_up_lbl
+ let _global_lbls $0
+ let _func_lbls $1
+ let _func_stack $2
+ let _name $3
+ pop $_func_stack _func_name
+ ife $_func_name $nil
+  / global
+  get $_global_lbls $_name _pc
+  ret $_pc
+ els
+  get $_func_lbls $_func_name _lbls
+  get $_lbls $_name _pc
+  psh $_func_stack $_func_name
+  ret $_pc
+ fin
+end
+
 / ** main eval **
 def runtime
  let _src $0
  let _args $1
- let env {}
- let _stack []
+ / == stack frame ==
+ let env {}               / global vars
+ let env_stack []         / func env
+ let _pc_stack []         / func call pc stack
+ let _func_name_stack []  / func name stack
+ / == end of frame ==
  let runtime_running 1
  let key_press []
+ let _p {}
+ let _lbl {}       / global labels
+ let _func_lbl {}  / function local labels
+ let _funcs {}     / function name -> line map
+ let _pc 0         / program counter
+ / read args
  let i 0
  ife $_args $nil
  els
@@ -61,11 +136,8 @@ def runtime
     add i $i 1
   nxt
  fin
- let _p {}
- let _lbl {}
- let _funcs {}
- cal parse_src $_src $_p $_lbl $_funcs
- let _pc 0
+
+ cal parse_src $_src $_p $_lbl $_func_lbl $_funcs
 
  let sig_interrupt 0
  
@@ -101,7 +173,7 @@ def runtime
  ife $_cmd 'let'
   get $_line 1 _var
   cal eval_param $_line 2
-  put $env $_var $ret
+  cal add_var_to_env $_var $ret
  fin
  jeq $_cmd 'add' do_arithmetic
  jeq $_cmd 'sub' do_arithmetic
@@ -130,7 +202,7 @@ def runtime
   ife $_cmd 'mod'
    mod _res $_val1 $_val2
   fin
-  put $env $_var $_res
+  cal add_var_to_env $_var $_res
  #non_arithmetic
  ife $_cmd 'slp'
   cal eval_param $_line 1
@@ -151,11 +223,12 @@ def runtime
   cal eval_param $_line 3
   let _y $ret
   pxl $_x $_y _val
-  put $env $_name $_val
+  cal add_var_to_env $_name $_val
  fin
  ife $_cmd 'jmp'
   get $_line 1 _lbl_name
-  get $_lbl $_lbl_name _pc
+  cal look_up_lbl $_lbl $_func_lbl $_func_name_stack $_lbl_name
+  let _pc $ret
  fin
 
  jeq $_cmd 'jeq' do_cond_jump
@@ -171,26 +244,30 @@ def runtime
   get $_line 3 _lbl_name
   ife $_cmd 'jeq'
     jne $_v1 $_v2 jeq_false
-    get $_lbl $_lbl_name _pc
+    cal look_up_lbl $_lbl $_func_lbl $_func_name_stack $_lbl_name
+    let _pc $ret
     #jeq_false
   fin
   ife $_cmd 'jne'
     jeq $_v1 $_v2 jne_false
-    get $_lbl $_lbl_name _pc
+    cal look_up_lbl $_lbl $_func_lbl $_func_name_stack $_lbl_name
+    let _pc $ret
     #jne_false
   fin
   ife $_cmd 'jgt'
     jgt $_v1 $_v2 jgt_true
     jmp jgt_false
     #jgt_true
-    get $_lbl $_lbl_name _pc
+    cal look_up_lbl $_lbl $_func_lbl $_func_name_stack $_lbl_name
+    let _pc $ret
     #jgt_false
   fin
   ife $_cmd 'jlt'
     jlt $_v1 $_v2 jlt_true
     jmp jlt_false
     #jlt_true
-    get $_lbl $_lbl_name _pc
+    cal look_up_lbl $_lbl $_func_lbl $_func_name_stack $_lbl_name
+    let _pc $ret
     #jlt_false
   fin
  #non_cond_jump
@@ -198,7 +275,7 @@ def runtime
  ife $_cmd 'inp'
   get $_line 1 _var
   inp _val
-  put $env $_var $_val
+  cal add_var_to_env $_var $_val
  fin
  ife $_cmd 'rnd'
   get $_line 1 _name
@@ -207,7 +284,7 @@ def runtime
   cal eval_param $_line 3
   let _v2 $ret
   rnd _r $_v1 $_v2
-  put $env $_name $_r
+  cal add_var_to_env $_name $_r
  fin
  jeq $_cmd 'int' type_cmd
  jeq $_cmd 'str' type_cmd
@@ -225,20 +302,20 @@ def runtime
  ife $_cmd 'typ'
   typ _val $ret
  fin
- put $env $_var $_val
+ cal add_var_to_env $_var $_val
  #not_type_cmd
  ife $_cmd 'tim'
   get $_line 1 _var
   get $_line 2 _time
   tim _val $_time
-  put $env $_var $_val
+  cal add_var_to_env $_var $_val
  fin
  ife $_cmd 'len'
   cal eval_param $_line 1
   let _list $ret
   get $_line 2 _name
   len $_list _len
-  put $env $_name $_len
+  cal add_var_to_env $_name $_len
  fin
  ife $_cmd 'pol'
   cal eval_param $_line 1
@@ -247,8 +324,8 @@ def runtime
   pol $_list _first
   get $_line 1 _list_name
   pol $_list_name x
-  put $env $_list_name $_list
-  put $env $_name $_first
+  cal add_var_to_env $_list_name $_list
+  cal add_var_to_env $_name $_first
  fin
  ife $_cmd 'pop'
   cal eval_param $_line 1
@@ -257,8 +334,8 @@ def runtime
   pop $_list _last
   get $_line 1 _list_name
   pol $_list_name x
-  put $env $_list_name $_list
-  put $env $_name $_last
+  cal add_var_to_env $_list_name $_list
+  cal add_var_to_env $_name $_last
  fin
  ife $_cmd 'psh'
   cal eval_param $_line 1
@@ -273,7 +350,7 @@ def runtime
   nxt
   get $_line 1 _list_name
   pol $_list_name x
-  put $env $_list_name $_list
+  cal add_var_to_env $_list_name $_list
  fin
  ife $_cmd 'put'
   cal eval_param $_line 1
@@ -292,26 +369,51 @@ def runtime
   cal eval_param $_line 3
   let _var $ret
   get $_list $_key _val
-  put $env $_var $_val
+  cal add_var_to_env $_var $_val
  fin
 
  / ** function commands **
- jeq $_cmd 'end' func_return
- jeq $_cmd 'ret' func_return
- jmp not_func_return
- #func_return
-  pop $_stack _pc
- #not_func_return
+ ife $_cmd 'end'
+  pop $env_stack _
+  pop $_pc_stack _pc
+  pop $_func_name_stack _
+ fin
+ ife $_cmd 'ret'
+   get $_line 1 _res
+   ife $_res $nil
+    let _res_val $nil
+   els
+    cal eval_param $_line 1
+    let _res_val $ret
+   fin
+   pop $env_stack _
+   cal add_var_to_env 'ret' $_res_val
+   pop $_pc_stack _pc
+   pop $_func_name_stack _
+ fin
  ife $_cmd 'def'
-  / jump to end
+  / jump to func end
   get $_line 1 _func_name
   add _func_end $_func_name '$$'
   get $_funcs $_func_end _pc
  fin
  ife $_cmd 'cal'
-  psh $_stack $_pc
+  psh $_pc_stack $_pc
   get $_line 1 _func_name
+  psh $_func_name_stack $_func_name
   get $_funcs $_func_name _pc
+  let _new_frame {}
+  let _i 2
+  #read_args_loop
+  get $_line $_i _argv
+  jeq $_argv $nil read_args_finished
+  sub _j $_i 2
+  cal eval_param $_line $_i
+  put $_new_frame $_j $ret
+  add _i $_i 1
+  jmp read_args_loop
+  #read_args_finished 
+  psh $env_stack $_new_frame
  fin
  
  / ** special **
@@ -333,12 +435,12 @@ def runtime
   ife $_lib_name 'os.get_home_path'
    cal get_home_path
    get $_line 2 _name
-   put $env $_name $ret
+   cal add_var_to_env $_name $ret
   fin
   ife $_lib_name 'os.get_current_path'
    cal lib_get_path
    get $_line 2 _name
-   put $env $_name $ret
+   cal add_var_to_env $_name $ret
   fin
   ife $_lib_name 'os.set_current_path'
    cal eval_param $_line 2
@@ -360,7 +462,7 @@ def runtime
    let _path $ret
    cal lib_get_file_list $_path
    get $_line 3 _name
-   put $env $_name $ret
+   cal add_var_to_env $_name $ret
   fin
   ife $_lib_name 'os.get_file_type'
    cal eval_param $_line 2
@@ -369,7 +471,7 @@ def runtime
    let _file_name $ret
    cal lib_get_file_type $_path $_file_name
    get $_line 4 _file_type_name
-   put $env $_file_type_name $ret
+   cal add_var_to_env $_file_type_name $ret
   fin
   ife $_lib_name 'os.read_file'
    cal eval_param $_line 2
@@ -378,7 +480,7 @@ def runtime
    let _file_name $ret
    cal lib_read_file $_path $_file_name
    get $_line 4 _file_content_name
-   put $env $_file_content_name $ret
+   cal add_var_to_env $_file_content_name $ret
   fin
   ife $_lib_name 'os.write_file'
    cal eval_param $_line 2
@@ -392,19 +494,28 @@ def runtime
   ife $_lib_name 'os.get_os_info'
    get $_line 2 _info
    cal lib_get_os_info
-   put $env $_info $ret
+   cal add_var_to_env $_info $ret
   fin
   ife $_lib_name 'os.get_sys_info'
    get $_line 2 _info
    cal lib_get_sys_info
-   put $env $_info $ret
+   cal add_var_to_env $_info $ret
+  fin
+  ife $_lib_name 'os.execute'
+   cal eval_param $_line 2
+   let _file_path $ret
+   psh $env_stack $env
+   let env {}
+   / ...
+   pop $env_stack env
+   / ...
   fin
   ife $_lib_name 'util.get_path_by_str'
    cal eval_param $_line 2
    let _path_str $ret
    cal get_path_by_str $_path_str $_relative_to
    get $_line 3 _name
-   put $env $_name $ret
+   cal add_var_to_env $_name $ret
   fin
   ife $_lib_name 'util.verify_path'
    cal eval_param $_line 2
@@ -413,13 +524,13 @@ def runtime
    let _is_file $ret
    cal verify_path $_path $_is_file
    get $_line 4 _name
-   put $env $_name $ret
+   cal add_var_to_env $_name $ret
   fin
   ife $_lib_name 'util.get_real_path'
    cal eval_param $_line 2
    cal get_real_path $ret
    get $_line 3 _name
-   put $env $_name $ret
+   cal add_var_to_env $_name $ret
   fin
   ife $_lib_name 'dev.set_led'
    cal eval_param $_line 2
@@ -453,11 +564,11 @@ def runtime
   fin
   ife $_lib_name 'term.get_width'
    get $_line 2 _name
-   put $env $_name $term_w
+   cal add_var_to_env $_name $term_w
   fin
   ife $_lib_name 'term.get_height'
    get $_line 2 _name
-   put $env $_name $term_h
+   cal add_var_to_env $_name $term_h
   fin
   ife $_lib_name 'term.move_cursor'
    cal eval_param $_line 2

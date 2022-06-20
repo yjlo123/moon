@@ -49,16 +49,22 @@ end
 
 def parse_src
  let _src $0
- let _p $1     / ln-tokens map
- let _lbl $2   / label-ln map
- let _funcs $3 / func-ln map
+ let _p $1         / ln-tokens: map
+ let _lbl $2       / label-ln: map
+ let _func_lbl $3  / func-label-ln: map of map
+ let _funcs $4     / func-ln: map
  let _lc 0
  let _cur_func_name 'global'
+ let _cur_func_lbl {}
  for _line $_src
   / check label
   pol $_line _c1
   ife $_c1 '#'
-   put $_lbl $_line $_lc
+   ife $_cur_func_name 'global'
+    put $_lbl $_line $_lc
+   els
+    put $_cur_func_lbl $_line $_lc
+   fin
   fin
   add _line $_c1 $_line
   cal parse_line $_line
@@ -70,8 +76,11 @@ def parse_src
    put $_funcs $_func_name $_lc
   fin
   ife $_first_token 'end'
+   / for jump to func end
    add _func_end $_cur_func_name '$$'
    put $_funcs $_func_end $_lc
+   put $_func_lbl $_cur_func_name $_cur_func_lbl
+   let _cur_func_lbl {}
    let _cur_func_name 'global'
   fin
   put $_p $_lc $_line_tokens
