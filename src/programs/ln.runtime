@@ -38,7 +38,7 @@ prt $src_path_str ''
 prt ' is a directory (not copied)'
 jmp done
 #print_error_invalid_name
-prt 'USAGE cp source_file target_file/directory'
+prt 'USAGE ln source_file target_file/directory'
 jmp done
 #print_error_invalid_path
 prt 'ERR No such file/directory: ' ''

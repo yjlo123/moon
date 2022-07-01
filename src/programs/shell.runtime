@@ -1,0 +1,4 @@
+/a shell
+prt 'hello'
+lib 'os.execute' '/programs/cal'
+prt 'done'

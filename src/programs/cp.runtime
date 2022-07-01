@@ -16,12 +16,13 @@ lib 'os.read_file' $src_path $src_file_name file_data
 jeq $file_data $nil print_error_src_dir
 
 lib 'util.get_path_by_str' $dest_path_str dest_path
+#retry_load_from_path
+pop $dest_path dest_file_name
 lib 'util.get_real_path' $dest_path dest_path
 let err_param $dest_path_str
 jeq $dest_path $nil print_error_invalid_path
-pop $dest_path dest_file_name
-lib 'os.get_file_type' $dest_path $dest_file_name dest_file_type
 
+lib 'os.get_file_type' $dest_path $dest_file_name dest_file_type
 jne $dest_file_type 'dir' copy_as_file
 / copy to dir
 psh $dest_path $dest_file_name
@@ -29,8 +30,14 @@ lib 'os.write_file' $dest_path $src_file_name $file_data
 jmp done
 
 #copy_as_file
+jeq $dest_file_type 'lnk' path_end_with_link
 lib 'os.write_file' $dest_path $dest_file_name $file_data
 jmp done
+
+#path_end_with_link
+psh $dest_path $dest_file_name
+lib 'util.get_real_path' $dest_path dest_path
+jmp retry_load_from_path
 
 #print_error_src_dir
 prt 'ERR ' ''
