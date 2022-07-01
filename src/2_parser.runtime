@@ -58,7 +58,9 @@ def parse_src
  let _cur_func_lbl {}
  for _line $_src
   / check label
+  #pull_first_char
   pol $_line _c1
+  jeq $_c1 ' ' pull_first_char
   ife $_c1 '#'
    ife $_cur_func_name 'global'
     put $_lbl $_line $_lc

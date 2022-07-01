@@ -25,7 +25,7 @@ for dir in ['programs', 'games']:
                 virtual_file.append(header)
                 row = f.readline()
                 while row:
-                    virtual_file.append(row.strip())
+                    virtual_file.append(row.rstrip())
                     row = f.readline()
             elif ext == 'link':
                 header = [\"lnk\", f.readline().strip()]
