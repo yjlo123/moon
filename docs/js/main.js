@@ -195,6 +195,8 @@
 					});
 				} else {
 					term.write(data.status+"\n\r");
+					loggingIn = 0;
+					return promptCallback("");
 				}
 			}).error(function(){
 				term.write("Login failed.\n\r");
