@@ -631,7 +631,7 @@
 				term.write('\x1b[C');
 			}
 			
-			if (val === '0') {
+			if (val === '0' || val === 0) {
 				term.write(' ');
 			} else if (val !== ''){
 				term.write('#');

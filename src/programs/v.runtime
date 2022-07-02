@@ -64,6 +64,7 @@ let max_ln $h
 sub line_max $w 4
 add line_max_1 $line_max 1
 let displayed_ln 0
+let wrap_ln 0
 
 #content_loop
 jeq $i $max_ln content_done
@@ -114,6 +115,7 @@ jmp line_loop
 #whole_line_done
 prt ''
 add displayed_ln $displayed_ln 1
+add wrap_ln $wrap_ln 1
 / ^^^ wrap done
 jmp content_loop
 
@@ -180,6 +182,7 @@ jne $key 70 not_forward
 / FORWARD: f
 jeq $reached_end 1 not_forward
 add top_ln $top_ln $h
+sub top_ln $top_ln $wrap_ln
 let key_pressed 1
 jmp continue
 #not_forward
