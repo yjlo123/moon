@@ -301,6 +301,20 @@
 		}
 	}
 
+	function moveCursorToInputLeftMost(pos) {
+		while (cursor > 0) {
+			cursor--;
+			term.write('\x1b[D');
+		}
+	}
+
+	function moveCursorToInputRightMost(pos) {
+		while (cursor < command.length) {
+			term.write('\x1b[C');
+			cursor++;
+		}
+	}
+
 	function parseCmdInput(str) {
 		let result = [];
 		let token = ''
@@ -530,6 +544,12 @@
 		switch (e) {
 		case '\u0003': // Ctrl+C
 			onCtrlC();
+			break;
+		case '\u0001': // Ctrl+A
+			moveCursorToInputLeftMost();
+			break;
+		case '\u0005': // Ctrl+E
+			moveCursorToInputRightMost();
 			break;
 		case '\r': // Enter
 			term.write('\n\r');
