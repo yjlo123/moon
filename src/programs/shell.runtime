@@ -1,4 +1,55 @@
 /a shell
-prt 'hello'
-lib 'os.execute' '/programs/cal'
-prt 'done'
+prt 'Runtime Shell v1.0 (beta)'
+prt 'Type <help> for more info, <exit> to quit'
+#main_loop
+prt '> ' ''
+inp raw_input
+
+let cmd ''
+let prog_name_done 0
+let prog_with_path 0
+#pre_process
+pol $raw_input c
+jeq $c '' pre_process_done
+jne $c ' ' continue
+jeq $cmd '' pre_process
+let prog_name_done 1
+#continue
+jne $c '/' push_char
+jeq $prog_name_done 1 push_char
+let prog_with_path 1
+#push_char
+psh $cmd $c
+jmp pre_process
+#pre_process_done
+
+#remove_trailing_space
+pop $cmd c
+jeq $c ' ' remove_trailing_space
+psh $cmd $c
+
+jeq $cmd '' main_loop
+jeq $cmd 'exit' exit
+jeq $cmd 'help' help
+
+jeq $prog_with_path 1 execute_prog
+add cmd '/programs/' $cmd
+#execute_prog
+lib 'os.execute' $cmd
+jmp main_loop
+
+#help
+prt 'Available programs:'
+let prog_path []
+psh $prog_path 'programs'
+lib 'os.get_file_list' $prog_path prog_list
+#print_prog_names_loop
+pol $prog_list prog_name
+jeq $prog_name $nil print_prog_names_done
+prt $prog_name ' '
+jmp print_prog_names_loop
+#print_prog_names_done
+prt ''
+jmp main_loop
+
+#exit

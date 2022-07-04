@@ -1,6 +1,7 @@
 let ctx_stack []
-let env {}
-let env_stack []
+let env {}       / global vars of current program
+let env_stack [] / func-scoped vars of current programs
+let frames []    / frame stack for all running programs
 let prt_delay 5
 let prt_delay_disabled 0
 let sig_interrupt 0
@@ -114,19 +115,19 @@ end
 def runtime
  let _src $0
  let _args $1
- / == stack frame ==
+ / == env frame ==
  let env {}               / global vars
  let env_stack []         / func env
+/ == end of frame ==
  let _pc_stack []         / func call pc stack
  let _func_name_stack []  / func name stack
- / == end of frame ==
- let runtime_running 1
- let key_press []
  let _p {}
  let _lbl {}       / global labels
  let _func_lbl {}  / function local labels
  let _funcs {}     / function name -> line map
  let _pc 0         / program counter
+ let runtime_running 1
+ let key_press []
  / read args
  let i 0
  ife $_args $nil
@@ -141,7 +142,7 @@ def runtime
 
  let sig_interrupt 0
  
- #eval
+ #eval_loop
  jeq $sig_interrupt 1 eval_done
  get $_p $_pc _line
  jeq $_line $nil eval_done
@@ -503,12 +504,18 @@ def runtime
   fin
   ife $_lib_name 'os.execute'
    cal eval_param $_line 2
-   let _file_path $ret
-   psh $env_stack $env
-   let env {}
-   / ...
-   pop $env_stack env
-   / ...
+   let _file_path_and_args_str $ret
+   / pack & push frame
+   let _frame []
+   psh $_frame $env
+   psh $_frame $env_stack
+   psh $frames $_frame
+   cal parse_input $_file_path_and_args_str
+   cal run $ret
+   / pop & unpack frame
+   pop $frames _frame
+   get $_frame 0 env
+   get $_frame 1 env_stack
   fin
   ife $_lib_name 'util.get_path_by_str'
    cal eval_param $_line 2
@@ -599,7 +606,7 @@ def runtime
  fin
 
  add _pc $_pc 1
- jmp eval
+ jmp eval_loop
  
  #eval_done
  let runtime_running 0
