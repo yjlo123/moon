@@ -38,7 +38,7 @@
 		brightWhite: '#FFFFFF'
 	};
 	let term = new Terminal({
-		fontFamily: '"Cascadia Code", Menlo, monospace',
+		fontFamily: 'monospace', /* "Cascadia Code", Menlo */
 		theme: baseTheme,
 		cursorBlink: true,
 		cols: TERM_COLS,
