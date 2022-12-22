@@ -15,12 +15,12 @@ def parse_line
  #parse_string
  let _q $_c
  / Due to eval, use % for recog str
- let _s '\'%'
+ let _s '%'
 
  #parse_string_char
  pol $_line _c
  ife $_c $_q
-  psh $_s $_q
+  / psh $_s $_q  / # the final quote
   psh $_tokens $_s
   jmp next_token
  els

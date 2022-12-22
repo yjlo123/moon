@@ -18,13 +18,16 @@ def expr
  ret $_i
  #continue
  ife $_expr '[]'
+  / 1. empty list
   ret []
  fin
  ife $_expr '{}'
+  / 2. empty map
   ret {}
  fin
  pol $_expr _c1
  ife $_c1 '$'
+  / 3. variable reference
   ife $_expr 'lastkey'
    pol $key_press _key
    ret $_key
@@ -35,8 +38,10 @@ def expr
  fin
  / str is parsed as %str, due to conflict with single quote
  ife $_c1 '%'
+  / 4. string
   ret $_expr
  fin
+ 
  ret $_original
 end
 
