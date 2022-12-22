@@ -14,7 +14,7 @@
 	const API_FILES_SAVE= API_AUTH_HOST + "/api/fs/save"
 
 	const TERM_COLS = 51;
-	const TERM_ROWS = 20;
+	const TERM_ROWS = 19;
 
 	let baseTheme = {
 		foreground: '#F8F8F8',
@@ -38,8 +38,9 @@
 		brightWhite: '#FFFFFF'
 	};
 	let term = new Terminal({
-		fontFamily: '"Source Code Pro", Ubuntu Mono, courier-new, courier, monospace', /* "Cascadia Code", Menlo, monospace */
+		fontFamily: '"Cascadia Code", Menlo, monospace', /* Ubuntu Mono, courier-new, courier, monospace', "Cascadia Code", Menlo, monospace */
 		fontSize: 16,
+		lineHeight: 1,
 		theme: baseTheme,
 		cursorBlink: true,
 		cols: TERM_COLS,

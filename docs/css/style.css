@@ -47,6 +47,10 @@ body {
     border-radius: 20px;
 }
 
+#terminal {
+    height: 360px;
+}
+
 .monitor-shell {
     position: relative;
     margin: auto;
