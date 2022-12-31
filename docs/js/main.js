@@ -448,7 +448,7 @@
 		if (env.global.runtime_running === 1) {
 			env.global.sig_interrupt = 1;
 			env.global.prt_delay_disabled = 0;
-			env.global.runtime_running = 0;
+			//env.global.runtime_running = 0;
 		}
 		promptCallback("");
 	}

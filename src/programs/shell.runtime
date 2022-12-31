@@ -1,7 +1,12 @@
 /a shell
 prt 'Runtime Shell v1.0 (beta)'
 prt 'Type <help> for more info, <exit> to quit'
+
+rnd sid 1000 9999
+
 #main_loop
+prt '[' ''
+prt $sid ']'
 prt '> ' ''
 inp raw_input
 

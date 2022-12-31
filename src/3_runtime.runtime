@@ -1,4 +1,7 @@
-let ctx_stack []
+/ *****************************
+/ * A Runtime Script Intepreter
+/ *****************************
+
 let env {}       / global vars of current program
 let env_stack [] / func-scoped vars of current programs
 let frames []    / frame stack for all running programs
@@ -51,6 +54,19 @@ def eval_param
  get $_line $_idx _val
  cal expr $_val
  ret $ret
+end
+
+def push_frame
+ let _frame []
+ psh $_frame $env
+ psh $_frame $env_stack
+ psh $frames $_frame
+end
+
+def pop_frame
+ pop $frames _frame
+ get $_frame 0 env
+ get $_frame 1 env_stack
 end
 
 def add_var_to_env
@@ -511,16 +527,11 @@ def runtime
    cal eval_param $_line 2
    let _file_path_and_args_str $ret
    / pack & push frame
-   let _frame []
-   psh $_frame $env
-   psh $_frame $env_stack
-   psh $frames $_frame
+   cal push_frame
    cal parse_input $_file_path_and_args_str
    cal run $ret
    / pop & unpack frame
-   pop $frames _frame
-   get $_frame 0 env
-   get $_frame 1 env_stack
+   cal pop_frame
   fin
   ife $_lib_name 'util.get_path_by_str'
    cal eval_param $_line 2
@@ -614,5 +625,9 @@ def runtime
  jmp eval_loop
  
  #eval_done
- let runtime_running 0
+ let sig_interrupt 0
+ ife $frames []
+  / frame stack is empty
+  let runtime_running 0
+ fin
 end
