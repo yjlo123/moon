@@ -488,10 +488,12 @@
 	function sendKeyEventToEnv(keyCode) {
 		let env = runtime.getEnv(false);
 		if (env.global.runtime_running === 1) {
+			// key press captured by runtime program
 			env.global.key_press.push(keyCode);
 			env.global.key_press = env.global.key_press.slice(0,5);
 			return true;
 		}
+		// key press can be processed by terminal
 		return false;
 	}
 

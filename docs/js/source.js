@@ -1,7 +1,7 @@
-/* Built on Sat Dec 31 16:56:12 EST 2022 */
+/* Built on Sun Jan  1 16:47:09 EST 2023 */
 let moonSrc = `
 let os_name 'Moon OS'
-let os_ver '1.19'
+let os_ver '1.20'
 let os_build 'N/A'
 
 let init_cmd '/programs/motd'
@@ -50,7 +50,7 @@ def load_extra_files
  nxt
 end
 cal load_extra_files
-let os_build '221231.1656'
+let os_build '230101.1647'
 
 / ====== parsing runtime program ======
 def parse_line
@@ -821,7 +821,8 @@ def runtime
  
  #eval_done
  let sig_interrupt 0
- ife $frames []
+ len $frames _num_frames
+ ife $_num_frames 0
   / frame stack is empty
   let runtime_running 0
  fin

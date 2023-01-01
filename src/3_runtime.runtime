@@ -626,7 +626,8 @@ def runtime
  
  #eval_done
  let sig_interrupt 0
- ife $frames []
+ len $frames _num_frames
+ ife $_num_frames 0
   / frame stack is empty
   let runtime_running 0
  fin
