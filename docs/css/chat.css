@@ -1,0 +1,40 @@
+
+.chat-view {
+    overflow: hidden;
+    border-radius: 10px 10px 0 0;
+    text-align: left;
+    position: fixed;
+    height: 400px;
+    width: 300px;
+    bottom: 0;
+    right: 50px;
+    background-color: #555;
+    border: 2px solid #444;
+    z-index: 100;
+}
+
+.chat-collapsed {
+    bottom: -370px;
+}
+
+.chat-header {
+    top: 0;
+    height: 30px;
+    width: 300px;
+    background-color: #333;
+    border-bottom: 2px solid #444;
+}
+
+#chat-console {
+    position: relative;
+    height: calc(100% - 30px);
+}
+
+#chat-btn {
+    float: right;
+    margin: 7px;
+    width: 16px;
+    height: 16px;
+    background-color: #888;
+    cursor: pointer;
+}

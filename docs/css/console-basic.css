@@ -1,0 +1,128 @@
+body {
+    background: #444;
+}
+
+.wrapper {
+    text-align: center;
+    width: 500px;
+    margin: auto;
+}
+
+.console-view {
+    margin: auto;
+    height: 362px;
+    padding: 12px;
+    text-align: left;
+    background-color: #1a1a1a;
+    border: 10px solid #444;
+    overflow: hidden;
+}
+
+.terminal-view {
+    margin: auto;
+    height: 362px;
+    padding: 17px;
+    text-align: left;
+    background-color: #2D2E2C;
+    border: 0 solid #444;
+    overflow: hidden;
+}
+
+#terminal {
+    height: 360px;
+}
+
+.monitor-shell {
+    position: relative;
+    margin: auto;
+    width: 500px;
+    padding: 0 0 10px 0;
+    background-color: #444;
+}
+
+.monitor-led {
+    width: 100%;
+    position: absolute;
+    overflow: hidden;
+}
+
+.monitor-led div{
+    width: 20px;
+    height: 8px;
+    float: right;
+    margin: 1px 0 0 2px;
+    /* background-color: rgb(129, 129, 129); */
+    background-color: #444;
+}
+
+.keypad {
+    margin: 5px 0;
+    /* background-color: #bbb; */
+    border-radius: 5px;;
+}
+
+.keyrow {
+    overflow: hidden;
+}
+
+.key {
+    display: inline-block;
+    padding: 3px 10px;
+    color: #bbb;
+    border: 1px solid #666;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+@media(hover: hover) {
+    .key:hover {
+        background-color: rgb(100, 100, 100);
+    }
+}
+
+.key.left {
+    float: left;
+    margin-right: 8px;
+}
+
+.key.right {
+    float: right;
+    margin-left: 8px;
+}
+
+.key.arrow {
+    width: 15px;
+}
+
+.app-info p {
+    margin: 2px;
+    color: #bbb;
+}
+
+.app-info a {
+    color: #ddd;
+}
+
+#console {
+    width: 450px;
+    height: 361px;
+    padding-right: 10px;
+    overflow: hidden;
+}
+
+.app-info {
+    width: 500px;
+    overflow: hidden;
+    margin: auto;
+    font-size: 14px;
+}
+
+footer {
+    color: #bbb;
+}
+
+footer a {
+    color: #ddd;
+}

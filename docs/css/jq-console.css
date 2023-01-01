@@ -1,0 +1,34 @@
+
+.jqconsole {
+    padding: 0;
+}
+
+/* The current prompt text color */
+.jqconsole-prompt {
+    color: #ddd;
+    background: none;
+}
+
+/* The command history */
+.jqconsole-old-prompt {
+	color: #ddd;
+    font-weight: normal;
+    background: none;
+}
+/* The text color when in input mode. */
+.jqconsole-input {
+	color: #ccc;
+    font-weight: normal;
+    background: none;
+	padding-left: 2px;
+}
+/* Previously entered input. */
+.jqconsole-old-input {
+	color: #bbb;
+	font-weight: normal;
+	background: none;
+	padding-left: 2px;
+}
+.console-default {
+    color: #ddd;
+}

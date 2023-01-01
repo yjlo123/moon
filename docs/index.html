@@ -16,7 +16,16 @@
 
 	<link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
 	<link rel="stylesheet" href="css/style.css"/>
+	<link rel="stylesheet" href="css/console-simple.css" id="theme-style-link"/>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+	<script>
+		function onChangeTheme(id) {
+			let theme = document.getElementById('theme-style-link');
+			theme.setAttribute('href', 'css/console-' + id + '.css');
+
+		}
+	</script>
 </head>
 
 <body>
@@ -31,6 +40,7 @@
 			</div>
 			<div class="monitor-led">
 				<div></div><div></div><div></div>
+				<div style="display: none; /* always off */"></div>
 			</div>
 		</div>
 
@@ -51,8 +61,12 @@
 			<p><a href="manual.txt" target="_blank">Manual</a> for Runtime Script on Moon OS</p>
 			<p>Powered by <a href="https://github.com/yjlo123/runtime-script" target="_blank">Runtime Script</a>.</p>
 			<p>View source code <a href="https://raw.githubusercontent.com/yjlo123/moon/master/dist/program.runtime" target="_blank">here</a>.</p>
-			<p>Switch to <a href="index_legacy.html">legacy terminal</a>.</p>
-			<p>View in <a href="https://github.com/yjlo123/moon" target="_blank">GitHub</a>.</p>
+			<!-- <p>Switch to <a href="index_legacy.html">legacy terminal</a>.</p> -->
+			<p>View on <a href="https://github.com/yjlo123/moon" target="_blank">GitHub</a>.</p>
+			<p>Themes: 
+				<a href="#" onclick="onChangeTheme('simple')">Simple</a>
+				<a href="#" onclick="onChangeTheme('basic')">Basic</a>
+			</p>
 			<!-- <p>Download binary: <a href="dist/Moon_macOS.zip" target="_blank">macOS</a> <a href="dist/Moon_win.zip" target="_blank">Windows</a>.</p> -->
 		</div>
 		<footer>

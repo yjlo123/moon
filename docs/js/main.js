@@ -608,11 +608,11 @@
 		let devLed = env.global.root.dev.led;
 		leds[0] = parseInt(devLed) === 1 ? 1 : 0;
 		for (let i = 0; i < 3; i++) {
-			let color = "rgb(129, 129, 129)"
+			let color = $(`.monitor-led div:nth-child(4)`).css("background");
 			if (leds[i] === 1) {
 				color = "#eee";
 			}
-			$(`.monitor-led div:nth-child(${i+1})`).css( "background", color);
+			$(`.monitor-led div:nth-child(${i+1})`).css("background", color);
 		}
 	}, 1000);
 
@@ -668,4 +668,5 @@
 		term_w: TERM_COLS,
 		term_h: TERM_ROWS
 	}, moonSrc);
+	
 })();
