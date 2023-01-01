@@ -69,6 +69,7 @@
     float: left;
     margin: 10px 12px;
     background-color: rgb(129, 129, 129);
+    transition: background-color 0.2s ease;
 }
 
 .keypad {
