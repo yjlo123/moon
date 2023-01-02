@@ -1,0 +1,13 @@
+/ set environment variables
+let expr $0
+
+let var_name ''
+
+#loop
+pol $expr c
+jeq $c '=' done_split
+add var_name $var_name $c
+jmp loop
+#done_split
+
+lib 'os.set_env_var' $var_name $expr

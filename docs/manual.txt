@@ -1,4 +1,4 @@
-== Supported Runtime Script commands in Moon OS
+## Supported Runtime Script commands in Moon OS
 prt, let, slp, inp, rnd
 add, sub, mul, div, mod
 jmp, jeq, jne, jgt, jlt
@@ -6,9 +6,9 @@ int, str, typ, tim
 len, pol, pop, psh, put, get
 clr, drw, pxl
 def, end, ret, cal
+ife, ifg, els, fin
 
 ~ not supported:
-ife, ifg, els, fin
 for, nxt
 key, del
 prs, lod, sav
@@ -17,7 +17,8 @@ prs, lod, sav
 led V
 lib <API> [$V*] [N?]
 
-~lib APIs:
+
+## Moon OS lib APIs
 os.get_home_path (path)
 os.get_current_path (path)
 os.set_current_path ($path)
@@ -29,10 +30,15 @@ os.read_file ($path, $name, content)
 os.write_file ($path, $name, $content)
 os.get_os_info (info)
 os.get_sys_info (info)
+os.get_env_var ($name, name)
+os.set_env_var ($var_name, $var_val)
+
 util.get_path_by_str ($path_str, $is_file, $skip_verify, path)
 util.get_real_path ($path, path)
 util.verify_path ($path, $is_file, is_valid)
+
 dev.set_led ($val)
+
 term.prev_line
 term.clear_line
 term.reverse
@@ -43,6 +49,7 @@ term.get_width (width)
 term.get_height (height)
 term.move_cursor ($dx, $dy)
 
-== Runtime Script resources
+
+## Runtime Script resources
 Tutorial: https://siwei.dev/doc/runtime/
 Cheatsheet: https://siwei.dev/doc/RuntimeScriptCheatSheet.pdf

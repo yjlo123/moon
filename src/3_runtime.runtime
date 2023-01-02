@@ -132,6 +132,58 @@ def look_up_lbl
  fin
 end
 
+def goto_if_end
+ let _p $0
+ let _pc $1
+ let _stack 0
+ #loop
+ get $_p $_pc _line
+ jeq $_line $nil done
+ get $_line 0 _cmd
+ jeq $_cmd 'ife' add_stack
+ jeq $_cmd 'ifg' add_stack
+ jmp continue
+ #add_stack
+ add _stack $_stack 1
+ #continue
+ ife $_cmd 'fin'
+  jeq $_stack 0 done
+  sub _stack $_stack 1
+ fin
+ add _pc $_pc 1
+ jmp loop
+ #done
+ ret $_pc
+end
+
+def goto_if_false
+ let _p $0
+ let _pc $1
+ add _pc $_pc 1  / first 'ife/ifg'
+ let _stack 0
+ #loop
+ get $_p $_pc _line
+ jeq $_line $nil done
+ get $_line 0 _cmd
+ jeq $_cmd 'ife' add_stack
+ jeq $_cmd 'ifg' add_stack
+ jmp continue
+ #add_stack
+ add _stack $_stack 1
+ #continue
+ ife $_cmd 'fin'
+  jeq $_stack 0 done
+  sub _stack $_stack 1
+ fin
+ ife $_cmd 'els'
+  jeq $_stack 0 done
+ fin
+ add _pc $_pc 1
+ jmp loop
+ #done
+ ret $_pc
+end
+
 / ** main eval **
 def runtime
  let _src $0
@@ -393,6 +445,32 @@ def runtime
   get $_list $_key _val
   cal add_var_to_env $_var $_val
  fin
+ ife $_cmd 'ife'
+  cal eval_param $_line 1
+  let _v1 $ret
+  cal eval_param $_line 2
+  let _v2 $ret
+  jeq $_v1 $_v2 continue_if_true
+   cal goto_if_false $_p $_pc
+   let _pc $ret
+  #continue_if_true
+ fin
+ ife $_cmd 'ifg'
+  cal eval_param $_line 1
+  let _v1 $ret
+  cal eval_param $_line 2
+  let _v2 $ret
+  jgt $_v1 $_v2 continue_if_true
+   cal goto_if_false $_p $_pc
+   let _pc $ret
+  #continue_if_true
+ fin
+ ife $_cmd 'els'
+  cal goto_if_end $_p $_pc
+  let _pc $ret
+ fin
+ ife $_cmd 'fin'
+ fin
 
  / ** function commands **
  ife $_cmd 'end'
@@ -532,6 +610,24 @@ def runtime
    cal run $ret
    / pop & unpack frame
    cal pop_frame
+  fin
+  ife $_lib_name 'os.get_env_var'
+   cal eval_param $_line 2
+   let _file_name $ret
+   let _file_path []
+   psh $_file_path 'env'
+   get $_line 3 _name
+   cal lib_read_file $_file_path $_file_name
+   cal add_var_to_env $_name $ret
+  fin
+  ife $_lib_name 'os.set_env_var'
+   cal eval_param $_line 2
+   let _var_name $ret
+   cal eval_param $_line 3
+   let _var_val $ret
+   let _file_path []
+   psh $_file_path 'env'
+   cal lib_write_file $_file_path $_var_name $_var_val
   fin
   ife $_lib_name 'util.get_path_by_str'
    cal eval_param $_line 2
