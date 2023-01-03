@@ -18,7 +18,7 @@ end
 
 def rand_string
  let _s ''
- rnd _l 6 $h
+ rnd _l 4 $h
  let _i 0
  #loop
  jeq $_i $_l done
