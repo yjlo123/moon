@@ -1,0 +1,145 @@
+/ simulates the code rain from \"The Matrix\"
+
+lib 'term.get_height' h
+lib 'term.get_width' w
+jeq $h $nil err_term_not_supported
+sub h $h 1
+lib 'term.set_prt_delay' 0
+
+let str_pool 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890+-<>?[]{}@#$%&'
+
+def rand_char
+ len $str_pool _pl
+ sub _pl $_pl 1
+ rnd _idx 0 $_pl
+ get $str_pool $_idx _c
+ ret $_c
+end
+
+def rand_string
+ let _s ''
+ rnd _l 6 $h
+ let _i 0
+ #loop
+ jeq $_i $_l done
+ cal rand_char
+ add _s $_s $ret
+ add _i $_i 1
+ jmp loop
+ #done
+ ret $_s
+end
+
+let offsets []
+let cols []
+
+def init
+ let _i 0
+ #loop
+  jeq $_i $w done
+  rnd _offset 0 $h
+  psh $offsets $_offset
+  cal rand_string
+  psh $cols $ret
+  add _i $_i 1
+ jmp loop
+ #done
+end
+
+def update
+ let _i 0
+ #loop
+  jeq $_i $w done
+  pol $offsets _offset
+  pol $cols _col
+  / update offset
+  add _offset $_offset 1
+  ife $_offset $h
+   / new column string
+   cal rand_string
+   let _new_col $ret
+   len $_new_col _len
+   sub _offset 0 $_len
+   psh $offsets $_offset
+   psh $cols $_new_col
+  els
+   psh $offsets $_offset
+   / update column string
+   pol $_col _
+   cal rand_char
+   psh $_col $ret
+   psh $cols $_col
+  fin
+  add _i $_i 1
+ jmp loop
+ #done
+end
+
+def clear
+ let _i 0
+ lib 'term.clear_line'
+ #clear_loop
+  jeq $_i $h done
+  lib 'term.prev_line'
+  lib 'term.clear_line'
+  add _i $_i 1
+ jmp clear_loop
+ #done
+end
+
+def display
+ let _i 0
+ #loop_row
+  jeq $_i $h done
+  let _line ''
+  let _j 0
+  #loop_col
+   jeq $_j $w line_done
+   get $offsets $_j _offset
+   jlt $_i $_offset add_space
+   get $cols $_j _col
+   len $_col _col_len
+   sub _k $_i $_offset
+   jeq $_k $_col_len add_space
+   jgt $_k $_col_len add_space
+   get $_col $_k _c
+   add _line $_line $_c
+   jmp continue_col
+   #add_space
+   add _line $_line ' '
+   #continue_col
+   add _j $_j 1
+  jmp loop_col
+  #line_done
+  prt $_line
+  add _i $_i 1
+ jmp loop_row
+ #done
+end
+
+/ -- main --
+cal init
+let clock 0
+#loop
+ cal display
+ prt 'Frame count: ' ''
+ prt $clock ''
+ slp 10
+ cal update
+ cal clear
+ let key $lastkey
+ jeq $key 81 exit  / q
+ add clock $clock 1
+jmp loop
+/ -- end of main --
+
+#exit
+cal clear
+lib 'term.set_prt_delay' 1
+jmp end
+
+#err_term_not_supported
+prt 'ERR Your terminal is not supported'
+jmp end
+
+#end
