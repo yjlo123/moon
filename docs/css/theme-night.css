@@ -26,6 +26,13 @@ body {
     overflow: hidden;
 }
 
+#console {
+    width: 450px;
+    height: 361px;
+    padding-right: 10px;
+    overflow: hidden;
+}
+
 .terminal-view {
     margin: auto;
     height: 362px;
@@ -47,18 +54,15 @@ body {
     background-color: #444;
 }
 
-#console {
-    width: 450px;
-    height: 361px;
-    padding-right: 10px;
-    overflow: hidden;
+.keypad {
+    display: none;
 }
 
 .app-info {
     width: 500px;
     overflow: hidden;
     margin: auto;
-    margin-top: 127px;
+    margin-top: 260px;
     font-size: 14px;
 }
 
