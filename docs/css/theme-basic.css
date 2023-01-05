@@ -18,6 +18,13 @@ body {
     overflow: hidden;
 }
 
+#console {
+    width: 450px;
+    height: 361px;
+    padding-right: 10px;
+    overflow: hidden;
+}
+
 .terminal-view {
     margin: auto;
     height: 362px;
@@ -96,6 +103,13 @@ body {
     width: 15px;
 }
 
+.app-info {
+    width: 500px;
+    overflow: hidden;
+    margin: auto;
+    font-size: 14px;
+}
+
 .app-info p {
     margin: 2px;
     color: #bbb;
@@ -103,20 +117,6 @@ body {
 
 .app-info a {
     color: #ddd;
-}
-
-#console {
-    width: 450px;
-    height: 361px;
-    padding-right: 10px;
-    overflow: hidden;
-}
-
-.app-info {
-    width: 500px;
-    overflow: hidden;
-    margin: auto;
-    font-size: 14px;
 }
 
 footer {

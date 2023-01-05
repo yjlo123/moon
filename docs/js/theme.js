@@ -1,6 +1,6 @@
 function onChangeTheme(id) {
     let theme = document.getElementById('theme-style-link');
-    theme.setAttribute('href', 'css/console-' + id + '.css');
+    theme.setAttribute('href', 'css/theme-' + id + '.css');
     let savedTheme = localStorage.getItem('theme');
     if (savedTheme !== id) {
         localStorage.setItem('theme', id);
