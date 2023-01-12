@@ -133,6 +133,10 @@ def lib_screen_clear_line
  prt '\\033[2K'
 end
 
+def lib_screen_clear_screen
+ prt '\\033[2H'
+end
+
 def lib_screen_reverse
  prt '\\u001b[7m' ''
 end
@@ -175,6 +179,14 @@ end
 
 def lib_screen_right_arrow
  prt '\\x1b[C'
+end
+
+def lib_screen_alternate_buffer
+ prt '\\x9B?47h'
+end
+
+def lib_screen_primary_buffer
+ prt '\\x9B?47l'
 end
 
 def lib_set_prt_delay

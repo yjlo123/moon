@@ -662,8 +662,17 @@ def runtime
   ife $_lib_name 'term.clear_line'
    cal lib_screen_clear_line
   fin
+  ife $_lib_name 'term.clear_screen'
+   cal lib_screen_clear_screen
+  fin
   ife $_lib_name 'term.reverse'
    cal lib_screen_reverse
+  fin
+  ife $_lib_name 'term.alternate_buffer'
+   cal lib_screen_alternate_buffer
+  fin
+  ife $_lib_name 'term.primary_buffer'
+   cal lib_screen_primary_buffer
   fin
   ife $_lib_name 'term.color_print'
    cal eval_param $_line 2

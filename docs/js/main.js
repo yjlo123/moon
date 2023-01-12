@@ -79,12 +79,24 @@
 					// clear line
 					term.write('\033[2K');
 					return;
+				} else if (lineContent === '\\033[2H') {
+					// clear screen
+					term.write('\033[2H\033[F');
+					return;
 				} else if (lineContent === '\\u001b[7m') {
 					// reverse
 					term.write('\u001b[7m');
 					return;
 				} else if (lineContent.startsWith('\u001b[38;5;')) {
 					term.write('\u001b[38;5;87m');
+				} else if (lineContent === "\\x9B?47h") {
+					// alternate buffer
+					term.write('\x9B?1049h');
+					return;
+				} else if (lineContent === "\\x9B?47l") {
+					// primary buffer
+					term.write('\x9B?1049l');
+					return;
 				}
 			}
 			// text = text.replaceAll('[x1b', '\x1b');

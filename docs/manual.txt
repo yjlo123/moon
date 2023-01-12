@@ -41,8 +41,11 @@ dev.set_led ($val)
 
 term.prev_line
 term.clear_line
+term.clear_screen
 term.reverse
 term.reset
+term.alternate_buffer
+term.primary_buffer
 term.color_print ($text, $fg_color, $bg_color)
 term.set_prt_delay ($enable)
 term.get_width (width)
