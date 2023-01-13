@@ -23,6 +23,7 @@ body {
     text-align: left;
     background-color: #1a1a1a;
     border: 10px solid #444;
+    border-radius: 5px;
     overflow: hidden;
 }
 
@@ -38,13 +39,15 @@ body {
     height: 362px;
     padding: 17px;
     text-align: left;
-    background-color: #2D2E2C;
+    background-color: #1f1f1e;
     border: 0 solid #444;
     overflow: hidden;
 }
 
 #terminal {
     height: 360px;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 .monitor-shell {

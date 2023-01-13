@@ -210,26 +210,28 @@ jmp loop
 
 #print_usage
 prt 'USAGE v file'
-jmp done
+jmp exit
 
 #err_term_not_supported
 prt 'ERR Your current terminal is not supported'
-jmp done
+jmp exit
 
 #print_error_invalid_file
 prt 'ERR No such file'
-jmp done
+jmp exit
 
 #print_error_directory
 prt 'ERR \"' ''
 prt $file_name ''
 prt '\" is a directory'
-jmp done
+jmp exit
 
 #unsupported_file_type
 prt 'ERR Unsupported file type'
-jmp done
+jmp exit
 
 #done
-lib 'term.set_prt_delay' 1
 lib 'term.primary_buffer'
+
+#exit
+lib 'term.set_prt_delay' 1
