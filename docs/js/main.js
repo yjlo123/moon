@@ -81,7 +81,8 @@
 					return;
 				} else if (lineContent === '\\033[2H') {
 					// clear screen
-					term.write('\033[2H\033[F');
+					//term.write('\033[2H\033[F');
+					term.clear();
 					return;
 				} else if (lineContent === '\\u001b[7m') {
 					// reverse

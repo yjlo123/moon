@@ -45,16 +45,16 @@ lib 'term.set_prt_delay' 0
 lib 'term.alternate_buffer'
 
 def clear
-/  let i 0
-/  #clear_loop
-/  jeq $i $h clear_done
-/  lib 'term.clear_line'
-/  lib 'term.prev_line'
-/  add i $i 1
-/  jmp clear_loop
-/  #clear_done
-/  lib 'term.clear_line'
- lib 'term.clear_screen'
+ let i 0
+ #clear_loop
+ jeq $i $h clear_done
+ lib 'term.clear_line'
+ lib 'term.prev_line'
+ add i $i 1
+ jmp clear_loop
+ #clear_done
+ lib 'term.clear_line'
+ / lib 'term.clear_screen'
 end
 
 let top_ln 1
