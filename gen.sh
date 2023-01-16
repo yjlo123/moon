@@ -35,7 +35,9 @@ text = json.dumps(f_json)
 text = text.replace(\"'\", \"\\\\'\")
 print(text, end = '')
 f.close()" >> $files_extra
-sed -i '' 's/\\u/\\\\u/g' $files_extra
+
+sed -i'' 's/\\u/\\\\u/g' $files_extra
+
 echo "'
  for _d \$_fs
   get \$_fs \$_d _content
@@ -66,9 +68,14 @@ echo '`' >> $source_js
 # sed -i '' 's/\\\\\\u/\u/g' $source_js
 
 # on Linux
-sed -i'' 's/\\/\\\\/g' $source_js
-sed -i'' 's/\\\\\\\\u/\\u/g' $source_js
-sed -i'' 's/\\\\u/\\u/g' $source_js
+# SEDOPTION=
+# if [[ "$OSTYPE" == "darwin"* ]]; then
+#   SEDOPTION="-i ''"
+# fi
+
+sed -i''  's/\\/\\\\/g' $source_js
+sed -i''  's/\\\\\\\\u/\\u/g' $source_js
+sed -i''  's/\\\\u/\\u/g' $source_js
 
 cp $source_js ./docs/js/source.js
 rm $source_js

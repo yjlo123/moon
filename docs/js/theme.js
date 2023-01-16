@@ -11,5 +11,8 @@ function onChangeTheme(id) {
     let savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
         onChangeTheme(savedTheme);
+    } else {
+        // default theme
+        onChangeTheme('simple');
     }
 }());
