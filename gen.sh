@@ -36,7 +36,13 @@ text = text.replace(\"'\", \"\\\\'\")
 print(text, end = '')
 f.close()" >> $files_extra
 
-sed -i'' 's/\\u/\\\\u/g' $files_extra
+if [ "$(uname -s)" = "Darwin" ]; then
+    # on Mac
+    sed -i '' 's/\\u/\\\\u/g' $files_extra
+else
+    # on Linux
+    sed -i'' 's/\\u/\\\\u/g' $files_extra
+fi
 
 echo "'
  for _d \$_fs
@@ -63,19 +69,20 @@ echo 'let moonSrc = `' >> $source_js
 cat $dist_program >> $source_js
 echo '`' >> $source_js
 
-# on Mac
-# sed -i '' 's/\\/\\\\/g' $source_js
-# sed -i '' 's/\\\\\\u/\u/g' $source_js
-
-# on Linux
-# SEDOPTION=
-# if [[ "$OSTYPE" == "darwin"* ]]; then
-#   SEDOPTION="-i ''"
-# fi
-
-sed -i''  's/\\/\\\\/g' $source_js
-sed -i''  's/\\\\\\\\u/\\u/g' $source_js
-sed -i''  's/\\\\u/\\u/g' $source_js
+if [ "$(uname -s)" = "Darwin" ]; then
+    # on Mac
+    sed -i '' 's/\\/\\\\/g' $source_js
+    sed -i '' 's/\\\\\\u/\u/g' $source_js
+else
+    # on Linux
+    # SEDOPTION=
+    # if [[ "$OSTYPE" == "darwin"* ]]; then
+    #   SEDOPTION="-i ''"
+    # fi
+    sed -i''  's/\\/\\\\/g' $source_js
+    sed -i''  's/\\\\\\\\u/\\u/g' $source_js
+    sed -i''  's/\\\\u/\\u/g' $source_js
+fi
 
 cp $source_js ./docs/js/source.js
 rm $source_js
