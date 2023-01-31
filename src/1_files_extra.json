@@ -76,6 +76,15 @@
             },
             "games": [
                 ["lnk", "/games"]
+            ],
+            "script": [
+                ["bat"],
+                "echo Hi $user",
+                "echo '============'",
+                "echo 'Your current working directory:'",
+                "pwd",
+                "echo 'Current date:'",
+                "date"
             ]
         }
     },

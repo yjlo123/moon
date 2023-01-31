@@ -14,6 +14,7 @@ lib 'os.get_file_type' $path $file_name file_type
 jeq $file_type 'raw' raw_file
 jeq $file_type 'txt' txt_file
 jeq $file_type 'exe' exe_file
+jeq $file_type 'bat' exe_file
 jeq $file_type 'dir' print_error_directory
 typ data_type $file_content
 jeq $data_type 'list' list_file
@@ -47,8 +48,8 @@ jeq $file_len 0 done
 jeq $i $file_len done
 get $file_content $i line
 /replace_char_in_str $line '\n' '\\n'
-prt $i ''
-prt ' |' ''
+/ prt $i ''
+/ prt ' |' ''
 prt $line
 add i $i 1
 jmp print_exe_loop

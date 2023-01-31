@@ -3,14 +3,14 @@ prt, let, slp, inp, rnd
 add, sub, mul, div, mod
 jmp, jeq, jne, jgt, jlt
 int, str, typ, tim
-len, pol, pop, psh, put, get
+len, pol, pop, psh
+put, get, key, del
 clr, drw, pxl
 def, end, ret, cal
 ife, ifg, els, fin
 
 ~ not supported:
 for, nxt
-key, del
 prs, lod, sav
 
 ~ only in Moon OS:

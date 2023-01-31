@@ -18,6 +18,7 @@ lib 'os.get_file_type' $path $file_name file_type
 /jeq $file_type 'raw' raw_file
 jeq $file_type 'txt' txt_file
 jeq $file_type 'exe' exe_file
+jeq $file_type 'bat' exe_file
 jeq $file_type 'dir' print_error_directory
 typ data_type $file_content
 jeq $data_type 'list' list_file

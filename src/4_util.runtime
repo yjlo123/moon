@@ -81,6 +81,14 @@ def get_home_path
  ret $_home_path
 end
 
+def get_env_path
+ cal split_str $env_path '/'
+ cal get_by_path $ret
+ let _env_path_str $ret
+ cal get_path_by_str $_env_path_str
+ ret $ret
+end
+
 def get_current_path_str
  let _path '/'
  for _d $path
@@ -281,9 +289,11 @@ def check_executable
  typ file_type $_file
  ife $file_type 'list'
   cal get_list_type $_file
-  ife $ret 'exe'
-   ret 1
-  fin
+  jeq $ret 'exe' is_executable
+  jeq $ret 'bat' is_executable
+  ret 0
+  #is_executable
+  ret 1
  fin
  ret 0
 end

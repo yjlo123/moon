@@ -4,21 +4,29 @@ def main
 
  jeq $0 $nil repl_loop
  / continue with init program
- let in $0
- jmp continue_parse_input
+ let _in $0
+ jmp parse_and_execute
 
  #repl_loop
- cal get_prompt_str
- prt $ret ''
- inp in
- #continue_parse_input
- cal parse_input $in
+  cal get_prompt_str
+  prt $ret ''
+  inp _in
+  #parse_and_execute
+  cal execute_cmd $_in
+  jeq $ret 0 exit_on_0
+ jmp repl_loop
+ #exit_on_0
+ prt '>> Session ended <<'
+end
+
+def execute_cmd
+ cal parse_input $0
  let tokens $ret
  #exec_tokens
  pol $tokens cmd
 
  jeq $cmd 'exit' exit
- jeq $cmd $nil repl_loop
+ jeq $cmd $nil continue
 
  / -- RUN EXE --
  len $cmd cmd_len
@@ -35,7 +43,7 @@ def main
    psh $_tokens $_t
   nxt
   cal run $_tokens
-  jmp repl_loop
+  jmp continue
  fin
 
  / -- EDIT --
@@ -48,7 +56,7 @@ def main
  ife $cmd 'save'
   sav 'moon.sav' $root
   prt '[Saved]'
-  jmp repl_loop
+  jmp continue
  fin
 
  / -- LOAD --
@@ -60,12 +68,12 @@ def main
    let root $loaded_data
    prt '[Loaded]'
   fin
-  jmp repl_loop
+  jmp continue
  fin
 
  / -- (EMPTY) --
  ife $cmd $nil
-  jmp repl_loop
+  jmp continue
  fin
 
  / -- (ENV PROGRAM) --
@@ -103,10 +111,13 @@ def main
  / -- (INVALID) --
  add err_msg 'Unknown command: ' $cmd
  cal print_error $err_msg
- jmp repl_loop
+ jmp continue
+
+ #continue
+ ret 1
 
  #exit
- prt '>> Session ended <<'
+ ret 0
 end
 
 cal main $init_cmd

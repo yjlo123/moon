@@ -35,6 +35,8 @@ def run
  els
   cal check_executable $_file_content
   ife $ret 1
+   get $_file_content 0 _meta_data
+   get $_meta_data 0 _file_type
    let _exe []
    len $_file_content _length
    sub _length $_length 1   / skip frist meta line
@@ -43,7 +45,13 @@ def run
     get $_file_content $_j _line
     psh $_exe $_line
    nxt
-   cal runtime $_exe $_tokens
+   ife $_file_type 'exe'
+    / exe
+    cal runtime $_exe $_tokens
+   els
+    / bat shell script
+    cal shell $_exe $_tokens
+   fin
   els
    cal print_error 'File not executable'
   fin

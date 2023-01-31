@@ -1,11 +1,14 @@
 / display a line of text
-let string $0
-
-ife $string $nil
- prt ''
+ife $0 $nil
  jmp end
 fin
 
+let args []
+psh $args $0 $1 $2 $3 $4 $5 $6 $7
+let i 0
+#loop
+get $args $i string
+jeq $string $nil end
 get $string 0 fst_char
 ife $fst_char '$'
  pol $string _
@@ -16,7 +19,12 @@ ife $string $nil
  let string ''
 fin
 
-prt $string
+ifg $i 0
+ prt ' ' ''
+fin
+prt $string ''
+add i $i 1
+jmp loop
 
 / ife $p '>'
 /  / write to file
@@ -70,3 +78,4 @@ prt $string
 / fin
 
 #end
+prt ''

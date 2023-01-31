@@ -720,7 +720,7 @@ fin
 ife $cmd 'echo'
  pol $tokens msg
  add msg '\"' $msg
- add msg $msg '>>'
+ add msg $msg '\"'
  prt $msg
  jmp loop
 fin

@@ -445,6 +445,21 @@ def runtime
   get $_list $_key _val
   cal add_var_to_env $_var $_val
  fin
+ ife $_cmd 'key'
+  cal eval_param $_line 1
+  let _map $ret
+  cal eval_param $_line 2
+  let _var $ret
+  key $_map _keys
+  cal add_var_to_env $_var $_keys
+ fin
+ ife $_cmd 'del'
+  cal eval_param $_line 1
+  let _map $ret
+  cal eval_param $_line 2
+  let _key $ret
+  del $_map $_key
+ fin
  ife $_cmd 'ife'
   cal eval_param $_line 1
   let _v1 $ret
