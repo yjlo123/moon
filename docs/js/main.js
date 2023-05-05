@@ -685,7 +685,7 @@
 		$(`.monitor-led div:nth-child(${ledId+1})`).css("background", color);
 	});
 	
-	// parser, evaluater, editor, consl, canvas, controls, options
+	// parser, evaluator, editor, console, canvas, controls, options
 	runtime.config(parser, evaluator, null, con, canvas, {}, {});
 	runtime.restart();
 	runtime.executeAll({

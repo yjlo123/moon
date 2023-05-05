@@ -1,5 +1,20 @@
 {
+  "name": "moon_os",
+  "description": "Moon OS",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yjlo123/moon.git"
+  },
+  "author": {
+    "name":"Siwei Liu",
+    "email": "liusiwei.yjlo@gmail.com",
+    "url": "https://liusiwei.com"
+  },
+  "homepage": "https://github.com/yjlo123/moon",
+  "type":"module",
   "dependencies": {
+    "express": "^4.18.2",
     "xterm": "^4.18.0"
   }
 }
