@@ -739,6 +739,14 @@ def runtime
     nxt
    fin
   fin
+  ife $_lib_name 'http.get'
+   cal eval_param $_line 2
+   let _url $ret
+   get $_line 3 _var
+   net $_url _tmp
+   cal add_var_to_env $_var $_tmp
+  fin
+
  fin
 
  add _pc $_pc 1

@@ -1,0 +1,9 @@
+/get a random quote
+let api_url 'https://api.quotable.io/quotes/random'
+lib 'http.get' $api_url res
+get $res 0 first
+get $first 'content' quote
+prt $quote
+prt ' - ' ''
+get $first 'author' author
+prt $author

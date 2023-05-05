@@ -676,6 +676,19 @@
 		}
 	}
 
+	evaluator.extend("net", function(env, args) {
+		let env_paused_status = env._pause;
+		env._pause = true; /* pause execution for waiting for ajax result */
+		let url = evaluator.expr(args[0]);
+		$.ajax(url)
+		.done(function(data) {
+			env._global[args[1]] = data;
+			// resume execution
+			env._pause = env_paused_status;
+			env._resume.call();
+		})
+	});
+	
 	// parser, evaluater, editor, consl, canvas, controls, options
 	runtime.config(parser, evaluator, null, con, canvas, {}, {});
 	runtime.restart();
