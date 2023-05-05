@@ -1,5 +1,5 @@
 let os_name 'Moon OS'
-let os_ver '1.22'
+let os_ver '1.23'
 let os_build 'N/A'
 
 let init_cmd '/programs/motd'
