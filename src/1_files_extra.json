@@ -20,14 +20,6 @@
             "misc": {
                 "test": "Hello World!"
             },
-            "challenge": [
-                ["txt"],
-                "=== CHALLENGE ===",
-                "Turn on the 3 LEDs on the bottom right of the monitor",
-                "Do not hack the front-end webpage",
-                "Use only the supported commands in Moon OS",
-                "~Siwei"
-            ],
             "led": [
                 ["exe"],
                 "let val $0",
@@ -36,11 +28,15 @@
                 "jeq $val 0 turn_off",
                 "jmp error",
                 "#turn_on",
-                "led 1",
+                "lib 'dev.set_led' 0 1",
+                "lib 'dev.set_led' 1 1",
+                "lib 'dev.set_led' 2 1",
                 "prt 'LED ON'",
                 "jmp end",
                 "#turn_off",
-                "led 0",
+                "lib 'dev.set_led' 0 0",
+                "lib 'dev.set_led' 1 0",
+                "lib 'dev.set_led' 2 0",
                 "prt 'LED OFF'",
                 "jmp end",
                 "#error",

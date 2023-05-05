@@ -530,18 +530,6 @@ def runtime
   #read_args_finished 
   psh $env_stack $_new_frame
  fin
- 
- / ** special **
- ife $_cmd 'led'
-  cal eval_param $_line 1
-  let _led_val $ret
-  jeq $_led_val 0 valid_led_value
-  jeq $_led_val 1 valid_led_value
-  jmp led_done
-  #valid_led_value
-  cal set_led 2 $_led_val
-  #led_done
- fin
 
  / ** system library **
  ife $_cmd 'lib'
@@ -668,8 +656,10 @@ def runtime
   fin
   ife $_lib_name 'dev.set_led'
    cal eval_param $_line 2
+   let _idx $ret
+   cal eval_param $_line 3
    let _val $ret
-   cal lib_set_led $_val
+   cal lib_set_led $_idx $_val
   fin
   ife $_lib_name 'term.prev_line'
    cal lib_screen_prev_line

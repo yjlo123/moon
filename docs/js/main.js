@@ -617,20 +617,6 @@
 
 	term.focus();
 
-	let ledClock = setInterval(function(){
-		let env = runtime.getEnv(false);
-		let leds = env.global.leds;
-		let devLed = env.global.root.dev.led;
-		leds[0] = parseInt(devLed) === 1 ? 1 : 0;
-		for (let i = 0; i < 3; i++) {
-			let color = $(`.monitor-led div:nth-child(4)`).css("background");
-			if (leds[i] === 1) {
-				color = "#eee";
-			}
-			$(`.monitor-led div:nth-child(${i+1})`).css("background", color);
-		}
-	}, 1000);
-
 	let pixels = [];
 	let widthInBlocks = 20;
 	let canvas = {
@@ -687,6 +673,16 @@
 			env._pause = env_paused_status;
 			env._resume.call();
 		})
+	});
+
+	evaluator.extend("led", function(env, args) {
+		let ledId = parseInt(evaluator.expr(args[0]));
+		let ledVal = parseInt(evaluator.expr(args[1]));
+		let color = $(`.monitor-led div:nth-child(4)`).css("background");
+		if (ledVal === 1) {
+			color = "#eee";
+		}
+		$(`.monitor-led div:nth-child(${ledId+1})`).css("background", color);
 	});
 	
 	// parser, evaluater, editor, consl, canvas, controls, options

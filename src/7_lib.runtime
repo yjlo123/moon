@@ -105,8 +105,9 @@ def lib_write_file
 end
 
 def lib_set_led
- let _val $0
- cal set_led 1 $_val
+ let _idx $0
+ let _val $1
+ led $_idx $_val
 end
 
 def lib_get_os_info

@@ -14,7 +14,6 @@ for, nxt
 prs, lod, sav
 
 ~ only in Moon OS:
-led V
 lib <API> [$V*] [N?]
 
 
@@ -37,7 +36,7 @@ util.get_path_by_str ($path_str, $is_file, $skip_verify, path)
 util.get_real_path ($path, path)
 util.verify_path ($path, $is_file, is_valid)
 
-dev.set_led ($val)
+dev.set_led ($idx, $val)
 
 term.prev_line
 term.clear_line

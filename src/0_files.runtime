@@ -11,7 +11,6 @@ let env_prompt ''
 let env_user ''
 
 tim boot_time now
-let leds []
 
 def init_files
  let root {}
@@ -26,16 +25,6 @@ def init_files
  put $_env_dir 'prompt' '$p \'#\''
  put $_env_dir 'user' 'guest'
  put $root 'env' $_env_dir
-
- / /dev
- let _dev_dir {}
- put $_dev_dir 'led' '0'
- put $root 'dev' $_dev_dir
-
- / init leds
- put $leds 0 0
- put $leds 1 0
- put $leds 2 0
 
 end
 

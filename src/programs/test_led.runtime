@@ -1,0 +1,12 @@
+/test led
+lib 'dev.set_led' 0 1
+slp 200
+lib 'dev.set_led' 1 1
+slp 200
+lib 'dev.set_led' 2 1
+slp 500
+lib 'dev.set_led' 0 0
+slp 200
+lib 'dev.set_led' 1 0
+slp 200
+lib 'dev.set_led' 2 0

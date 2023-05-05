@@ -9,7 +9,7 @@ echo -e "def load_extra_files
 python3 -c "
 import json
 import os
-f = open('src/1_files_extra.json')
+f = open('src/1_files_extra.json', encoding='utf8')
 f_json = json.load(f)
 for dir in ['programs', 'games']:
     for prog in os.listdir(\"src/{}\".format(dir)):
@@ -17,7 +17,7 @@ for dir in ['programs', 'games']:
         if os.path.isdir(ff):
             continue
         ext = prog.split('.')[-1]
-        with open(ff, 'r') as f:
+        with open(ff, 'r', encoding='utf8') as f:
             virtual_file = []
             if ext == 'runtime':
                 description = f.readline().strip()[1:]
