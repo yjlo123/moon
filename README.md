@@ -9,6 +9,25 @@ A linux-like terminal emulator written in Runtime Script
     <img alt="arch" src="https://github.com/yjlo123/moon/blob/master/arch.png?raw=true" width="500">
 </p>
 
+## Local Setup
+### Add hosts
+```
+127.0.0.1 local.siwei.dev
+```
+
+### Create local CA & cert
+```
+brew install mkcert
+mkcert -install
+mkcert local.siwei.dev
+```
+move certificate and key files to `<project_path>/localcert/`
+
+### Start local server
+```
+node server.mjs
+```
+
 ## macOS & Windows
 [VM](https://github.com/yjlo123/runtime-go)  
 [Moon OS source](https://raw.githubusercontent.com/yjlo123/moon/master/dist/program.runtime)  

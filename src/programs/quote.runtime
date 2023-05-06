@@ -1,6 +1,8 @@
 /get a random quote
-let api_url 'https://api.quotable.io/quotes/random'
-lib 'http.get' $api_url res
+let req {}
+put $req 'method' 'GET'
+put $req 'url' 'https://api.quotable.io/quotes/random'
+lib 'net.http' $req res
 get $res 0 first
 get $first 'content' quote
 prt $quote

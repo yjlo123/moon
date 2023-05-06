@@ -9,7 +9,7 @@
 	const API_AUTH_HOST = "https://siwei.dev";
 	const API_AUTH_SESSION = API_AUTH_HOST + "/session";
 	const API_AUTH_LOGIN = API_AUTH_HOST + "/login";
-	const API_AUTH_LOGOUT = API_AUTH_HOST + "/logout";
+	const API_AUTH_LOGOUT = API_AUTH_HOST + "/logout?redirect=false";
 	const API_FILES_LOAD = API_AUTH_HOST + "/api/fs/load"
 	const API_FILES_SAVE= API_AUTH_HOST + "/api/fs/save"
 
@@ -114,7 +114,7 @@
 	function checkLogin(callback) {
 		$.ajax({
 			url: API_AUTH_SESSION,
-			type: "post"
+			method: "POST"
 		}).done(function( data ) {
 			if (data.status === "0") {
 				loginUsername = data.username;
@@ -134,7 +134,10 @@
 	function loadUserFiles(callback) {
 		$.ajax({
 			url: API_FILES_LOAD,
-			type: "get"
+			method: "GET",
+			xhrFields: {
+				withCredentials: true
+			}
 		}).done(function( data ) {
 			if (data.status === 0) {
 				let env = runtime.getEnv(false);
@@ -153,7 +156,10 @@
 		let env = runtime.getEnv(false);
 		$.ajax({
 			url: API_FILES_SAVE,
-			type: "post",
+			method: "POST",
+			xhrFields: {
+				withCredentials: true
+			},
 			data: {
 				data: JSON.stringify(env.global.root.home[loginUsername])
 			}
@@ -195,7 +201,11 @@
 			term.write("Logging in...\n\r");
 			$.ajax({
 				url: API_AUTH_LOGIN,
-				type: "post",
+				method: "POST",
+				xhrFields: {
+					withCredentials: true
+				},
+				crossDomain: true,
 				data: {
 					username: loginUsername,
 					password: command
@@ -225,8 +235,10 @@
 	function executeLogout() {
 		$.ajax({
 			url: API_AUTH_LOGOUT,
-			type: "get",
-			data: {}
+			method: "GET",
+			xhrFields: {
+				withCredentials: true
+			}
 		}).done(()=>{
 			let env = runtime.getEnv(false);
 			delete env.global.root.home[loginUsername];
@@ -665,10 +677,22 @@
 	evaluator.extend("net", function(env, args) {
 		let env_paused_status = env._pause;
 		env._pause = true; /* pause execution for waiting for ajax result */
-		let url = evaluator.expr(args[0]);
-		$.ajax(url)
-		.done(function(data) {
-			env._global[args[1]] = data;
+		let paramsObject =  evaluator.expr(args[0]);
+		if ("with_credential" in paramsObject) {
+			paramsObject.xhrFields = {withCredentials: true};
+			delete paramsObject.with_credential;
+		}
+		$.ajax(paramsObject
+			// {
+			// 	url: evaluator.expr(args[0]),
+			// 	method: evaluator.expr(args[1]),
+			// 	data: evaluator.expr(args[2]),
+			// 	xhrFields: {
+			// 		withCredentials: true
+			// 	}
+			// }
+		).done(function(resp) {
+			env._global[args[1]] = resp;
 			// resume execution
 			env._pause = env_paused_status;
 			env._resume.call();
