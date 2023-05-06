@@ -11,13 +11,20 @@ A linux-like terminal emulator written in Runtime Script
 
 ## Local Setup
 ### Add hosts
+mac: /etc/hosts  
+win: C:\Windows\System32\drivers\etc
 ```
 127.0.0.1 local.siwei.dev
 ```
 
 ### Create local CA & cert
 ```
+# mac
 brew install mkcert
+
+# win
+choco install mkcert
+
 mkcert -install
 mkcert local.siwei.dev
 ```
