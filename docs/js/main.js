@@ -50,10 +50,8 @@
 	let cursor = 0;
 	let promptCallback = null;
 	let promptOn = false;
-	let loggingIn = 0;
 	let inputMask = false;
-	let loginUsername = undefined;
-	let loggedIn = undefined;
+
 	const escapeMap = {
 		'\\x1b[A': '\x1b[A',
 		'\\x1b[B': '\x1b[B',
@@ -110,7 +108,7 @@
 		},
 		AbortInput: ()=>{}
 	}
-
+/*
 	function checkLogin(callback) {
 		$.ajax({
 			url: API_AUTH_SESSION,
@@ -248,7 +246,7 @@
 			promptCallback("cd"); // go to guest home
 		});
 	}
-
+*/
 	function recordCommandHistory() {
 		if (command.length > 0) {
 			consoleHistory.push(command);
@@ -261,15 +259,15 @@
 
 	function executeCommand() {
 		promptOn = false;
-		if (command === "login" || loggingIn > 0) {
-			executeLogin();
-			if (command === "login") {
-				recordCommandHistory();
-			}
-		} else {
-			if (command === "logout") {
+		// if (command === "login2" || loggingIn > 0) {
+		// 	//executeLogin();
+		// 	if (command === "login2") {
+		// 		recordCommandHistory();
+		// 	}
+		// } else {
+			if (command === "logout2") {
 				executeSync(()=>{
-					executeLogout();
+					//executeLogout();
 				});
 			} else if (command === "sync") {
 				executeSync(()=>{
@@ -279,7 +277,7 @@
 				promptCallback(command);
 			}
 			recordCommandHistory();
-		} 
+		// } 
 		command = '';
 		cursor = 0;
 	}
@@ -467,7 +465,6 @@
 		term.write('\n\r');
 		command = '';
 		cursor = 0;
-		loggingIn = 0;
 		inputMask = false;
 		// clean temp status in Runtime Script env
 		if (env.global.runtime_running === 1) {

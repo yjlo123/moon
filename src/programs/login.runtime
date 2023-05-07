@@ -1,0 +1,94 @@
+/login to remote server
+let AUTH_API 'https://siwei.dev'
+add API_SESSION $AUTH_API '/session'
+add API_LOGIN $AUTH_API '/login'
+
+def build_req
+ let _method $0
+ let _url $1
+ let _data $2
+ let _with_credential $3
+ let _req {}
+ put $_req 'method' $_method
+ put $_req 'url' $_url
+ jeq $_data $nil skip_data
+  put $_req 'data' $_data
+ #skip_data
+ ife $_with_credential 1
+  put $_req 'with_credential' 1
+ fin
+ ret $_req
+end
+
+def init_account
+ let _username $0
+ prt 'switching to logged-in account...'
+ lib 'os.set_env_var' 'user' $_username
+ let _home_dir []
+ psh $_home_dir 'home'
+ lib 'os.write_file' $_home_dir $_username {}
+ lib 'os.get_home_path' _home_path
+ lib 'os.set_current_path' $_home_path
+end
+
+def load_user_files
+ prt 'loading files...'
+end
+
+/ check existing session
+cal build_req 'POST' $API_SESSION $nil 1
+let req $ret
+lib 'net.http' $req res
+get $res 'status' status
+jeq $status '1' start_login
+get $res 'username' username
+lib 'os.get_env_var' 'user' current_user
+jeq $username $current_user error_already_logged_in
+
+
+/ resume existing session
+prt 'existing session found, resuming...'
+jmp setup_user
+
+
+/ create a new session
+#start_login
+prt 'Username:' ''
+inp username
+prt 'Password:' ''
+inp password
+prt 'logging in...'
+let payload {}
+put $payload 'username' $username
+put $payload 'password' $password
+cal build_req 'POST' $API_LOGIN $payload 1
+let req $ret
+lib 'net.http' $req res
+get $res 'status' status
+jeq $status 'success' setup_user
+prt $status
+jmp end
+
+
+/ setup logged in user
+#setup_user
+cal init_account $username
+cal load_user_files
+prt 'logged in as ' ''
+prt $username
+jmp end
+
+#error_already_logged_in
+prt 'Already logged in as ' $username
+prt ''
+jmp end
+
+#error_login
+prt 'ERR failed to login'
+jmp end
+
+#error_load_file
+prt 'ERR failed to load user files'
+jmp end
+
+#end

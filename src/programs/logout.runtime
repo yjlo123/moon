@@ -1,0 +1,56 @@
+/logout from remote server
+let AUTH_API 'https://siwei.dev'
+add API_SESSION $AUTH_API '/session'
+add API_LOGOUT $AUTH_API '/logout?redirect=false'
+
+def build_req
+ let _method $0
+ let _url $1
+ let _with_credential $2
+ let _req {}
+ put $_req 'method' $_method
+ put $_req 'url' $_url
+ ife $_with_credential 1
+  put $_req 'with_credential' 1
+ fin
+ ret $_req
+end
+
+/ check existing session
+cal build_req 'POST' $API_SESSION 1
+let req $ret
+lib 'net.http' $req res
+get $res 'status' status
+jeq $status 1 error_not_login
+get $res 'username' session_username
+lib 'os.get_env_var' 'user' current_user
+jne $session_username $current_user error_not_logged_in
+
+prt 'logging out...'
+cal build_req 'GET' $API_LOGOUT 1
+let req $ret
+lib 'net.http' $req _
+
+prt 'saving files...'
+
+prt 'switching to guest account...'
+lib 'os.get_home_path' _home_path
+lib 'os.delete_path' $_home_path
+lib 'os.set_env_var' 'user' 'guest'
+lib 'os.get_home_path' _home_path
+lib 'os.set_current_path' $_home_path
+
+prt 'logged out'
+
+
+jmp end
+
+#error_not_logged_in
+prt 'ERR invalid login status, please login first'
+jmp end
+
+#error_not_login
+prt 'ERR not logged in'
+jmp end
+
+#end

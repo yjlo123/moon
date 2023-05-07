@@ -35,8 +35,12 @@ def expr
    pol $key_press _key
    ret $_key
   els
-   cal get_var_from_env $_expr
-   ret $ret
+   ife $_expr 'nil'
+    ret $nil
+   els
+    cal get_var_from_env $_expr
+    ret $ret
+   fin
   fin
  fin
  / str is parsed as %str, due to conflict with single quote
