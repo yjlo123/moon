@@ -1,7 +1,7 @@
-/* Built on Sun, May  7, 2023  3:08:38 PM */
+/* Built on Sun, May  7, 2023  3:13:46 PM */
 let moonSrc = `
 let os_name 'Moon OS'
-let os_ver '1.23'
+let os_ver '1.24'
 let os_build 'N/A'
 
 let init_cmd '/programs/motd'
@@ -39,7 +39,7 @@ def load_extra_files
  nxt
 end
 cal load_extra_files
-let os_build '230507.1508'
+let os_build '230507.1513'
 
 / ====== parsing runtime program ======
 def parse_line
