@@ -31,7 +31,7 @@ lib 'os.get_env_var' 'user' current_user
 jne $session_username $current_user error_login_status
 
 / save files
-prt 'Saving files...'
+prt 'Saving files...' ''
 let home_dir []
 psh $home_dir 'home'
 lib 'os.read_file' $home_dir $current_user user_files
@@ -42,24 +42,28 @@ cal build_req 'POST' $API_SAVE_FILE $payload 1
 lib 'net.http' $ret res
 get $res 'status' status
 jne $status 0 error_save_file
+prt '[done]'
 
 / logout session
-prt 'Logging out...'
+prt 'Logging out...' ''
 cal build_req 'GET' $API_LOGOUT $nil 1
 lib 'net.http' $ret _
+prt '[done]'
 
 / switch to guest
-prt 'Switching to guest account...'
+prt 'Switching to guest account...' ''
 lib 'os.get_home_path' _home_path
 lib 'os.delete_path' $_home_path
 lib 'os.set_env_var' 'user' 'guest'
 lib 'os.get_home_path' _home_path
 lib 'os.set_current_path' $_home_path
+prt '[done]'
 
 prt 'Logged out'
 jmp end
 
 #error_save_file
+prt '[fail]'
 prt 'ERR failed to save files, logout aborted'
 jmp end
 

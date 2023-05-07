@@ -23,28 +23,31 @@ end
 
 def init_account
  let _username $0
- prt 'Switching to logged-in account...'
+ prt 'Switching to logged-in account...' ''
  lib 'os.set_env_var' 'user' $_username
  let _home_dir []
  psh $_home_dir 'home'
  lib 'os.write_file' $_home_dir $_username {}
  lib 'os.get_home_path' _home_path
  lib 'os.set_current_path' $_home_path
+ prt '[done]'
 end
 
 def load_user_files
  let _username $0
- prt 'Loading files...'
+ prt 'Loading files...' ''
  cal build_req 'GET' $API_LOAD_FILE $nil 1
  lib 'net.http' $ret _res
  get $_res 'status' _status
  ife $_status 0
+  prt '[done]'
   get $_res 'home' _home_data
   prs _parsed_data $_home_data
   let _home_dir []
   psh $_home_dir 'home'
   lib 'os.write_file' $_home_dir $_username $_parsed_data
  els
+  prt '[fail]'
   prt 'ERR error loading user files'
   ret
  fin
@@ -62,7 +65,7 @@ jeq $username $current_user error_already_logged_in
 
 
 / resume existing session
-prt 'Existing session found, resuming...'
+prt 'Existing session found, resuming'
 jmp setup_user
 
 
