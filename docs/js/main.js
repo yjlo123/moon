@@ -6,12 +6,6 @@
 	let consoleHistory = [];
 	let consoleHistoryIndex = -1;
 	const MaxHistorySize = 20;
-	const API_AUTH_HOST = "https://siwei.dev";
-	const API_AUTH_SESSION = API_AUTH_HOST + "/session";
-	const API_AUTH_LOGIN = API_AUTH_HOST + "/login";
-	const API_AUTH_LOGOUT = API_AUTH_HOST + "/logout?redirect=false";
-	const API_FILES_LOAD = API_AUTH_HOST + "/api/fs/load"
-	const API_FILES_SAVE= API_AUTH_HOST + "/api/fs/save"
 
 	const TERM_COLS = 51;
 	const TERM_ROWS = 19;
@@ -50,7 +44,7 @@
 	let cursor = 0;
 	let promptCallback = null;
 	let promptOn = false;
-	let inputMask = false;
+	let inputMask = null;
 
 	const escapeMap = {
 		'\\x1b[A': '\x1b[A',
@@ -108,145 +102,7 @@
 		},
 		AbortInput: ()=>{}
 	}
-/*
-	function checkLogin(callback) {
-		$.ajax({
-			url: API_AUTH_SESSION,
-			method: "POST"
-		}).done(function( data ) {
-			if (data.status === "0") {
-				loginUsername = data.username;
-				loggedIn = true;
-			} else {
-				loggedIn = false;
-			}
-			callback();
-		}).error(function(){
-			console.log("Check login status failed.");
-			loggedIn = false;
-			callback();
-		});
-		return null;
-	}
 
-	function loadUserFiles(callback) {
-		$.ajax({
-			url: API_FILES_LOAD,
-			method: "GET",
-			xhrFields: {
-				withCredentials: true
-			}
-		}).done(function( data ) {
-			if (data.status === 0) {
-				let env = runtime.getEnv(false);
-				env.global.root.env.user = loginUsername;
-				env.global.root.home[loginUsername] = JSON.parse(data.home);
-				callback();
-			} else {
-				term.write("\n\rLoad files error status.\n\r");
-			}
-		}).error(function(){
-			term.write("\n\rRequest files failed.\n\r");
-		});
-	}
-
-	function executeSync(callback) {
-		let env = runtime.getEnv(false);
-		$.ajax({
-			url: API_FILES_SAVE,
-			method: "POST",
-			xhrFields: {
-				withCredentials: true
-			},
-			data: {
-				data: JSON.stringify(env.global.root.home[loginUsername])
-			}
-		}).done(function( data ) {
-			if (data.status === 0) {
-				term.write("Saved files successfully.\n\r");
-			} else {
-				term.write("Save files error status.\n\r");
-			}
-			callback();
-		}).error(function(){
-			term.write("\n\rRequest saving files failed.\n\r");
-			callback();
-		});
-	}
-
-	function executeLogin() {
-		if (typeof loggedIn === "undefined") {
-			// checkLogin sets loggedIn true/false
-			return checkLogin(executeLogin);
-		}
-		if (loggedIn) {
-			term.writeln("Already logged in as " + loginUsername);
-			loggingIn = 0;
-			return loadUserFiles(()=>{
-				promptCallback("cd");
-			});
-		}
-		if (loggingIn === 0) {
-			term.write("Username:");
-			promptOn = true;
-		} else if (loggingIn === 1) {
-			loginUsername = command;
-			term.write("Password:");
-			inputMask = true;
-			promptOn = true;
-		} else if (loggingIn === 2) {
-			inputMask = false;
-			term.write("Logging in...\n\r");
-			$.ajax({
-				url: API_AUTH_LOGIN,
-				method: "POST",
-				xhrFields: {
-					withCredentials: true
-				},
-				crossDomain: true,
-				data: {
-					username: loginUsername,
-					password: command
-				}
-			}).done(function( data ) {
-				if (data.status === 'success' || data.status === 'already logged in') {
-					term.write(`Logged in as ${loginUsername}\n\r`);
-					loggedIn = true;
-					loadUserFiles(()=>{
-						loggingIn = 0;
-						return promptCallback("cd"); // go to user home
-					});
-				} else {
-					term.write(data.status+"\n\r");
-					loggingIn = 0;
-					return promptCallback("");
-				}
-			}).error(function(){
-				term.write("Login failed.\n\r");
-				loggingIn = 0;
-				return promptCallback(""); // resume normal prompt
-			});
-		}
-		loggingIn++;
-	}
-
-	function executeLogout() {
-		$.ajax({
-			url: API_AUTH_LOGOUT,
-			method: "GET",
-			xhrFields: {
-				withCredentials: true
-			}
-		}).done(()=>{
-			let env = runtime.getEnv(false);
-			delete env.global.root.home[loginUsername];
-			env.global.root.env.user = "guest";
-			loggedIn = false;
-			loginUsername = undefined;
-			promptCallback("cd"); // go to guest home
-		});
-	}
-*/
 	function recordCommandHistory() {
 		if (command.length > 0) {
 			consoleHistory.push(command);
@@ -259,25 +115,10 @@
 
 	function executeCommand() {
 		promptOn = false;
-		// if (command === "login2" || loggingIn > 0) {
-		// 	//executeLogin();
-		// 	if (command === "login2") {
-		// 		recordCommandHistory();
-		// 	}
-		// } else {
-			if (command === "logout2") {
-				executeSync(()=>{
-					//executeLogout();
-				});
-			} else if (command === "sync") {
-				executeSync(()=>{
-					promptCallback("");
-				});
-			} else {
-				promptCallback(command);
-			}
+		if (inputMask === null) {
 			recordCommandHistory();
-		// } 
+		}
+		promptCallback(command);
 		command = '';
 		cursor = 0;
 	}
@@ -287,7 +128,7 @@
 		let right = command.slice(cursor, command.length);
 		command = left + text + right;
 		if (inputMask) {
-			term.write("*".repeat(text.length));
+			term.write(inputMask.repeat(text.length));
 		} else {
 			term.write(text);
 		}
@@ -465,7 +306,7 @@
 		term.write('\n\r');
 		command = '';
 		cursor = 0;
-		inputMask = false;
+		inputMask = null;
 		// clean temp status in Runtime Script env
 		if (env.global.runtime_running === 1) {
 			env.global.sig_interrupt = 1;
@@ -671,7 +512,7 @@
 		}
 	}
 
-	evaluator.extend("net", function(env, args) {
+	evaluator.extend("net", (env, args) => {
 		let env_paused_status = env._pause;
 		env._pause = true; /* pause execution for waiting for ajax result */
 		let paramsObject =  evaluator.expr(args[0]);
@@ -679,16 +520,8 @@
 			paramsObject.xhrFields = {withCredentials: true};
 			delete paramsObject.with_credential;
 		}
-		$.ajax(paramsObject
-			// {
-			// 	url: evaluator.expr(args[0]),
-			// 	method: evaluator.expr(args[1]),
-			// 	data: evaluator.expr(args[2]),
-			// 	xhrFields: {
-			// 		withCredentials: true
-			// 	}
-			// }
-		).done(function(resp) {
+		$.ajax(paramsObject)
+		.done(function(resp) {
 			env._global[args[1]] = resp;
 			// resume execution
 			env._pause = env_paused_status;
@@ -696,7 +529,7 @@
 		})
 	});
 
-	evaluator.extend("led", function(env, args) {
+	evaluator.extend("led", (env, args) => {
 		let ledId = parseInt(evaluator.expr(args[0]));
 		let ledVal = parseInt(evaluator.expr(args[1]));
 		let color = $(`.monitor-led div:nth-child(4)`).css("background");
@@ -706,6 +539,13 @@
 		$(`.monitor-led div:nth-child(${ledId+1})`).css("background", color);
 	});
 	
+	evaluator.extend("con", (env, args) => {
+		let type = evaluator.expr(args[0]);
+		if (type === "mask") {
+			inputMask = evaluator.expr(args[1]);
+		}
+	});
+
 	// parser, evaluator, editor, console, canvas, controls, options
 	runtime.config(parser, evaluator, null, con, canvas, {}, {});
 	runtime.restart();

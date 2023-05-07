@@ -2,6 +2,7 @@
 let AUTH_API 'https://siwei.dev'
 add API_SESSION $AUTH_API '/session'
 add API_LOGIN $AUTH_API '/login'
+add API_LOAD_FILE $AUTH_API '/api/fs/load'
 
 def build_req
  let _method $0
@@ -22,7 +23,7 @@ end
 
 def init_account
  let _username $0
- prt 'switching to logged-in account...'
+ prt 'Switching to logged-in account...'
  lib 'os.set_env_var' 'user' $_username
  let _home_dir []
  psh $_home_dir 'home'
@@ -32,7 +33,21 @@ def init_account
 end
 
 def load_user_files
- prt 'loading files...'
+ let _username $0
+ prt 'Loading files...'
+ cal build_req 'GET' $API_LOAD_FILE $nil 1
+ lib 'net.http' $ret _res
+ get $_res 'status' _status
+ ife $_status 0
+  get $_res 'home' _home_data
+  prs _parsed_data $_home_data
+  let _home_dir []
+  psh $_home_dir 'home'
+  lib 'os.write_file' $_home_dir $_username $_parsed_data
+ els
+  prt 'ERR error loading user files'
+  ret
+ fin
 end
 
 / check existing session
@@ -47,7 +62,7 @@ jeq $username $current_user error_already_logged_in
 
 
 / resume existing session
-prt 'existing session found, resuming...'
+prt 'Existing session found, resuming...'
 jmp setup_user
 
 
@@ -56,7 +71,7 @@ jmp setup_user
 prt 'Username:' ''
 inp username
 prt 'Password:' ''
-inp password
+inp password '*'
 prt 'logging in...'
 let payload {}
 put $payload 'username' $username
@@ -73,8 +88,8 @@ jmp end
 / setup logged in user
 #setup_user
 cal init_account $username
-cal load_user_files
-prt 'logged in as ' ''
+cal load_user_files $username
+prt 'Logged in as ' ''
 prt $username
 jmp end
 

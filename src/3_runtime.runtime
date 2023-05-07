@@ -1,6 +1,6 @@
-/ *****************************
-/ * A Runtime Script Intepreter
-/ *****************************
+/ *******************************
+/ * A Runtime Script Interpreter
+/ *******************************
 
 let env {}       / global vars of current program
 let env_stack [] / func-scoped vars of current programs
@@ -352,7 +352,13 @@ def runtime
 
  ife $_cmd 'inp'
   get $_line 1 _var
+  get $_line 2 _mask
+  jeq $_mask $nil skip_mask_char
+  cal eval_param $_line 2
+  con 'mask' $ret
+  #skip_mask_char
   inp _val
+  con 'mask' $nil
   cal add_var_to_env $_var $_val
  fin
  ife $_cmd 'rnd'
@@ -363,6 +369,13 @@ def runtime
   let _v2 $ret
   rnd _r $_v1 $_v2
   cal add_var_to_env $_name $_r
+ fin
+ ife $_cmd 'prs'
+  get $_line 1 _name
+  cal eval_param $_line 2
+  let _v $ret
+  prs _tmp $_v
+  cal add_var_to_env $_name $_tmp
  fin
  jeq $_cmd 'int' type_cmd
  jeq $_cmd 'str' type_cmd

@@ -2,7 +2,7 @@
 prt, let, slp, inp, rnd
 add, sub, mul, div, mod
 jmp, jeq, jne, jgt, jlt
-int, str, typ, tim
+int, str, typ, prs, tim
 len, pol, pop, psh
 put, get, key, del
 clr, drw, pxl
@@ -11,7 +11,7 @@ ife, ifg, els, fin
 
 ~ not supported:
 for, nxt
-prs, lod, sav
+lod, sav
 
 ~ only in Moon OS:
 lib <API> [$V*] [N?]
@@ -37,6 +37,8 @@ util.get_real_path ($path, path)
 util.verify_path ($path, $is_file, is_valid)
 
 dev.set_led ($idx, $val)
+
+net.http ($params{method,url,data,withCredentials}, res)
 
 term.prev_line
 term.clear_line
