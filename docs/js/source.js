@@ -1,4 +1,4 @@
-/* Built on Sun, May  7, 2023  3:26:22 PM */
+/* Built on Sun, May  7, 2023 10:23:10 PM */
 let moonSrc = `
 let os_name 'Moon OS'
 let os_ver '1.24'
@@ -27,7 +27,35 @@ def init_files
  put $_env_dir 'prompt' '$p \\'#\\''
  put $_env_dir 'user' 'guest'
  put $root 'env' $_env_dir
+end
 
+def get_autocomplete
+ let _keyword $0
+ let _is_prog $1
+ ife $_is_prog 1
+  cal get_env_path
+  let _cur_path $ret
+  psh $_cur_path $_keyword
+ els
+  cal get_path_by_str $_keyword
+  let _cur_path $ret
+ fin
+ pop $_keyword _last_char
+ ife $_last_char '/'
+  let _name ''
+ els
+  pop $_cur_path _name
+ fin
+ cal get_real_path $_cur_path
+ let _real_path $ret
+ psh $_keyword $_last_char
+ cal lib_get_file_list $_real_path
+ let _file_list $ret
+ ife $_name $nil
+  let _name ''
+ fin
+ cal filter_list_by_startwith $_file_list $_name
+ let autocomplete_ $ret
 end
 
 cal init_files
@@ -39,7 +67,7 @@ def load_extra_files
  nxt
 end
 cal load_extra_files
-let os_build '230507.1526'
+let os_build '230507.2223'
 
 / ====== parsing runtime program ======
 def parse_line
@@ -1320,6 +1348,32 @@ def get_list_type
  els
   ret $nil
  fin
+end
+
+def str_startwith
+ let s1 $0
+ let s2 $1
+ #loop
+ ife $s2 ''
+  ret 1
+ fin
+ pol $s1 c1
+ pol $s2 c2
+ jeq $c1 $c2 loop
+ ret 0
+end
+
+def filter_list_by_startwith
+ let _list $0
+ let _start $1
+ let _res []
+ for _s $_list
+  cal str_startwith $_s $_start
+  ife $ret 1
+   psh $_res $_s
+  fin
+ nxt
+ ret $_res
 end
 / ==== RUN ====
 def run

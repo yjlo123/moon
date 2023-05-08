@@ -212,93 +212,28 @@
 	}
 
 	function onTab() {
-		let env = runtime.getEnv(false);
-		let path = env.global.path.slice(); // copy path
-		let root = env.global.root;
 		let text = command;
 		let tokens = parseCmdInput(text);
 		if (tokens.length < 1 || text.length > 0 && text[text.length-1] === " ") {
-			return false;
+			return;
 		}
 		let lastToken = tokens[tokens.length-1];
-		let currentDir = root;
+		let isProgramFromPath = tokens.length===1 && lastToken.indexOf('/') === -1
+		runtime.executeFuncCall('get_autocomplete', [lastToken, isProgramFromPath?1:0]);
+		let suggestions = evaluator.expr('$autocomplete_');
 
-		if (lastToken.indexOf('/') > -1) {
-			// specified path
-			let pathTokens = lastToken.split('/');
-			if (lastToken[0] === '/') {
-				// absolute path, from root
-				pathTokens = lastToken.slice(1).split('/');
-				path = [];
-			}
-			for (let i = 0; i < pathTokens.length-1; i++) {
-				if (pathTokens[i] == '..') {
-					path.pop();
-				} else if (pathTokens[i] == '~') {
-					// home dir
-					let envUserNameDir = env.global.env_user.split("/").filter(i => i);
-					let tempPath = root;
-					for (let i = 0; i < envUserNameDir.length; i++) {
-						tempPath = tempPath[envUserNameDir[i]];
-					}
-					path = ['home'];
-					path.push(tempPath);
-					console.log(path);
-				} else if (pathTokens[i] !== '.') {
+		console.log(suggestions)
 
-					path.push(pathTokens[i]);
-				}
-			}
-			lastToken = pathTokens[pathTokens.length-1];
-
-		} else if (tokens.length === 1) {
-			// find program in env path
-			let envPathDir = env.global.env_path.split("/").filter(i => i);
-			let tempPath = root;
-			for (let i = 0; i < envPathDir.length; i++) {
-				tempPath = tempPath[envPathDir[i]];
-			}
-			path = tempPath.split("/").filter(i => i);
-		}
-
-		// go to path
-		let pathStack = path.reverse();
-		while (pathStack.length > 0) {
-			let p = pathStack.pop();
-			currentDir = currentDir[p];
-			if (Array.isArray(currentDir) && currentDir.length > 0 &&
-				Array.isArray(currentDir[0]) && currentDir[0][0] === "lnk") {
-					let linkToPathStr = currentDir[0][1];
-					if (linkToPathStr[0] === "/") {
-						currentDir = root
-						let linkPath = linkToPathStr.split("/").filter(i => i);
-						for (let i = linkPath.length-1; i >= 0; i--) {
-							pathStack.push(linkPath[i]);
-						}
-					}
-			}
-			if (!currentDir) {
-				return false;
-			}
-		}
-
-		let candidate = []
-		for (const [key, value] of Object.entries(currentDir)) {
-			if (key.startsWith(lastToken)) {
-				candidate.push(key);
-			}
-		}
-		if (candidate.length === 1) {
-			// found exact one candidate
+		if (suggestions.length === 1) {
+			// found exactly one candidate
+			let theCandidate = suggestions[0];
 			moveCursorTo(command.length);
-			text = text.slice(0, text.length-lastToken.length);
-			let theCandidate = candidate[0];
-			text += theCandidate;
-			command = text;
+			let lastWord = lastToken.split('/').slice(-1)[0]
+			theCandidate = theCandidate.slice(lastWord.length, theCandidate.length)
+			command = text + theCandidate;
 			cursor = command.length;
-			term.write(theCandidate.slice(lastToken.length, theCandidate.length));
+			term.write(theCandidate);
 		}
-		return false;
 	}
 
 	function onCtrlC() {
@@ -514,7 +449,8 @@
 
 	evaluator.extend("net", (env, args) => {
 		let env_paused_status = env._pause;
-		env._pause = true; /* pause execution for waiting for ajax result */
+		/* pause execution for waiting for ajax result */
+		env._pause = true;
 		let paramsObject =  evaluator.expr(args[0]);
 		if ("with_credential" in paramsObject) {
 			paramsObject.xhrFields = {withCredentials: true};
@@ -523,7 +459,7 @@
 		$.ajax(paramsObject)
 		.done(function(resp) {
 			env._global[args[1]] = resp;
-			// resume execution
+			/* resume execution */
 			env._pause = env_paused_status;
 			env._resume.call();
 		})
@@ -540,6 +476,7 @@
 	});
 	
 	evaluator.extend("con", (env, args) => {
+		/* console operations */
 		let type = evaluator.expr(args[0]);
 		if (type === "mask") {
 			inputMask = evaluator.expr(args[1]);

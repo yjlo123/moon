@@ -25,7 +25,35 @@ def init_files
  put $_env_dir 'prompt' '$p \'#\''
  put $_env_dir 'user' 'guest'
  put $root 'env' $_env_dir
+end
 
+def get_autocomplete
+ let _keyword $0
+ let _is_prog $1
+ ife $_is_prog 1
+  cal get_env_path
+  let _cur_path $ret
+  psh $_cur_path $_keyword
+ els
+  cal get_path_by_str $_keyword
+  let _cur_path $ret
+ fin
+ pop $_keyword _last_char
+ ife $_last_char '/'
+  let _name ''
+ els
+  pop $_cur_path _name
+ fin
+ cal get_real_path $_cur_path
+ let _real_path $ret
+ psh $_keyword $_last_char
+ cal lib_get_file_list $_real_path
+ let _file_list $ret
+ ife $_name $nil
+  let _name ''
+ fin
+ cal filter_list_by_startwith $_file_list $_name
+ let autocomplete_ $ret
 end
 
 cal init_files

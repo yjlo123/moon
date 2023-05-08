@@ -368,3 +368,29 @@ def get_list_type
   ret $nil
  fin
 end
+
+def str_startwith
+ let s1 $0
+ let s2 $1
+ #loop
+ ife $s2 ''
+  ret 1
+ fin
+ pol $s1 c1
+ pol $s2 c2
+ jeq $c1 $c2 loop
+ ret 0
+end
+
+def filter_list_by_startwith
+ let _list $0
+ let _start $1
+ let _res []
+ for _s $_list
+  cal str_startwith $_s $_start
+  ife $ret 1
+   psh $_res $_s
+  fin
+ nxt
+ ret $_res
+end
