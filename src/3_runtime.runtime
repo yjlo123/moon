@@ -451,6 +451,13 @@ def runtime
   cal eval_param $_line 3
   let _val $ret
   put $_map $_key $_val
+  typ _type $_map
+  ife $_type 'str'
+   / replace string value
+   get $_line 1 _var_name
+   pol $_var_name _
+   cal add_var_to_env $_var_name $_map
+  fin
  fin
  ife $_cmd 'get'
   cal eval_param $_line 1
