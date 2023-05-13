@@ -380,6 +380,7 @@ def infix_to_postfix
   jeq $_ss 0 operator_done
   sub _last_idx $_ss 1
   get $_stack $_last_idx _last
+  jeq $_last '(' operator_done
   get $precedence $_last _last_prece
   get $precedence $_t _this_prece
   jlt $_last_prece $_this_prece operator_done
