@@ -686,16 +686,13 @@ def runtime
    cal lib_set_led $_idx $_val
   fin
   ife $_lib_name 'term.prev_line'
-   cal lib_screen_prev_line
+   cal lib_screen_up_arrow
   fin
   ife $_lib_name 'term.clear_line'
    cal lib_screen_clear_line
   fin
   ife $_lib_name 'term.clear_screen'
    cal lib_screen_clear_screen
-  fin
-  ife $_lib_name 'term.reverse'
-   cal lib_screen_reverse
   fin
   ife $_lib_name 'term.alternate_buffer'
    cal lib_screen_alternate_buffer
@@ -711,9 +708,6 @@ def runtime
    cal eval_param $_line 4
    let _bg_color $ret
    cal lib_screen_color_print $_text $_fg_color $_bg_color
-  fin
-  ife $_lib_name 'term.reset'
-   cal lib_screen_reset
   fin
   ife $_lib_name 'term.set_prt_delay'
    cal eval_param $_line 2

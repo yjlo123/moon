@@ -462,27 +462,15 @@
 			} else if (mode === "alternate") {
 				term.write('\x9B?1049h');
 			}
-		} else if (type === "color") {
-			let mode = evaluator.expr(args[1]);
-			if (mode === "reverse") {
-				term.write('\u001b[7m');
-			} else if (mode === "reset") {
-				term.write('\u001b[0m');
-			}
 		} else if (type === "arrow") {
 			let direction = evaluator.expr(args[1]);
 			let arrowMap = {"up": "A", "down": "B", "right": "C", "left": "D"};
 			term.write("\x1b[" + arrowMap[direction]);
-		} else if (type === "line") {
+		} else if (type === "clear") {
 			let mode = evaluator.expr(args[1]);
-			if (mode === "prev") {
-				term.write("\033[F");
-			} else if (mode === "clear") {
+			if (mode === "line") {
 				term.write("\033[2K");
-			}
-		} else if (type === "screen") {
-			let mode = evaluator.expr(args[1]);
-			if (mode === "clear") {
+			} else if (mode === "screen") {
 				//term.write("\033[2H");
 				term.clear();
 			}

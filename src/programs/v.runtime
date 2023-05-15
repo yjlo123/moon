@@ -130,7 +130,7 @@ jmp content_loop
 #content_done
 
 / Bottom bar
-lib 'term.reverse'
+
 let bar_left $file_name
 add bar_left $bar_left '  '
 add bar_left $bar_left 'q:quit  ↓/↑:line  f/b:page '
@@ -143,17 +143,15 @@ let progress 100
 add bar_right '' $progress
 add bar_right $bar_right '%'
 
-prt $bar_left ''
+lib 'term.color_print' $bar_left 0 255
 
 len $bar_left left_len
 len $bar_right right_len
 sub free_len $w $left_len
 sub free_len $free_len $right_len
 mul bar_space ' ' $free_len
-prt $bar_space ''
-
-prt $bar_right ''
-lib 'term.reset'
+lib 'term.color_print' $bar_space 0 255
+lib 'term.color_print' $bar_right 0 255
 
 #key_listener
 let key_pressed 0

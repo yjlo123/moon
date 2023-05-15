@@ -126,24 +126,12 @@ def lib_get_sys_info
  ret $_info
 end
 
-def lib_screen_prev_line
- con 'line' 'prev'
-end
-
 def lib_screen_clear_line
- con 'line' 'clear'
+ con 'clear' 'line'
 end
 
 def lib_screen_clear_screen
- con 'screen' 'clear'
-end
-
-def lib_screen_reverse
- con 'color' 'reverse'
-end
-
-def lib_screen_reset
- con 'color' 'reset'
+ con 'clear' 'screen'
 end
 
 def lib_screen_color_print
