@@ -32,7 +32,7 @@
 		brightWhite: '#FFFFFF'
 	};
 	let term = new Terminal({
-		fontFamily: '"Cascadia Code", Menlo, monospace', /* Ubuntu Mono, courier-new, courier, monospace', "Cascadia Code", Menlo, monospace */
+		fontFamily: '"Cascadia Code", Menlo, monospace',
 		fontSize: 16,
 		lineHeight: 1,
 		theme: baseTheme,
@@ -46,53 +46,8 @@
 	let promptOn = false;
 	let inputMask = null;
 
-	const escapeMap = {
-		'\\x1b[A': '\x1b[A',
-		'\\x1b[B': '\x1b[B',
-		'\\x1b[C': '\x1b[C',
-		'\\x1b[D': '\x1b[D',
-	}
-
 	let con = {
 		Write: (text, style) => {
-			if (text.length > 0) {
-				let w = text.slice(0,text.length-1);
-				if (w.slice(0,4) === '\\x1b') {
-					term.write(escapeMap[w]);
-					return;
-				}
-
-				let lineContent = text.slice(0,text.length-1);
-				if (lineContent === '\\033[F') {
-					// prev line
-					term.write('\033[F');
-					return;
-				} else if (lineContent === '\\033[2K') {
-					// clear line
-					term.write('\033[2K');
-					return;
-				} else if (lineContent === '\\033[2H') {
-					// clear screen
-					//term.write('\033[2H\033[F');
-					term.clear();
-					return;
-				} else if (lineContent === '\\u001b[7m') {
-					// reverse
-					term.write('\u001b[7m');
-					return;
-				} else if (lineContent.startsWith('\u001b[38;5;')) {
-					term.write('\u001b[38;5;87m');
-				} else if (lineContent === "\\x9B?47h") {
-					// alternate buffer
-					term.write('\x9B?1049h');
-					return;
-				} else if (lineContent === "\\x9B?47l") {
-					// primary buffer
-					term.write('\x9B?1049l');
-					return;
-				}
-			}
-			// text = text.replaceAll('[x1b', '\x1b');
 			text = text.replaceAll("\n", "\n\r");
 			term.write(text);
 		},
@@ -480,6 +435,57 @@
 		let type = evaluator.expr(args[0]);
 		if (type === "mask") {
 			inputMask = evaluator.expr(args[1]);
+		} else if (type === "color_print") {
+			let text = evaluator.expr(args[1]);
+			text = text.replaceAll("\n", "\n\r");
+			let fgColor = evaluator.expr(args[2]);
+			let bgColor = evaluator.expr(args[3]);
+			let sequence = "";
+			let styled = false;
+			if (fgColor != null) {
+				sequence += ("\u001b[38;5;" + fgColor + "m");
+				styled = true;
+			}
+			if (bgColor != null) {
+				sequence += ("\u001b[48;5;" + bgColor + "m");
+				styled = true;
+			}
+			sequence += text;
+			if (styled) {
+				sequence += "\u001b[0m";
+			}
+			term.write(sequence);
+		} else if (type === "buffer") {
+			let mode = evaluator.expr(args[1]);
+			if (mode === "primary") {
+				term.write('\x9B?1049l');
+			} else if (mode === "alternate") {
+				term.write('\x9B?1049h');
+			}
+		} else if (type === "color") {
+			let mode = evaluator.expr(args[1]);
+			if (mode === "reverse") {
+				term.write('\u001b[7m');
+			} else if (mode === "reset") {
+				term.write('\u001b[0m');
+			}
+		} else if (type === "arrow") {
+			let direction = evaluator.expr(args[1]);
+			let arrowMap = {"up": "A", "down": "B", "right": "C", "left": "D"};
+			term.write("\x1b[" + arrowMap[direction]);
+		} else if (type === "line") {
+			let mode = evaluator.expr(args[1]);
+			if (mode === "prev") {
+				term.write("\033[F");
+			} else if (mode === "clear") {
+				term.write("\033[2K");
+			}
+		} else if (type === "screen") {
+			let mode = evaluator.expr(args[1]);
+			if (mode === "clear") {
+				//term.write("\033[2H");
+				term.clear();
+			}
 		}
 	});
 
