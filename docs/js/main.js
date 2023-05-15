@@ -103,7 +103,7 @@
 		AbortInput: ()=>{}
 	}
 
-	function recordCommandHistory() {
+	function _recordCommandHistory() {
 		if (command.length > 0) {
 			consoleHistory.push(command);
 			if (consoleHistory.length > MaxHistorySize) {
@@ -116,7 +116,7 @@
 	function executeCommand() {
 		promptOn = false;
 		if (inputMask === null) {
-			recordCommandHistory();
+			_recordCommandHistory();
 		}
 		promptCallback(command);
 		command = '';
@@ -144,10 +144,10 @@
 			term.write('\x1b[C');
 			cursor++;
 		}
-		while (command.length > 0) {
+		for (let i = 0; i < command.length; i++) {
 			term.write('\b \b');
-			command = command.slice(0, command.length - 1);
 		}
+		command = "";
 		cursor = 0;
 	}
 
@@ -169,14 +169,14 @@
 		}
 	}
 
-	function moveCursorToInputLeftMost(pos) {
+	function moveCursorToInputLeftMost() {
 		while (cursor > 0) {
 			cursor--;
 			term.write('\x1b[D');
 		}
 	}
 
-	function moveCursorToInputRightMost(pos) {
+	function moveCursorToInputRightMost() {
 		while (cursor < command.length) {
 			term.write('\x1b[C');
 			cursor++;
@@ -392,7 +392,7 @@
 				cursor--;
 			}
 			break;
-		default: // Print all other characters for demo
+		default: // all other characters
 			if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7E) || e >= '\u00a0') {
 				// 0x20 ~ 0x7e : 32 ~ 126
 				insertToCommand(e);
