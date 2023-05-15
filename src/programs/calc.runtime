@@ -64,11 +64,10 @@ def is_var_name
  jeq $_typ 'str' continue
  ret 0
  #continue
- len $_val _l
  let _i 0
  #loop
  get $_val $_i _c
- jeq $_c $nil false
+ jeq $_c '' false
  get $num_char $_c _v
  jeq $_v $nil true
  add _i $_i 1
@@ -381,6 +380,7 @@ def infix_to_postfix
   jeq $_ss 0 operator_done
   sub _last_idx $_ss 1
   get $_stack $_last_idx _last
+  jeq $_last '(' operator_done
   get $precedence $_last _last_prece
   get $precedence $_t _this_prece
   jlt $_last_prece $_this_prece operator_done
