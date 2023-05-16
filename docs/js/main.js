@@ -169,7 +169,7 @@
 	function onTab() {
 		let text = command;
 		let tokens = parseCmdInput(text);
-		if (tokens.length < 1 || text.length > 0 && text[text.length-1] === " ") {
+		if (tokens.length === 0 || text.length > 0 && text[text.length-1] === " ") {
 			return;
 		}
 		let lastToken = tokens[tokens.length-1];
@@ -429,6 +429,10 @@
 		}
 		$(`.monitor-led div:nth-child(${ledId+1})`).css("background", color);
 	});
+
+	evaluator.extend("log", (env, args) => {
+		console.log(args.map((a)=> {evaluator.expr(a)}));
+	});
 	
 	evaluator.extend("con", (env, args) => {
 		/* console operations */
@@ -437,6 +441,7 @@
 			inputMask = evaluator.expr(args[1]);
 		} else if (type === "color_print") {
 			let text = evaluator.expr(args[1]);
+			text = text + "";
 			text = text.replaceAll("\n", "\n\r");
 			let fgColor = evaluator.expr(args[2]);
 			let bgColor = evaluator.expr(args[3]);
@@ -472,6 +477,7 @@
 				term.write("\033[2K");
 			} else if (mode === "screen") {
 				//term.write("\033[2H");
+				term.write('\x1b[A\033[2K')
 				term.clear();
 			}
 		}

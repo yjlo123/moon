@@ -747,6 +747,11 @@ def runtime
     nxt
    fin
   fin
+  ife $_lib_name 'term.read_key'
+   get $_line 2 _name
+   pol $key_press _key
+   cal add_var_to_env $_name $_key
+  fin
   ife $_lib_name 'net.http'
    cal eval_param $_line 2
    let _req $ret

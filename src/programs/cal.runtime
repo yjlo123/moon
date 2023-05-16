@@ -25,6 +25,7 @@ jmp check_leap_done
 #leap_year
 let day_count 29
 #check_leap_done
+
 prt 'Su Mo Tu We Th Fr Sa'
 let i 0
 let column 0
@@ -44,6 +45,7 @@ prt '   ' ''
 add i $i 1
 add column $column 1
 jmp skip_cell
+
 #start
 let i 1
 #loop
@@ -51,7 +53,12 @@ jgt $i $day_count done
 jgt $i 9 print_day
 prt ' ' ''
 #print_day
-prt $i ' '
+ife $i $_date
+ lib 'term.color_print' $i 0 255
+ prt ' ' ''
+els
+ prt $i ' '
+fin
 add i $i 1
 add column $column 1
 jne $column 7 loop

@@ -42,11 +42,11 @@ def get_autocomplete
  ife $_last_char '/'
   let _name ''
  els
+  psh $_keyword $_last_char
   pop $_cur_path _name
  fin
  cal get_real_path $_cur_path
  let _real_path $ret
- psh $_keyword $_last_char
  cal lib_get_file_list $_real_path
  let _file_list $ret
  ife $_name $nil

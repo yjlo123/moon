@@ -1,15 +1,16 @@
 /manage a todo list
-lib 'term.set_prt_delay' 0
-lib 'term.alternate_buffer'
-/ lib 'term.clear_screen'  / not working well, use self defined clear func
 lib 'os.get_home_path' home_path
 
 lib 'term.get_height' h
 jeq $h $nil err_term_not_supported
 sub h $h 1
 
+lib 'term.set_prt_delay' 0
+lib 'term.alternate_buffer'
+
 def print_header
- prt '┌───────────── TODO ─────────────┐'
+ cal clear
+ prt '┌────────── TODO v1.0 ───────────┐'
  prt '│Usage: add <t> / done <i> / exit│'
  prt '└────────────────────────────────┘'
 end
@@ -24,10 +25,10 @@ def clear
  jmp clear_loop
  #clear_done
  lib 'term.clear_line'
+ / * BUG: calling lib will clear the primary buffer
  / lib 'term.clear_screen'
 end
 
-cal clear
 cal print_header
 
 #load_data
@@ -91,9 +92,7 @@ let todo $new_todo
 #not_done
 
 / clear screen
-lib 'term.prev_line'
-lib 'term.clear_line'
-cal clear
+lib 'term.clear_screen'
 cal print_header
 
 len $todo size
@@ -119,10 +118,10 @@ prt 'ERR Your current terminal is not supported'
 jmp exit
 
 #end
-lib 'term.clear_line'
 lib 'os.write_file' $home_path '_todo' $todo
+lib 'term.clear_screen'
 lib 'term.primary_buffer'
-prt 'Bye~'
+/prt 'Bye~'
 
 #exit
 lib 'term.set_prt_delay' 1
