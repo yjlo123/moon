@@ -756,8 +756,8 @@ def runtime
    cal eval_param $_line 2
    let _req $ret
    get $_line 3 _var
-   net $_req _tmp
-   cal add_var_to_env $_var $_tmp
+   net $_req tmp
+   cal add_var_to_env $_var $tmp
   fin
 
  fin

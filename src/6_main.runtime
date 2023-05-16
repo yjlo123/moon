@@ -54,14 +54,14 @@ def execute_cmd
 
  / -- SAVE --
  ife $cmd 'save'
-  sav 'moon.sav' $root
+  sav 'moon.json' $root
   prt '[Saved]'
   jmp continue
  fin
 
  / -- LOAD --
  ife $cmd 'load'
-  lod 'moon.sav' loaded_data
+  lod 'moon.json' loaded_data
   ife $loaded_data $nil
    cal print_error 'There is no saved data'
   els

@@ -1,4 +1,4 @@
-/* Built on Mon, May 15, 2023  8:54:47 PM */
+/* Built on Tue, May 16, 2023 12:36:27 AM */
 let moonSrc = `
 let os_name 'Moon OS'
 let os_ver '1.24'
@@ -67,7 +67,7 @@ def load_extra_files
  nxt
 end
 cal load_extra_files
-let os_build '230515.2054'
+let os_build '230516.0036'
 
 / ====== parsing runtime program ======
 def parse_line
@@ -968,8 +968,8 @@ def runtime
    cal eval_param $_line 2
    let _req $ret
    get $_line 3 _var
-   net $_req _tmp
-   cal add_var_to_env $_var $_tmp
+   net $_req tmp
+   cal add_var_to_env $_var $tmp
   fin
 
  fin
@@ -1627,14 +1627,14 @@ def execute_cmd
 
  / -- SAVE --
  ife $cmd 'save'
-  sav 'moon.sav' $root
+  sav 'moon.json' $root
   prt '[Saved]'
   jmp continue
  fin
 
  / -- LOAD --
  ife $cmd 'load'
-  lod 'moon.sav' loaded_data
+  lod 'moon.json' loaded_data
   ife $loaded_data $nil
    cal print_error 'There is no saved data'
   els
