@@ -27,7 +27,6 @@ body {
 
 .terminal-view {
     margin: auto;
-    height: 362px;
     padding: 17px;
     text-align: left;
     background-color: #2D2E2C;
@@ -36,7 +35,7 @@ body {
 }
 
 #terminal {
-    height: 360px;
+    overflow: hidden;
 }
 
 .monitor-shell {
