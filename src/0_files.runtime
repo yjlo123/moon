@@ -2,6 +2,10 @@ let os_name 'Moon OS'
 let os_ver '1.24'
 let os_build 'N/A'
 
+ife $os_host $nil
+ let os_host 'unknown'
+fin
+
 let init_cmd '/programs/motd'
 
 let root {}

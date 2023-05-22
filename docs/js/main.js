@@ -488,7 +488,8 @@
 	runtime.restart();
 	runtime.executeAll({
 		term_w: TERM_COLS,
-		term_h: TERM_ROWS
+		term_h: TERM_ROWS,
+		os_host: 'browser (js)'
 	}, moonSrc);
 	
 })();

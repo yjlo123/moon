@@ -115,6 +115,7 @@ def lib_get_os_info
  psh $_info $os_name
  psh $_info $os_ver
  psh $_info $os_build
+ psh $_info $os_host
  ret $_info
 end
 

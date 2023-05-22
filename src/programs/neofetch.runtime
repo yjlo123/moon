@@ -84,6 +84,7 @@ lib 'os.get_os_info' info
 get $info 0 os_name
 get $info 1 os_ver
 get $info 2 os_build
+get $info 3 os_host
 lib 'term.color_print' 'OS: ' $l_color $nil
 prt $os_name
 cal offset
@@ -93,15 +94,15 @@ cal offset
 lib 'term.color_print' 'OS Build: ' $l_color $nil
 prt $os_build
 cal offset
+lib 'term.color_print' 'Host: ' $l_color $nil
+prt $os_host
+cal offset
 
 lib 'term.get_height' h
 lib 'term.get_width' w
 lib 'term.color_print' 'Term Size: ' $l_color $nil
 prt $w 'x'
 prt $h
-cal offset
-lib 'term.color_print' 'Term Theme: ' $l_color $nil
-prt 'default'
 cal offset
 
 lib 'os.get_sys_info' info
