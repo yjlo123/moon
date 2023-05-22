@@ -1,6 +1,35 @@
 /a system info script
 let param $0
 
+lib 'os.get_os_info' info
+get $info 0 os_name
+get $info 1 os_ver
+get $info 2 os_build
+get $info 3 os_host
+lib 'util.get_path_by_str' '/env' path
+lib 'os.read_file' $path 'user' username
+
+lib 'term.get_height' h
+lib 'term.get_width' w
+jne $h $nil normal_mode
+/ compatible mode
+prt '[In term compatible mode]'
+prt $username
+prt '------------'
+prt 'OS: ' ''
+prt $os_name
+prt 'OS Ver: ' ''
+prt $os_ver
+prt 'OS Build: ' ''
+prt $os_build
+prt 'Host: ' ''
+prt $os_host
+cal get_uptime_str
+prt 'Uptime: ' ''
+prt $uptime_str
+jmp end
+
+#normal_mode
 let t_color 2  / title color
 let l_color 3  / label color
 let col_offset 23
@@ -72,19 +101,12 @@ def offset
 end
 
 cal offset
-lib 'util.get_path_by_str' '/env' path
-lib 'os.read_file' $path 'user' username
 lib 'term.color_print' $username $t_color $nil
 prt ''
 cal offset
 prt '------------'
 cal offset
 
-lib 'os.get_os_info' info
-get $info 0 os_name
-get $info 1 os_ver
-get $info 2 os_build
-get $info 3 os_host
 lib 'term.color_print' 'OS: ' $l_color $nil
 prt $os_name
 cal offset
@@ -105,30 +127,34 @@ prt $w 'x'
 prt $h
 cal offset
 
-lib 'os.get_sys_info' info
-get $info 'uptime' uptime
-div uptime $uptime 1000
-let uptime_str ''
-div days $uptime 86400
-mod uptime $uptime 86400
-div hours $uptime 3600
-mod uptime $uptime 3600
-div minutes $uptime 60
-mod uptime $uptime 60
-jeq $days 0 skip_day
-add uptime_str $uptime_str $days
-add uptime_str $uptime_str 'd '
-#skip_day
-jeq $hours 0 skip_hour
-add uptime_str $uptime_str $hours
-add uptime_str $uptime_str 'h '
-#skip_hour
-jeq $minutes 0 skip_minute
-add uptime_str $uptime_str $minutes
-add uptime_str $uptime_str 'm '
-#skip_minute
-add uptime_str $uptime_str $uptime
-add uptime_str $uptime_str 's'
+def get_uptime_str
+ lib 'os.get_sys_info' info
+ get $info 'uptime' uptime
+ div uptime $uptime 1000
+ let uptime_str ''
+ div days $uptime 86400
+ mod uptime $uptime 86400
+ div hours $uptime 3600
+ mod uptime $uptime 3600
+ div minutes $uptime 60
+ mod uptime $uptime 60
+ jeq $days 0 skip_day
+ add uptime_str $uptime_str $days
+ add uptime_str $uptime_str 'd '
+ #skip_day
+ jeq $hours 0 skip_hour
+ add uptime_str $uptime_str $hours
+ add uptime_str $uptime_str 'h '
+ #skip_hour
+ jeq $minutes 0 skip_minute
+ add uptime_str $uptime_str $minutes
+ add uptime_str $uptime_str 'm '
+ #skip_minute
+ add uptime_str $uptime_str $uptime
+ add uptime_str $uptime_str 's'
+end
+
+cal get_uptime_str
 lib 'term.color_print' 'Uptime: ' $l_color $nil
 prt $uptime_str
 
