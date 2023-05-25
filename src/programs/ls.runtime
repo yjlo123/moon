@@ -6,7 +6,7 @@ put $type_map 'raw' 'RAW'
 put $type_map 'dir' 'DIR'
 put $type_map 'lnk' 'LNK'
 put $type_map 'bat' 'BAT'
-put $type_map $nil 'NIL'
+put $type_map 'lst' 'LST'
 jeq $0 $nil use_current_path
 lib 'util.get_path_by_str' $0 path
 jeq $path $nil print_error

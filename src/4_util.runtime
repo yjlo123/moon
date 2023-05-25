@@ -365,7 +365,7 @@ def get_list_type
   get $_meta 0 _t
   ret $_t
  els
-  ret $nil
+  ret 'lst'
  fin
 end
 

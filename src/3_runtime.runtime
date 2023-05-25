@@ -206,12 +206,13 @@ def runtime
  let runtime_running 1
  let key_press []
  / read args
- let i 0
+ let _i 0
  ife $_args $nil
  els
   for _arg $_args
-    put $env $i $_arg
-    add i $i 1
+   str _idx $_i
+   put $env $_idx $_arg
+   add _i $_i 1
   nxt
  fin
 
@@ -548,10 +549,11 @@ def runtime
   jeq $_argv $nil read_args_finished
   sub _j $_i 2
   cal eval_param $_line $_i
-  put $_new_frame $_j $ret
+  str _argi $_j
+  put $_new_frame $_argi $ret
   add _i $_i 1
   jmp read_args_loop
-  #read_args_finished 
+  #read_args_finished
   psh $env_stack $_new_frame
  fin
 
