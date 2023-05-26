@@ -290,6 +290,39 @@ cal assert_eq $val $nil
 cal count_result 'Map get deleted' $ret
 
 
+/ == Parse JSON
+prs j1 '{"k1": 123, "k2": "abc", "k3": null}'
+get $j1 'k1' val
+cal assert_eq $val 123
+cal count_result 'Parse JSON get int' $ret
+get $j1 'k2' val
+cal assert_eq $val 'abc'
+cal count_result 'Parse JSON get string' $ret
+get $j1 'k3' val
+cal assert_eq $val $nil
+cal count_result 'Parse JSON get nil' $ret
+prs j2 '{"list": [1,2,"ab"]}'
+get $j2 'list' lst1
+let lst2 []
+psh $lst2 1 2 'ab'
+cal assert_eq $lst1 $lst2
+cal count_result 'Parse JSON get list' $ret
+prs j3 '{"list":[1,2,[[],null,"aa"]]}'
+get $j3 'list' lst
+get $lst 2 inner_lst
+let lst2 []
+psh $lst2 [] $nil 'aa'
+cal assert_eq $inner_lst $lst2
+cal count_result 'Parse JSON inner list' $ret
+prs j4 '{"aa":{"bb":[{"cc":123}]}}'
+get $j4 'aa' im1
+get $im1 'bb' il1
+get $il1 0 im2
+get $im2 'cc' val
+cal assert_eq $val 123
+cal count_result 'Parse JSON inner map' $ret
+
+
 // == If-else
 let a 5
 let b 8
@@ -333,37 +366,37 @@ cal assert_eq $v 12
 cal count_result 'If greater true' $ret
 
 
-/ == FOR LOOP
-/ let lst []
-/ psh $lst 12 'ss' $nil 'ab'
-/ let res []
-/ for item $lst
-/  psh $res $item
-/ nxt
-/ cal assert_eq $lst $res
-/ cal count_result 'For loop list' $ret
+/ == For loop
+let lst []
+psh $lst 12 'ss' $nil 'ab'
+let res []
+for item $lst
+ psh $res $item
+nxt
+cal assert_eq $lst $res
+cal count_result 'For loop list' $ret
 
-/ let res []
-/ for v 3
-/  psh $res $v
-/ nxt
-/ let exp []
-/ psh $exp 0 1 2
-/ cal assert_eq $res $exp
-/ cal count_result 'For loop int range' $ret
+let res []
+for v 3
+ psh $res $v
+nxt
+let exp []
+psh $exp 0 1 2
+cal assert_eq $res $exp
+cal count_result 'For loop int range' $ret
 
-/ let m {}
-/ put $m 'a' 4
-/ put $m 'k' 9
-/ let res []
-/ for v $m
-/  psh $res $v
-/ nxt
-/ let exp []
-/ psh $exp 'a' 'k'
-/ cal set_equal $res $exp
-/ cal assert_eq $ret 1
-/ cal count_result 'For loop map' $ret
+let m {}
+put $m 'a' 4
+put $m 'k' 9
+let res []
+for v $m
+ psh $res $v
+nxt
+let exp []
+psh $exp 'a' 'k'
+cal set_equal $res $exp
+cal assert_eq $ret 1
+cal count_result 'For loop map' $ret
 
 
 prt '============'

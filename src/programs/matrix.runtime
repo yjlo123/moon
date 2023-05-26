@@ -1,4 +1,4 @@
-/ simulates the code rain from \"The Matrix\"
+/ simulates the code rain from <The Matrix>
 
 lib 'term.get_height' h
 lib 'term.get_width' w

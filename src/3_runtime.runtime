@@ -5,6 +5,7 @@
 let env {}       / global vars of current program
 let env_stack [] / func-scoped vars of current programs
 let frames []    / frame stack for all running programs
+let loops {}
 let prt_delay 5
 let prt_delay_disabled 0
 let sig_interrupt 0
@@ -183,6 +184,61 @@ def goto_if_false
   jeq $_stack 0 done
  fin
  add _pc $_pc 1
+ jmp loop
+ #done
+ ret $_pc
+end
+
+def goto_loop_end
+ let _p $0
+ let _pc $1
+ let _stack 0
+ add _pc $_pc 1
+ #loop
+ get $_p $_pc _line
+ jeq $_line $nil done
+ get $_line 0 _cmd
+ jeq $_cmd $nil next
+ jeq $_cmd 'for' add_stack
+ jmp continue
+ #add_stack
+ add _stack $_stack 1
+ #continue
+ ife $_cmd 'nxt'
+  jeq $_stack 0 done
+  sub _stack $_stack 1
+ fin
+ #next
+ add _pc $_pc 1
+ jmp loop
+ #done
+ ret $_pc
+end
+
+def back_to_loop_head
+ let _p $0
+ let _pc $1
+ let _stack 0
+ sub _pc $_pc 1
+ #loop
+ jlt $_pc 0 done
+ get $_p $_pc _line
+ get $_line 0 _cmd
+ jeq $_cmd $nil next
+ jeq $_cmd 'for' sub_stack
+ jmp continue
+ #sub_stack
+ ife $_stack 0
+  sub _pc $_pc 1
+  jmp done
+ fin
+ sub _stack $_stack 1
+ #continue
+ ife $_cmd 'nxt'
+  add _stack $_stack 1
+ fin
+ #next
+ sub _pc $_pc 1
  jmp loop
  #done
  ret $_pc
@@ -465,9 +521,8 @@ def runtime
   let _list $ret
   cal eval_param $_line 2
   let _key $ret
-  cal eval_param $_line 3
-  let _var $ret
   get $_list $_key _val
+  get $_line 3 _var
   cal add_var_to_env $_var $_val
  fin
  ife $_cmd 'key'
@@ -510,6 +565,47 @@ def runtime
   let _pc $ret
  fin
  ife $_cmd 'fin'
+ fin
+
+ / ** for loop **
+ ife $_cmd 'for'
+  get $_line 1 _var
+  cal eval_param $_line 2
+  let _rg $ret
+  get $loops $_var _state
+  ife $_state $nil
+   / init new loop
+   let _rg_list []
+   for _e $_rg
+    psh $_rg_list $_e
+   nxt
+   let _obj {}
+   put $_obj 'items' $_rg_list
+   put $_obj 'pc' $_pc
+   put $_obj 'index' 0
+   put $loops $_var $_obj 
+  fin
+
+  get $loops $_var _state
+  get $_state 'items' _items
+  get $_state 'index' _index
+  len $_items _len
+  jeq $_index $_len loop_finished
+  jgt $_index $_len loop_finished
+  get $_items $_index _cur
+  cal add_var_to_env $_var $_cur
+  add _index $_index 1
+  put $_state 'index' $_index
+  jmp for_end
+  #loop_finished
+   del $loops $_var
+   cal goto_loop_end $_p $_pc
+   let _pc $ret
+  #for_end
+ fin
+ ife $_cmd 'nxt'
+  cal back_to_loop_head $_p $_pc
+  let _pc $ret
  fin
 
  / ** function commands **

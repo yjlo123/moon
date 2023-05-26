@@ -29,8 +29,8 @@ def get
  get $_content 'type' _t
  ife $_t 'string'
   get $_content 'value' _val
-  add _val '\"' $_val
-  add _val $_val '\"'
+  add _val '"' $_val
+  add _val $_val '"'
   ret $_val
  els
   ret $WRONG_TYPE
@@ -148,8 +148,8 @@ def pop
  get $_content 'length' _len
  sub _len $_len 1
  put $_content 'length' $_len
- add _val '\"' $_val
- add _val $_val '\"'
+ add _val '"' $_val
+ add _val $_val '"'
  ife $_len 0
   cal del $_key
  fin
@@ -415,9 +415,9 @@ def print_list
  ifg $_end 0
   jgt $_i $_len done_print
  fin
- add _v $_idx ') \"'
+ add _v $_idx ') "'
  add _v $_v $_val
- add _v $_v '\"'
+ add _v $_v '"'
  prt $_v
  let _empty 0
  add _idx $_idx 1
@@ -438,7 +438,7 @@ def parse_input
  pol $input c
  jeq $c '' parse_done
  jeq $c ' ' token_done
- jeq $c '\"' parse_string
+ jeq $c '"' parse_string
  jmp add_token_char
  
  #parse_string
@@ -719,8 +719,8 @@ fin
 / ----- ECHO -----
 ife $cmd 'echo'
  pol $tokens msg
- add msg '\"' $msg
- add msg $msg '\"'
+ add msg '"' $msg
+ add msg $msg '"'
  prt $msg
  jmp loop
 fin

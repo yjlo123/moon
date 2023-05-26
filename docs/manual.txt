@@ -8,9 +8,9 @@ put, get, key, del
 clr, drw, pxl
 def, end, ret, cal
 ife, ifg, els, fin
+for, nxt
 
 ~ not supported:
-for, nxt
 lod, sav
 
 ~ only in Moon OS:

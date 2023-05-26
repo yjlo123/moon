@@ -47,9 +47,9 @@ prt 'USAGE head file'
 jmp done
 
 #print_error_directory
-prt 'ERR \"' ''
+prt 'ERR "' ''
 prt $file_name ''
-prt '\" is a directory'
+prt '" is a directory'
 jmp done
 
 #print_error_invalid_path

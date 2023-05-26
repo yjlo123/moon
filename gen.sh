@@ -73,6 +73,7 @@ if [ "$(uname -s)" = "Darwin" ]; then
     # on Mac
     sed -i '' 's/\\/\\\\/g' $source_js
     sed -i '' 's/\\\\\\u/\u/g' $source_js
+    sed -i '' 's/\\"/\\\\\\"/g' $source_js
 else
     # on Linux
     # SEDOPTION=
@@ -82,6 +83,7 @@ else
     sed -i''  's/\\/\\\\/g' $source_js
     sed -i''  's/\\\\\\\\u/\\u/g' $source_js
     sed -i''  's/\\\\u/\\u/g' $source_js
+    sed -i''  's/\\"/\\\\\\"/g' $source_js
 fi
 
 cp $source_js ./docs/js/source.js
