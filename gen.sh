@@ -16,7 +16,9 @@ for dir in ['programs', 'games']:
         ff = os.path.join(\"src/{}\".format(dir), prog)
         if os.path.isdir(ff):
             continue
-        ext = prog.split('.')[-1]
+        file_name, ext = prog.split('.')
+        #if file_name not in ['cd','cp','date','dir','echo','ls','mkdir','motd','mv','programs','pwd','rm','touch','uptime']:
+        #    continue
         with open(ff, 'r', encoding='utf8') as f:
             virtual_file = []
             if ext == 'runtime':
@@ -55,6 +57,7 @@ let os_build '$(date "+%y%m%d.%H%M")'
 " >> $files_extra
 
 dist_program="./dist/program.runtime"
+echo "/Moon OS" >> $dist_program
 for filename in ./src/*.runtime; do
 	echo $filename
 	cat $filename >> $dist_program

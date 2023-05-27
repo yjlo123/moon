@@ -1,3 +1,4 @@
+/ ==== MAIN ====
 def main
  cal get_home_path
  let path $ret
@@ -19,6 +20,82 @@ def main
  prt '>> Session ended <<'
 end
 
+/ ==== RUN ====
+def run
+ let _tokens $0
+ pol $_tokens _d
+ ife $_d $nil
+  cal print_error 'Invalid file name'
+  ret
+ fin
+
+ cal get_path_by_str $_d
+ let _prog_path $ret
+ pop $_prog_path _prog
+ cal get_real_path $_prog_path
+ let _real_path $ret
+ cal get_by_path $_real_path
+ let prog_dir $ret
+
+ get $prog_dir $_prog _file_content
+ cal lib_get_file_type $_real_path $_prog
+
+ ife $ret 'lnk'
+  get $_file_content 0 _file_meta
+  get $_file_meta 1 _link_path_str
+  cal get_path_by_str $_link_path_str $_real_path
+  let _prog_path $ret
+  pop $_prog_path _prog
+  
+  cal get_by_path $_prog_path
+  let prog_dir $ret
+  get $prog_dir $_prog _file_content
+ fin
+
+ ife $_file_content $nil
+  cal print_error 'File not found'
+ els
+  cal check_executable $_file_content
+  ife $ret 1
+   get $_file_content 0 _meta_data
+   get $_meta_data 0 _file_type
+   let _exe []
+   len $_file_content _length
+   sub _length $_length 1   / skip frist meta line
+   for _i $_length
+    add _j $_i 1
+    get $_file_content $_j _line
+    psh $_exe $_line
+   nxt
+   ife $_file_type 'exe'
+    / exe
+    cal runtime $_exe $_tokens
+   els
+    / bat shell script
+    cal shell $_exe $_tokens
+   fin
+  els
+   cal print_error 'File not executable'
+  fin
+ fin
+end
+
+/ ==== SHELL BATCH ====
+def shell
+ let _lines $0
+ let _args $1  / top level args, not used
+ let _i 0
+ len $_lines _len
+ #loop
+  jeq $_i $_len done
+  get $_lines $_i _line
+  cal execute_cmd $_line
+  add _i $_i 1
+ jmp loop
+ #done
+end
+
+/ ==== EXECUTE COMMAND ====
 def execute_cmd
  cal parse_input $0
  let tokens $ret
@@ -44,12 +121,6 @@ def execute_cmd
   nxt
   cal run $_tokens
   jmp continue
- fin
-
- / -- EDIT --
- ife $cmd 'edit'
-  cal edit $tokens
-  jmp edit_loop
  fin
 
  / -- SAVE --

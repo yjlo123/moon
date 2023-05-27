@@ -1,0 +1,165 @@
+/file editor
+let path_str $0
+jeq $path_str $nil print_error_invalid_name
+lib 'util.get_path_by_str' $path_str path
+pop $path file_name
+lib 'util.get_real_path' $path path
+jeq $path $nil print_error_invalid_path
+lib 'util.verify_path' $path 1 is_valid
+jeq $is_valid 0 print_error_invalid_path
+
+def create_new_file
+ let _file_content []
+ let _file_meta []
+ prt 'Create a new file?'
+ prt 't:txt(default) | e:exe | c:<cancel>'
+ inp _choice
+ ife $_choice 'c'
+  ret $nil
+ fin
+ ife $_choice 'e'
+  psh $_file_meta 'exe'
+ els
+  psh $_file_meta 'txt'
+ fin
+ psh $_file_content $_file_meta
+ lib 'os.write_file' $path $file_name $_file_content
+ prt 'File created.'
+ ret $_file_content
+end
+
+lib 'os.read_file' $path $file_name file_content
+ife $file_content $nil
+ cal create_new_file
+ let file_content $ret
+ jeq $ret $nil end
+fin
+
+lib 'os.get_file_type' $path $file_name file_type
+
+/ check file editable
+jeq $file_type 'txt' edit_file_valid
+jeq $file_type 'exe' edit_file_valid
+prt 'ERR File not editable'
+jmp end
+
+#edit_file_valid
+prt '== Edit v0.1 =='
+prt '= v:view a:append i:insert r:replace h:help q:quit'
+prt '= ' ''
+prt '<' $file_type
+prt '> ' ''
+prt $file_name
+
+#edit_loop
+prt '>' ''
+inp _edit_in
+
+let _cmd_token ''
+#extract_cmd_token
+pol $_edit_in _c
+jeq $_c '' extract_cmd_token_done
+jeq $_c ' ' extract_cmd_token_done
+add _cmd_token $_cmd_token $_c
+jmp extract_cmd_token
+#extract_cmd_token_done
+let _content $_edit_in
+pol $_cmd_token _cmd
+let _cmd_arg $_cmd_token
+
+/ == QUIT
+jeq $_cmd 'q' end
+
+/ == HELP
+ife $_cmd 'h'
+ prt '| v ..... View'
+ prt '| a ..... Append'
+ prt '| i<n> .. Insert at line <n>'
+ prt '| r<n> .. Replace line <n>'
+ prt '| q ..... Quit'
+fin
+
+/ == VIEW
+ife $_cmd 'v'
+ let _i 0    / line number
+ for _row $file_content
+  jeq $_i 0 edit_view_skip_meta
+  /cal replace_char_in_str $_row '\n' '\\n'
+  /let _row $ret
+  add _ln $_i ' |'
+  add _row $_ln $_row
+  prt $_row
+  #edit_view_skip_meta
+  add _i $_i 1
+ nxt
+fin
+
+/ == APPEND
+ife $_cmd 'a'
+ /cal replace_esc_in_str $_content
+ psh $file_content $_content
+fin
+
+/ == DELETE
+ife $_cmd 'd'
+ int _line_number $_cmd_arg
+ let new_content []
+ let _line_count 0
+ for line $file_content
+  ife $_line_count $_line_number
+   jmp _edit_delete_continue
+  fin
+  psh $new_content $line
+  #_edit_delete_continue
+  add _line_count $_line_count 1
+ nxt
+ lib 'os.write_file' $path $file_name $new_content
+ let file_content $new_content
+fin
+
+/ == INSERT
+ife $_cmd 'i'
+ int _line_number $_cmd_arg
+ let new_content []
+ let _line_count 0
+ for line $file_content
+  ife $_line_count $_line_number
+   /cal replace_esc_in_str $_content
+   psh $new_content $_content
+  fin
+  psh $new_content $line
+  add _line_count $_line_count 1
+ nxt
+ lib 'os.write_file' $path $file_name $new_content
+ let file_content $new_content
+fin
+
+/ == REPLACE
+ife $_cmd 'r'
+ int _line_number $_cmd_arg
+ let new_content []
+ let _line_count 0
+ for line $file_content
+  ife $_line_count $_line_number
+   /cal replace_esc_in_str $_content
+   psh $new_content $_content
+  els
+   psh $new_content $line
+  fin
+  add _line_count $_line_count 1
+ nxt
+ lib 'os.write_file' $path $file_name $new_content
+ let file_content $new_content
+fin
+
+jmp edit_loop
+
+#print_error_invalid_path
+prt 'ERR File not found'
+jmp end
+
+#print_error_invalid_name
+prt 'USAGE edit <file_name>'
+jmp end
+
+#end
