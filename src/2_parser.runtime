@@ -19,6 +19,23 @@ def parse_line
 
  #parse_string_char
  pol $_line _c
+ ife $_c '\\'
+  / escape
+  pol $_line _cc
+  ife $_cc '\''
+   psh $_s '\''
+   jmp parse_string_char
+  fin
+  ife $_cc '\\'
+   psh $_s '\\'
+   jmp parse_string_char
+  fin
+  ife $_cc 'n'
+   psh $_s '\n'
+   jmp parse_string_char
+  fin
+  jmp parse_string_char
+ fin
  ife $_c $_q
   / psh $_s $_q  / # the final quote
   psh $_tokens $_s

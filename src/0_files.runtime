@@ -1,5 +1,6 @@
 let os_name 'Moon OS'
 let os_ver '1.25'
+let os_flavor ''
 let os_build 'N/A'
 
 ife $os_host $nil

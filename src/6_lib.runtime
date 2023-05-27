@@ -113,7 +113,10 @@ end
 def lib_get_os_info
  let _info []
  psh $_info $os_name
- psh $_info $os_ver
+ let _full_ver $os_ver
+ add _full_ver $_full_ver '_'
+ add _full_ver $_full_ver $os_flavor
+ psh $_info $_full_ver
  psh $_info $os_build
  psh $_info $os_host
  ret $_info

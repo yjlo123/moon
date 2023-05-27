@@ -2,23 +2,33 @@
 rm -r dist
 mkdir dist
 
-
+# pro | lite | minimal
+flavor="pro"
 files_extra="./src/1_files_extra.runtime"
 echo -e "def load_extra_files
  prs _fs '\c" >> $files_extra
 python3 -c "
 import json
 import os
-f = open('src/1_files_extra.json', encoding='utf8')
-f_json = json.load(f)
+if '$flavor' == 'minimal':
+    f_json = {'home':{'guest':{}},'programs':{}}
+else:
+    f = open('src/1_files_extra.json', encoding='utf8')
+    f_json = json.load(f)
+lite_prog = ['cat','cd','cp','date','dir','echo','edit','ls','mkdir','motd','mv','programs','pwd','rm','touch','uptime']
+minimal_prog = ['cat','cd','cp','echo','ls','mkdir','motd','mv','pwd','rm','touch']
 for dir in ['programs', 'games']:
+    if '$flavor' == 'minimal' and dir != 'programs':
+        continue
     for prog in os.listdir(\"src/{}\".format(dir)):
         ff = os.path.join(\"src/{}\".format(dir), prog)
         if os.path.isdir(ff):
             continue
         file_name, ext = prog.split('.')
-        #if file_name not in ['cd','cp','date','dir','echo','ls','mkdir','motd','mv','programs','pwd','rm','touch','uptime']:
-        #    continue
+        if '$flavor' == 'lite' and file_name not in lite_prog:
+            continue
+        elif '$flavor' == 'minimal' and file_name not in minimal_prog:
+            continue
         with open(ff, 'r', encoding='utf8') as f:
             virtual_file = []
             if ext == 'runtime':
@@ -27,6 +37,7 @@ for dir in ['programs', 'games']:
                 virtual_file.append(header)
                 row = f.readline()
                 while row:
+                    row = row.replace('\\\\', '\\\\\\\\')
                     virtual_file.append(row.rstrip())
                     row = f.readline()
             elif ext == 'link':
@@ -54,10 +65,11 @@ echo "'
 end
 cal load_extra_files
 let os_build '$(date "+%y%m%d.%H%M")'
+let os_flavor '$flavor'
 " >> $files_extra
 
 dist_program="./dist/program.runtime"
-echo "/Moon OS" >> $dist_program
+echo "/Moon OS ($flavor)" >> $dist_program
 for filename in ./src/*.runtime; do
 	echo $filename
 	cat $filename >> $dist_program
