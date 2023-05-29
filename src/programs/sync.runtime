@@ -1,7 +1,6 @@
-/logout from remote server
+/sync user files with remote server
 let AUTH_API 'https://siwei.dev'
 add API_SESSION $AUTH_API '/session'
-add API_LOGOUT $AUTH_API '/logout?redirect=false'
 add API_SAVE_FILE $AUTH_API '/api/fs/save'
 
 def build_req
@@ -44,26 +43,6 @@ get $res 'status' status
 jne $status 0 error_save_file
 prt '[done]'
 
-/ logout session
-prt 'Logging out...' ''
-cal build_req 'GET' $API_LOGOUT $nil 1
-lib 'net.http' $ret _
-prt '[done]'
-
-/ switch to guest
-def switch_to_guest
- lib 'os.get_home_path' _home_path
- lib 'os.delete_path' $_home_path
- lib 'os.set_env_var' 'user' 'guest'
- lib 'os.get_home_path' _home_path
- lib 'os.set_current_path' $_home_path
-end
-
-prt 'Switching to guest account...' ''
-cal switch_to_guest
-prt '[done]'
-
-prt 'Logged out'
 jmp end
 
 #error_save_file

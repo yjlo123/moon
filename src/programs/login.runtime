@@ -2,6 +2,7 @@
 let AUTH_API 'https://siwei.dev'
 add API_SESSION $AUTH_API '/session'
 add API_LOGIN $AUTH_API '/login'
+add API_LOGOUT $AUTH_API '/logout?redirect=false'
 add API_LOAD_FILE $AUTH_API '/api/fs/load'
 
 def build_req
@@ -33,6 +34,14 @@ def init_account
  prt '[done]'
 end
 
+def switch_to_guest
+ lib 'os.get_home_path' _home_path
+ lib 'os.delete_path' $_home_path
+ lib 'os.set_env_var' 'user' 'guest'
+ lib 'os.get_home_path' _home_path
+ lib 'os.set_current_path' $_home_path
+end
+
 def load_user_files
  let _username $0
  prt 'Loading files...' ''
@@ -46,10 +55,10 @@ def load_user_files
   let _home_dir []
   psh $_home_dir 'home'
   lib 'os.write_file' $_home_dir $_username $_parsed_data
+  ret 0  / success
  els
-  prt '[fail]'
-  prt 'ERR error loading user files'
-  ret
+  prt '[failed]'
+  ret 1  / failed
  fin
 end
 
@@ -84,6 +93,7 @@ let req $ret
 lib 'net.http' $req res
 get $res 'status' status
 jeq $status 'success' setup_user
+prt 'ERR failed to login, ' ''
 prt $status
 jmp end
 
@@ -92,17 +102,25 @@ jmp end
 #setup_user
 cal init_account $username
 cal load_user_files $username
-prt 'Logged in as ' ''
-prt $username
+ife $ret 0
+ prt 'Logged in as ' ''
+ prt $username
+els
+ prt 'ERR Faild to load user files.'
+ prt 'Logging out...' ''
+ cal build_req 'GET' $API_LOGOUT $nil 1
+ lib 'net.http' $ret _
+ prt '[done]'
+ prt 'Switching back to guest account...' ''
+ cal switch_to_guest
+ prt '[done]'
+ prt 'ERR Login cancelled.'
+fin
 jmp end
 
 #error_already_logged_in
 prt 'Already logged in as ' $username
 prt ''
-jmp end
-
-#error_login
-prt 'ERR failed to login'
 jmp end
 
 #error_load_file
