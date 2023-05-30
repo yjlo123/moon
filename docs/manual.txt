@@ -50,6 +50,7 @@ term.set_prt_delay ($enable)
 term.get_width (width)
 term.get_height (height)
 term.move_cursor ($dx, $dy)
+term.set_cursor_position ($line, $column)
 
 
 ## Runtime Script resources

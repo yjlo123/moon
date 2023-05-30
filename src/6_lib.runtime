@@ -146,19 +146,25 @@ def lib_screen_color_print
 end
 
 def lib_screen_up_arrow
- con 'arrow' 'up'
+ con 'cursor' 'up'
 end
 
 def lib_screen_down_arrow
- con 'arrow' 'down'
+ con 'cursor' 'down'
 end
 
 def lib_screen_left_arrow
- con 'arrow' 'left'
+ con 'cursor' 'left'
 end
 
 def lib_screen_right_arrow
- con 'arrow' 'right'
+ con 'cursor' 'right'
+end
+
+def lib_screen_set_cursor_position
+ let _line $0
+ let _column $1
+ con 'cursor' 'position' $_line $_column
 end
 
 def lib_screen_alternate_buffer

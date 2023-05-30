@@ -467,17 +467,25 @@
 			} else if (mode === "alternate") {
 				term.write('\x9B?1049h');
 			}
-		} else if (type === "arrow") {
-			let direction = evaluator.expr(args[1]);
-			let arrowMap = {"up": "A", "down": "B", "right": "C", "left": "D"};
-			term.write("\x1b[" + arrowMap[direction]);
+		} else if (type === "cursor") {
+			let mode = evaluator.expr(args[1]);
+			if (mode == "position") {
+				let x = evaluator.expr(args[2]);
+				let y = evaluator.expr(args[3]);
+				console.log(x, y)
+				term.write("\033[" + x + ";" + y + "H");
+			} else {
+				let arrowMap = {"up": "A", "down": "B", "right": "C", "left": "D"};
+				term.write("\x1b[" + arrowMap[mode]);
+			}
 		} else if (type === "clear") {
 			let mode = evaluator.expr(args[1]);
 			if (mode === "line") {
 				term.write("\033[2K");
 			} else if (mode === "screen") {
 				//term.write("\033[2H");
-				term.write('\x1b[A\033[2K')
+				//term.write('\x1b[A\033[2K')
+				term.write('\033[1J\033[H')
 				term.clear();
 			}
 		}

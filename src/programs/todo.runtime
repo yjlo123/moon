@@ -26,7 +26,7 @@ def clear
  #clear_done
  lib 'term.clear_line'
  / * BUG: calling lib will clear the primary buffer
- / lib 'term.clear_screen'
+ /lib 'term.clear_screen'
 end
 
 cal print_header

@@ -819,6 +819,13 @@ def runtime
    get $_line 2 _name
    cal add_var_to_env $_name $term_h
   fin
+  ife $_lib_name 'term.set_cursor_position'
+   cal eval_param $_line 2
+   let _x $ret
+   cal eval_param $_line 3
+   let _y $ret
+   cal lib_screen_set_cursor_position $_x $_y
+  fin
   ife $_lib_name 'term.move_cursor'
    cal eval_param $_line 2
    let _dx $ret
