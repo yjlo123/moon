@@ -386,12 +386,7 @@
 			pixels[widthInBlocks*x+y] = val;
 
 			let up = widthInBlocks-y;
-			for (let i = 0; i < up; i++) {
-				term.write('\x1b[A');
-			}
-			for (let i = 0; i < x-1; i++) {
-				term.write('\x1b[C');
-			}
+			term.write("\033[" + (TERM_ROWS-up) + ";" + (x-1) + "H");
 			
 			if (val === '0' || val === 0) {
 				term.write(' ');
@@ -399,12 +394,7 @@
 				term.write('#');
 			}
 
-			for (let i = 0; i < up; i++) {
-				term.write('\x1b[B');
-			}
-			for (let i = 0; i < x; i++) {
-				term.write('\x1b[D');
-			}
+			term.write("\033[" + (TERM_ROWS-up) + ";" + (x-1) + "H");
 			
 		},
 		getPixel: (x, y) => {
@@ -500,7 +490,6 @@
 			if (mode == "position") {
 				let x = evaluator.expr(args[2]);
 				let y = evaluator.expr(args[3]);
-				console.log(x, y)
 				term.write("\033[" + x + ";" + y + "H");
 			} else {
 				let arrowMap = {"up": "A", "down": "B", "right": "C", "left": "D"};
@@ -511,10 +500,16 @@
 			if (mode === "line") {
 				term.write("\033[2K");
 			} else if (mode === "screen") {
-				//term.write("\033[2H");
-				//term.write('\x1b[A\033[2K')
-				term.write("\033[" + TERM_ROWS + ";" + TERM_COLS + "H");
-				term.write('\033[1J\033[H')
+				let type = evaluator.expr(args[2]);
+				if (type === "all") {
+					term.clear();
+					term.write("\x1b[A");  // prev line
+					term.write("\033[2K");  // clear line
+				} else {
+					// clear current screen
+					term.write("\033[" + TERM_ROWS + ";" + TERM_COLS + "H");
+					term.write('\033[1J\033[H');
+				}
 			}
 		}
 	});

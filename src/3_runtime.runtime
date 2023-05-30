@@ -791,7 +791,14 @@ def runtime
    cal lib_screen_clear_line
   fin
   ife $_lib_name 'term.clear_screen'
-   cal lib_screen_clear_screen
+   get $_line 2 _param
+   ife $_param $nil
+    let _type $nil
+   els
+    cal eval_param $_line 2
+    let _type $ret
+   fin
+   cal lib_screen_clear_screen $_type
   fin
   ife $_lib_name 'term.alternate_buffer'
    cal lib_screen_alternate_buffer

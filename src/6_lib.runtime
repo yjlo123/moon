@@ -135,7 +135,8 @@ def lib_screen_clear_line
 end
 
 def lib_screen_clear_screen
- con 'clear' 'screen'
+ let _mode $0
+ con 'clear' 'screen' $_mode
 end
 
 def lib_screen_color_print
