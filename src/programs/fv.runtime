@@ -6,15 +6,30 @@ sub hh $h 1
 
 let menu_width 15
 
+let cursor 1
+let win_top 0
+sub win_btm $h 2
+let cur_list []
+
+jeq $0 $nil use_current_path
+lib 'util.get_path_by_str' $0 path
+jeq $path $nil err_invalid_path
+jmp continue_with_path
+#use_current_path
+lib 'os.get_current_path' path
+#continue_with_path
+lib 'util.get_real_path' $path path
+jeq $path $nil err_invalid_path
+lib 'util.verify_path' $path 0 is_valid
+jeq $is_valid 0 err_invalid_path
+
+
 lib 'term.set_prt_delay' 0
 lib 'term.alternate_buffer'
 
-let cursor 1
-let cur_list []
-lib 'os.get_current_path' path
-
 
 def clear
+ lib 'term.set_cursor_position' $h 0
  let i 0
  #clear_loop
  jeq $i $hh clear_done
@@ -77,7 +92,7 @@ def show_preview_content
   ifg $_line_count $_fl
    let _line_count $_fl
   fin
-  let _i 0
+  let _i 1
   let _ln 2
   #content_loop
   jeq $_i $_line_count content_done
@@ -88,9 +103,9 @@ def show_preview_content
    pop $_line _
    jmp trim_loop
   fin
-  prt $_line ''
   add _preview_left $menu_width 1
   lib 'term.set_cursor_position' $_ln $_preview_left
+  prt $_line ''
   add _ln $_ln 1
   add _i $_i 1
   jmp content_loop
@@ -122,17 +137,28 @@ def refresh
   / set cursor to 0 when dir is empty
   let cursor 0
  fin
- cal pad_text '../' $menu_width
- let go_up_text $ret
- ife $cursor 0
-  lib 'term.color_print' $go_up_text 0 255
+ / go to parent dir
+ ife $win_top 0
+  cal pad_text '../' $menu_width
+  let go_up_text $ret
+  ife $cursor 0
+   lib 'term.color_print' $go_up_text 235 255
+  els
+   lib 'term.color_print' $go_up_text 255 235
+  fin
   prt ''
- els
-  prt $go_up_text
  fin
+ / dir list
  len $cur_list _l
- let _i 0
+ ifg $win_top 1
+  sub _i $win_top 1  / file index
+ els
+  / _i is 0 (first item shown) when top is 0 or 1
+  let _i 0
+ fin
+ add _j $_i 1  / cur line number
  #file_list_loop
+ jeq $_j $win_btm file_list_done
  jeq $_i $_l file_list_done
  jgt $_i $_l file_list_done
  get $cur_list $_i _fn
@@ -144,14 +170,35 @@ def refresh
  let _fn $ret
  add _j $_i 1
  ife $_j $cursor
-  lib 'term.color_print' $_fn 0 255
-  prt ''
+  lib 'term.color_print' $_fn 235 255
  els
-  prt $_fn
+  lib 'term.color_print' $_fn 255 235
+ fin
+ sub _k $win_btm 1
+ ife $_i $_k
+  / no new line after the last shown item
+ els
+  prt ''
  fin
  add _i $_i 1
  jmp file_list_loop
  #file_list_done
+
+ sub _h $h 2
+ jgt $_l $_h empty_item_rows_donw
+ #empty_item_row_loop
+ sub _btm $h 2
+ jeq $_j $_btm empty_item_rows_donw
+ cal pad_text '' $menu_width
+ lib 'term.color_print' $ret 255 235
+ sub _btm $_btm 1
+ ife $_j $_btm
+ els
+  prt ''
+ fin
+ add _j $_j 1
+ jmp empty_item_row_loop
+ #empty_item_rows_donw
 
  / == show preview
  add _preview_left $menu_width 1
@@ -176,7 +223,10 @@ def refresh
    prt $_ft '>'
   #preview_done
  fin
- lib 'term.set_cursor_position' $h 0
+ / == hide cursor on the selected item
+ sub _l $cursor $win_top
+ add _l $_l 2
+ lib 'term.set_cursor_position' $_l $menu_width
 end
 
 / === MAIN LOOP ===
@@ -190,12 +240,22 @@ ife $key 40
  len $cur_list lst_len
  jeq $cursor $lst_len skip_arrow_down
  add cursor $cursor 1
+ ifg $cursor $win_btm
+  add win_btm $win_btm 1
+  add win_top $win_top 1
+ fin
  #skip_arrow_down
 fin
 ife $key 38
  / arrow up
  ifg $cursor 0
   sub cursor $cursor 1
+  jlt $cursor $win_top scroll_up
+  jmp scroll_up_done
+  #scroll_up
+   sub win_btm $win_btm 1
+   sub win_top $win_top 1
+  #scroll_up_done
  fin
 fin
 ife $key 13
@@ -210,20 +270,28 @@ ife $key 13
   ife $ft 'dir'
    psh $path $fn
    let cursor 1
+   let win_top 0
+   sub win_btm $h 2
   els
    / not a dir
   fin
  fin
 fin
 
-slp 100
+slp 80
 jmp loop
 
 
 #err_term_not_supported
 prt 'ERR Your current terminal is not supported'
-jmp exit
+jmp end
+
+#err_invalid_path
+prt 'ERR Invalid path'
+jmp end
 
 #exit
 lib 'term.primary_buffer'
 lib 'term.set_prt_delay' 1
+
+#end
