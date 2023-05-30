@@ -154,8 +154,7 @@ lib 'term.color_print' $bar_space 0 255
 lib 'term.color_print' $bar_right 0 255
 
 #key_listener
-let key_pressed 0
-lib 'term.read_key' key
+lib 'term.get_key_pressed' key
 jne $key 81 not_q
 / QUIT: q
 cal clear
@@ -166,7 +165,6 @@ jne $key 40 not_down
 / DOWN
 jeq $reached_end 1 not_down
 add top_ln $top_ln 1
-let key_pressed 1
 jmp continue
 #not_down
 
@@ -175,7 +173,6 @@ jne $key 38 not_up
 jeq $top_ln 1 not_up
 let reached_end 0
 sub top_ln $top_ln 1
-let key_pressed 1
 jmp continue
 #not_up
 
@@ -184,7 +181,6 @@ jne $key 70 not_forward
 jeq $reached_end 1 not_forward
 add top_ln $top_ln $h
 sub top_ln $top_ln $wrap_ln
-let key_pressed 1
 jmp continue
 #not_forward
 
@@ -195,15 +191,10 @@ jgt $top_ln 0 valid_backward
 let top_ln 1
 #valid_backward
 let reached_end 0
-let key_pressed 1
 jmp continue
 #not_backward
 
 #continue
-
-slp 50
-
-jeq $key_pressed 0 key_listener
 cal clear
 jmp loop
 

@@ -1,0 +1,4 @@
+/test key press
+prt 'press any key to continue...'
+lib 'term.get_key_pressed' keycode
+prt $keycode

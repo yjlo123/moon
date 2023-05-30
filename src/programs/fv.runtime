@@ -233,8 +233,8 @@ end
 #loop
 cal refresh
 
-lib 'term.read_key' key
-jeq $key 81 exit
+lib 'term.get_key_pressed' key
+jeq $key 81 exit  / q
 ife $key 40
  / arrow down
  len $cur_list lst_len
@@ -278,7 +278,6 @@ ife $key 13
  fin
 fin
 
-slp 80
 jmp loop
 
 

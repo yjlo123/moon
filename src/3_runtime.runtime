@@ -12,6 +12,7 @@ let sig_interrupt 0
 
 let runtime_running 0
 let key_press []
+let key_pressed -1
 
 / ====== evaluating ======
 def expr
@@ -856,6 +857,12 @@ def runtime
    get $_line 2 _name
    pol $key_press _key
    cal add_var_to_env $_name $_key
+  fin
+  ife $_lib_name 'term.get_key_pressed'
+   get $_line 2 _name
+   / block and wait for key
+   blk 'key_press'
+   cal add_var_to_env $_name $key_pressed
   fin
   ife $_lib_name 'net.http'
    cal eval_param $_line 2

@@ -45,6 +45,7 @@
 	let promptCallback = null;
 	let promptOn = false;
 	let inputMask = null;
+	let waitForKeyPress = 0; // 0:not_waiting  1:waiting  2:to_be_processed
 
 	let con = {
 		Write: (text, style) => {
@@ -292,14 +293,32 @@
 	term.open(document.getElementById('terminal'));
 
 	term.onKey(function (ev) {
-		sendKeyEventToEnv(ev.domEvent.keyCode);
+		/* The event value contains the string that will be sent in the data event
+         * as well as the DOM event that triggered it
+	     */
+		if (waitForKeyPress === 1) {
+			waitForKeyPress = 2;
+			let env = runtime.getEnv(false);
+			env.global.key_pressed = ev.domEvent.keyCode;
+			runtime.resume();
+		} else {
+			sendKeyEventToEnv(ev.domEvent.keyCode);
+		}
 	});
 
 	term.onData(e => {
+		/* This happens for example when the user types
+		 * or pastes into the terminal.
+		 */
 		if (!promptOn && e !== '\u0003') {
 			// unless Ctrl+c
 			return;
 		}
+		if (waitForKeyPress === 2) {
+			waitForKeyPress = 0;
+			return;
+		}
+
 		switch (e) {
 		case '\u0003': // Ctrl+C
 			onCtrlC();
@@ -432,6 +451,15 @@
 
 	evaluator.extend("log", (env, args) => {
 		console.log(args.map((a)=> {evaluator.expr(a)}));
+	});
+
+	evaluator.extend("blk", (env, args) => {
+		// Block and Wait for Key
+		runtime.pause();
+		let name = evaluator.expr(args[0]);
+		if (name === "key_press") {
+			waitForKeyPress = 1;
+		}
 	});
 	
 	evaluator.extend("con", (env, args) => {
