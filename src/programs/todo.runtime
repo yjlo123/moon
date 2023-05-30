@@ -9,24 +9,10 @@ lib 'term.set_prt_delay' 0
 lib 'term.alternate_buffer'
 
 def print_header
- cal clear
+ lib 'term.clear_screen'
  prt '┌────────── TODO v1.0 ───────────┐'
  prt '│Usage: add <t> / done <i> / exit│'
  prt '└────────────────────────────────┘'
-end
-
-def clear
- let i 0
- #clear_loop
- jeq $i $h clear_done
- lib 'term.clear_line'
- lib 'term.prev_line'
- add i $i 1
- jmp clear_loop
- #clear_done
- lib 'term.clear_line'
- / * BUG: calling lib will clear the primary buffer
- /lib 'term.clear_screen'
 end
 
 cal print_header
@@ -92,7 +78,6 @@ let todo $new_todo
 #not_done
 
 / clear screen
-lib 'term.clear_screen'
 cal print_header
 
 len $todo size

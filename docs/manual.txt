@@ -10,11 +10,17 @@ def, end, ret, cal
 ife, ifg, els, fin
 for, nxt
 
-~ not supported:
-lod, sav
 
 ~ only in Moon OS:
 lib <API> [$V*] [N?]
+
+
+~ extensions needed in host
+blk: pause VM, e.g. waiting for a key press
+con: term sequence, e.g. text colors, moving cursors
+led: set status of LEDs
+log: output debugging information
+net: send HTTP requests
 
 
 ## Moon OS lib APIs
@@ -51,7 +57,8 @@ term.get_width (width)
 term.get_height (height)
 term.move_cursor ($dx, $dy)
 term.set_cursor_position ($line, $column)
-
+term.read_key (keycode)
+term.get_key_pressed (keycode)
 
 ## Runtime Script resources
 Tutorial: https://siwei.dev/doc/runtime/

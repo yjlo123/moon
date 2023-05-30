@@ -28,21 +28,6 @@ lib 'term.set_prt_delay' 0
 lib 'term.alternate_buffer'
 
 
-def clear
- lib 'term.set_cursor_position' $h 0
- let i 0
- #clear_loop
- jeq $i $hh clear_done
- lib 'term.clear_line'
- lib 'term.prev_line'
- add i $i 1
- jmp clear_loop
- #clear_done
- lib 'term.clear_line'
- / * BUG: calling lib will clear the primary buffer
- / lib 'term.clear_screen'
-end
-
 def pad_text
  let _text $0
  let _width $1
@@ -114,7 +99,7 @@ def show_preview_content
 end
 
 def refresh
- cal clear
+ lib 'term.clear_screen'
  lib 'os.get_file_list' $path cur_list
 
  / == show top bar

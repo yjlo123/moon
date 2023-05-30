@@ -513,8 +513,8 @@
 			} else if (mode === "screen") {
 				//term.write("\033[2H");
 				//term.write('\x1b[A\033[2K')
+				term.write("\033[" + TERM_ROWS + ";" + TERM_COLS + "H");
 				term.write('\033[1J\033[H')
-				term.clear();
 			}
 		}
 	});
