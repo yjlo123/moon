@@ -70,6 +70,7 @@ def show_preview_content
  jeq $_type 'txt' preview_list_type
  jeq $_type 'exe' preview_list_type
  jeq $_type 'bat' preview_list_type
+ jeq $_type 'bok' preview_book
  jmp preview_done
  #preview_list_type
   let _line_count $h
@@ -95,6 +96,27 @@ def show_preview_content
   add _i $_i 1
   jmp content_loop
   #content_done
+  jmp preview_done
+
+ #preview_book
+  get $_content 0 _meta
+  get $_meta 1 _book_intro
+  let _i 0
+  let _ln 2
+  lib 'util.wrap_words' $_book_intro $_width _lines
+  len $_lines _line_count
+  #line_loop
+  jeq $_i $_line_count preview_done
+  add _preview_left $menu_width 1
+  lib 'term.set_cursor_position' $_ln $_preview_left
+  get $_lines $_i _line
+  prt $_line ''
+  add _i $_i 1
+  add _ln $_ln 1
+  jmp line_loop
+  prt $_book_intro
+  jmp preview_done
+
  #preview_done
 end
 
@@ -198,6 +220,7 @@ def refresh
   jeq $_ft 'raw' preview_content
   jeq $_ft 'exe' preview_content
   jeq $_ft 'bat' preview_content
+  jeq $_ft 'bok' preview_content
   jmp file_type_cannot_preview
   #preview_content
    lib 'os.read_file' $path $_file _fc

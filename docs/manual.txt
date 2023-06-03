@@ -41,6 +41,7 @@ os.set_env_var ($var_name, $var_val)
 util.get_path_by_str ($path_str, $is_file, $skip_verify, path)
 util.get_real_path ($path, path)
 util.verify_path ($path, $is_file, is_valid)
+util.wrap_words ($text, $width, lines)
 
 dev.set_led ($idx, $val)
 

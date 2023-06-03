@@ -394,3 +394,49 @@ def filter_list_by_startwith
  nxt
  ret $_res
 end
+
+def wrap_words
+ let _text $0
+ let _width $1
+ let _res []
+ let _line ''
+ let _word ''
+ let _idx 0
+ len $_text _len
+ #loop
+ jgt $_idx $_len loop_done
+ ife $_idx $_len
+  / last_word
+  jmp word_done
+ fin
+ get $_text $_idx _c
+ jeq $_c ' ' word_done
+ add _word $_word $_c
+ jmp next_char
+ #word_done
+ ife $_line ''
+  add _line $_line $_word
+ els
+  len $_line _cur_line_len
+  len $_word _cur_word_len
+  add _line_len $_cur_line_len 1
+  add _line_len $_line_len $_cur_word_len
+  ifg $_line_len $_width
+   psh $_res $_line
+   let _line $_word
+  els
+   add _line $_line ' '
+   add _line $_line $_word
+  fin
+ fin
+ let _word ''
+ 
+ #next_char
+ add _idx $_idx 1
+ jmp loop
+ #loop_done
+ jeq $_line '' finished
+ psh $_res $_line
+ #finished
+ ret $_res
+end

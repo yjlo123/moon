@@ -777,6 +777,15 @@ def runtime
    get $_line 3 _name
    cal add_var_to_env $_name $ret
   fin
+  ife $_lib_name 'util.wrap_words'
+   cal eval_param $_line 2
+   let _text $ret
+   cal eval_param $_line 3
+   let _width $ret
+   get $_line 4 _name
+   cal wrap_words $_text $_width
+   cal add_var_to_env $_name $ret
+  fin
   ife $_lib_name 'dev.set_led'
    cal eval_param $_line 2
    let _idx $ret

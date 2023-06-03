@@ -1,11 +1,21 @@
 /get a random quote
+lib 'term.get_width' w
+
 let req {}
 put $req 'method' 'GET'
 put $req 'url' 'https://api.quotable.io/quotes/random'
 lib 'net.http' $req res
 get $res 0 first
 get $first 'content' quote
-prt $quote
+ife $w $nil
+ / cannot get terminal width
+ prt $quote
+els
+ lib 'util.wrap_words' $quote $w lines
+ for line $lines
+  prt $line
+ nxt
+fin
 prt ' - ' ''
 get $first 'author' author
 prt $author
