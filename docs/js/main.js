@@ -262,32 +262,48 @@
 	});
 	$('#key-up').click(()=>{
 		if (inputMask) { return; }
-		if (!sendKeyEventToEnv(38)) {
+		if (!onKeyCode(38)) {
 			onArrowUp();
 		}
 		term.focus();
 	});
 	$('#key-down').click(()=>{
 		if (inputMask) { return; }
-		if (!sendKeyEventToEnv(40)) {
+		if (!onKeyCode(40)) {
 			onArrowDown();
 		}
 		term.focus();
 	});
 	$('#key-left').click(()=>{
 		if (inputMask) { return; }
-		if (!sendKeyEventToEnv(37)) {
+		if (!onKeyCode(37)) {
 			onArrowLeft();
 		}
 		term.focus();
 	});
 	$('#key-right').click(()=>{
 		if (inputMask) { return; }
-		if (!sendKeyEventToEnv(39)) {
+		if (!onKeyCode(39)) {
 			onArrowRight();
 		}
 		term.focus();
 	});
+
+	function onKeyCode(keycode) {
+		/*
+			return true if key sent to env
+			or false if key not required by env
+		*/
+		if (waitForKeyPress === 1) {
+			waitForKeyPress = 2;
+			let env = runtime.getEnv(false);
+			env.global.key_pressed = keycode;
+			runtime.resume();
+			return true;
+		} else {
+			return sendKeyEventToEnv(keycode);
+		}
+	}
 
 
 	term.open(document.getElementById('terminal'));
@@ -296,14 +312,7 @@
 		/* The event value contains the string that will be sent in the data event
          * as well as the DOM event that triggered it
 	     */
-		if (waitForKeyPress === 1) {
-			waitForKeyPress = 2;
-			let env = runtime.getEnv(false);
-			env.global.key_pressed = ev.domEvent.keyCode;
-			runtime.resume();
-		} else {
-			sendKeyEventToEnv(ev.domEvent.keyCode);
-		}
+		onKeyCode(ev.domEvent.keyCode);
 	});
 
 	term.onData(e => {
