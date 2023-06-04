@@ -33,11 +33,11 @@ body {
     border: 0 solid #444;
     overflow: hidden;
 }
-
+/*
 #terminal {
     overflow: hidden;
 }
-
+*/
 .monitor-shell {
     position: relative;
     margin: auto;

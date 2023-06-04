@@ -64,7 +64,7 @@ def show_top_bar
  let _bar_left $0
  add _bar_left $_bar_left '  '
  lib 'term.color_print' $_bar_left 0 250
- let _bar_right 'q:quit  h:help  '
+ let _bar_right 'q:quit  f/b:page  '
  ife $mode 1
   / book progress
   add _chapter_n $cursor 1
