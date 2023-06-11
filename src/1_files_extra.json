@@ -82,8 +82,13 @@
                 "echo 'Current date:'",
                 "date"
             ],
+            "little_prince": [
+                ["bok", "The Little Prince, by Antoine de Saint-Exupéry. The Little Prince appears to be a simple children's tale, some would say that it is actually a profound and deeply moving tale, written in riddles and laced with philosophy and poetic metaphor.",
+                "https://siwei.dev/app/moon/book/little-prince.json"],
+                null
+            ],
             "mark_twain": [
-                ["bok", "Two short stories by Mark Twain (1835-1910). \"A Burlesque Biography.\" and \"Luck\""],
+                ["bok", "Two short stories by Mark Twain (1835-1910). \"A Burlesque Biography.\" and \"Luck\"."],
                 {
                     "A Burlesque Biography":
                     [

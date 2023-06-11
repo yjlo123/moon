@@ -16,6 +16,7 @@ jeq $file_type 'txt' txt_file
 jeq $file_type 'exe' exe_file
 jeq $file_type 'bat' exe_file
 jeq $file_type 'dir' print_error_directory
+jeq $file_type 'bok' unsupported_file_type
 typ data_type $file_content
 jeq $data_type 'list' list_file
 jmp unsupported_file_type

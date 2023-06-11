@@ -203,7 +203,12 @@ def show_preview_content
   #book_intro_loop_done
   add _ln $_ln 1
   lib 'term.set_cursor_position' $_ln $_preview_left
-  let _inst 'Press <Enter> to read'
+  get $_content 1 _book_data
+  ife $_book_data $nil
+   let _inst 'Press <Enter> to download'
+  els
+   let _inst 'Press <Enter> to read'
+  fin
   len $_inst _inst_len
   sub _space_len $_width $_inst_len
   div _space_len $_space_len 2
@@ -443,13 +448,27 @@ ife $key 13
     sub win_btm $h 2
    fin
    ife $ft 'bok'
-    / read book
+    / load book
     lib 'os.read_file' $path $fn fc
-    get $fc 1 fc
-    let cur_book $fc
+    get $fc 1 book_data
+    ife $book_data $nil
+     / download book
+     get $fc 0 book_meta
+     get $book_meta 2 book_url
+     let req {}
+     put $req 'method' 'GET'
+     put $req 'url' $book_url
+     lib 'net.http' $req book_data
+     put $fc 1 $book_data
+     lib 'os.write_file' $path $fn $fc
+     jmp book_downloaded
+    fin
+    / read book
+    let cur_book $book_data
     let mode 1
     let cursor 0
    fin
+   #book_downloaded
   fin
  fin
 fin
